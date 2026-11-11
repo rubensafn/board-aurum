@@ -1,23 +1,14 @@
 # AURUM · Fila de Posts
 
-App de controle de postagem do AURUM Cinema. Cada post do lote vira um card com prévia, legenda (versão celular e versão PC) com botão de copiar, botão de baixar o arquivo, campo de dia e "marcar como postado". Funciona no celular e no PC e sincroniza entre os dois.
+Board de controle de postagem do AURUM Cinema (board.aurumcinema.com.br). Cada post do lote vira um card com prévia, legenda (CELULAR / PC) com botão de copiar, botão de baixar, dia e "marcar como postado". Filtro por dia no topo. Funciona no celular e no PC.
 
-- **App publicado:** https://claude.ai/artifact/KeQcj2ohn58kJ1egU1uhJq
-- **Código:** `index.html` (página única, sem build).
-- **Dados:** banco do próprio artifact (coleção `posts`) + arquivos como assets do artifact.
+- **Front:** `index.html` (página única, sem build), publicada pela Vercel a partir deste repo.
+- **Dados:** Supabase, projeto `aurum_db_dev` — tabela `fila_posts` (fechada: só funções RPC com a senha da fila), bucket público `fila-posts` (caminhos aleatórios), Edge Function `fila-admin` (upload assinado, gravação de posts e limpeza).
+- **Limpeza:** 3 dias depois de marcado como postado, o vídeo sai do Supabase (o card e a legenda continuam). Limite do plano grátis: 50 MB por arquivo, 1 GB no total.
+- Não mexe em nada do sistema de cortesias, que usa o mesmo projeto.
 
-## Como um lote entra na fila
-Feito pelo Claude depois de entregar o lote com o selo AU (ver `claude/FILA-DE-POSTS-APP.md` no projeto AURUM EDITS):
-
-1. Sobe cada arquivo final como asset do artifact.
-2. Grava um documento por peça em `posts/<DD-MM>_<NN>`:
-
-```json
-{"num": 4, "nome": "04_EBENEZER_TRAILER_1080X1920", "filme": "Ebenezer e os Fantasmas do Natal",
- "tipo": "VIDEO", "lote": "11.11",
- "legenda_celular": "...", "legenda_pc": "...",
- "arquivos": [{"id": "<asset>", "url": "/_blob/<asset>", "nome": "04_EBENEZER_TRAILER_1080X1920.mp4", "kind": "video"}],
- "dia": "", "postado": false, "postadoEm": null}
+## Subir um lote
 ```
-
-O dia fica em branco: quem define e marca como postado é o Rubão, direto no app.
+FILA_TOKEN=<token> python3 tools/fila_push.py lote.json
+```
+Formato do `lote.json` no topo de `tools/fila_push.py`. O dia e o "postado" ficam com o Rubão, direto no board.

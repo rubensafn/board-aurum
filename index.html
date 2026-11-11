@@ -169,18 +169,37 @@ header.top{position:sticky;top:10px;z-index:5;max-width:1288px;margin:10px auto 
 
 .compb{top:10px;left:10px;padding:5px 10px;font-size:10px;letter-spacing:.1em;font-weight:700;color:#ffd75e;border-color:rgba(255,194,0,.6)}
 .compn{font-size:11.5px;line-height:1.4;color:#ffd75e;background:rgba(255,194,0,.08);border:1px solid rgba(255,194,0,.28);border-radius:var(--r-in);padding:9px 12px}
+
+/* filtros de dia + login */
+.filt{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex-basis:100%;padding:2px 0}
+.filt::-webkit-scrollbar{display:none}
+.fc{flex:none;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.28);border-radius:11px;padding:7px 12px;font-size:11.5px;letter-spacing:.08em;font-weight:700;color:var(--mute);display:flex;gap:6px;align-items:center;min-height:36px}
+.fc b{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink);opacity:.7}
+.fc.on{background:rgba(255,194,0,.14);border-color:rgba(255,194,0,.8);box-shadow:0 0 12px rgba(255,194,0,.2);color:#fff7df}
+.fc.on b{color:var(--gold);opacity:1}
+.fc.late{color:#ff8a82}
+.daytag{font-size:10.5px;letter-spacing:.1em;font-weight:700;padding:5px 8px;border-radius:7px;background:rgba(255,194,0,.14);color:var(--gold);white-space:nowrap}
+.daytag.late{background:rgba(255,69,58,.16);color:#ff8a82}
+.gone{padding:28px 16px;text-align:center;color:var(--mute);font-size:12.5px;line-height:1.5;border-radius:var(--r-in);background:rgba(0,0,0,.3)}
+.login{max-width:380px;margin:12vh auto 0;padding:28px 22px;text-align:center;border-radius:var(--r-card);background:rgba(26,22,18,.38);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);border:1px solid var(--neon);box-shadow:var(--neon-glow)}
+.login .au{margin:0 auto 16px;width:56px;height:56px;border-radius:14px}
+.login .au svg{width:32px;height:24.8px}
+.login strong{display:block;font-family:var(--display);letter-spacing:.16em;font-size:15px;margin-bottom:16px}
+.login input{width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:13px 14px;font-size:16px;text-align:center;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.login .btn{width:100%}
+.login .err{color:#ff8a82;font-size:12.5px;min-height:18px;margin-top:8px}
 </style>
 </head>
 <body>
 <div class="amb" aria-hidden="true"><i></i><i></i><i></i></div>
-<header class="top">
+<header class="top" id="top" hidden>
   <div class="hin">
-    <div class="brand"><div class="au"><svg viewBox="56.18 55.44 252.95 195.8" overflow="visible" aria-hidden="true"><path fill="#fff" d="M187.42,205.8c5.1,11.57,9.72,19.4,13.83,23.5,4.11,4.1,7.91,6.15,11.36,6.15v2.41h-71.14v-2.41c1.48,0,3.05-.24,4.69-.72,1.64-.48,3.17-1.28,4.57-2.410,1.4-1.12,2.55-2.61,3.46-4.46.9-1.85,1.36-4.14,1.36-6.87,0-4.01-1.32-9.16-3.95-15.43l-6.18-13.26c-2.96,7.23-6.51,13.86-10.62,19.89-4.12,6.03-8.52,11.17-13.22,15.43-4.69,4.26-9.47,7.59-14.33,10-4.86,2.41-9.6,3.62-14.2,3.62-8.89,0-15.48-2.05-19.76-6.15-4.28-4.1-6.63-10-7.04-17.72-.41-7.71.99-17.11,4.2-28.2,3.21-11.09,7.86-23.62,13.96-37.6l38.29-86.05h2.47l62.25,140.29ZM82.19,185.79c0,8.84,2.47,15.55,7.41,20.13,4.94,4.58,10.78,6.87,17.54,6.87s13.17-2.33,19.76-6.99c6.58-4.66,11.61-11.81,15.07-21.45l-32.11-71.83-18.03,39.05c-3.3,7.55-5.72,14.1-7.29,19.64-1.57,5.54-2.35,10.41-2.35,14.58Z"/><path fill="#fff" d="M299.07,163.84v-83.68c0-16.64-14.91-14.65-14.91-14.65h-16.57v2.4c8.22,1.12,14.26,6.52,18.13,16.2,3.86,9.68,5.79,22.12,5.79,37.33v55.93c0,7.36-1.18,13.88-3.53,19.56-2.35,5.68-5.41,10.36-9.19,14.04-3.78,3.68-8.1,6.48-12.97,8.4-4.87,1.92-9.82,2.88-14.85,2.88-1.38,0-2.76-.08-4.14-.22-3.81-.39-7.59-1.31-11.35-2.78-5.12-2-9.65-5-13.6-9-3.95-4-7.14-9-9.57-15-2.44-6-3.65-13-3.65-21v-86.17c0-6.24.75-10.76,2.27-13.56,1.51-2.8,3.69-5,6.55-6.6v-2.4h-51.61v2.4c3.02,1.6,5.290,3.8,6.8,6.6,1.51,2.8,2.27,7.32,2.27,13.56v67.41l20.7,46.66s0,.01,0,.02c5.76,13.06,9.68,18.49,11.95,20.75,3.37,3.36,5.01,3.53,5.02,3.53,4.97,0,8.99,4.03,8.99,9v.47c5.38,1.28,10.8,1.94,16.27,1.94,3.02,0,6-.2,8.95-.59,4.6-.61,9.13-1.69,13.58-3.25,7.3-2.56,13.8-6.36,19.51-11.4,5.59-4.94,10.13-11.12,13.63-18.52h0c.07-.15.16-.29.22-.44,1.26-3.44,2.62-6.86,3.59-10.4,1.04-3.79,1.44-7.68,1.63-11.59.28-5.92.07-11.9.07-17.83Z"/></svg></div><div class="brand-t"><h1>FILA DE POSTS</h1><span>AURUM CINEMA</span></div></div>
+    <div class="brand"><div class="au"><svg viewBox="56.18 55.44 252.95 195.8" overflow="visible" aria-hidden="true"><path fill="#fff" d="M187.42,205.8c5.1,11.57,9.72,19.4,13.83,23.5,4.11,4.1,7.91,6.15,11.36,6.15v2.41h-71.14v-2.41c1.48,0,3.05-.24,4.69-.72,1.64-.48,3.17-1.28,4.57-2.410,1.4-1.12,2.55-2.61,3.46-4.46.9-1.85,1.36-4.14,1.36-6.87,0-4.01-1.32-9.16-3.95-15.43l-6.18-13.26c-2.96,7.23-6.51,13.86-10.62,19.89-4.12,6.03-8.52,11.17-13.22,15.43-4.69,4.26-9.47,7.59-14.33,10-4.86,2.41-9.6,3.62-14.2,3.62-8.89,0-15.48-2.05-19.76-6.15-4.28-4.1-6.63-10-7.04-17.72-.41-7.71.99-17.11,4.2-28.2,3.21-11.09,7.86-23.62,13.96-37.6l38.29-86.05h2.47l62.25,140.29ZM82.19,185.79c0,8.84,2.47,15.55,7.41,20.13,4.94,4.58,10.78,6.87,17.54,6.87s13.17-2.33,19.76-6.99c6.58-4.66,11.61-11.81,15.07-21.45l-32.11-71.83-18.03,39.05c-3.3,7.55-5.72,14.1-7.29,19.64-1.57,5.54-2.35,10.41-2.35,14.58Z"/><path fill="#fff" d="M299.07,163.84v-83.68c0-16.64-14.91-14.65-14.91-14.65h-16.57v2.4c8.22,1.12,14.26,6.52,18.13,16.2,3.86,9.68,5.79,22.12,5.79,37.33v55.93c0,7.36-1.18,13.88-3.53,19.56-2.35,5.68-5.41,10.36-9.19,14.04-3.78,3.68-8.1,6.48-12.97,8.4-4.87,1.92-9.82,2.88-14.85,2.88-1.38,0-2.76-.08-4.14-.22-3.81-.39-7.59-1.31-11.35-2.78-5.12-2-9.65-5-13.6-9-3.95-4-7.14-9-9.57-15-2.44-6-3.65-13-3.65-21v-86.17c0-6.24.75-10.76,2.27-13.56,1.51-2.8,3.69-5,6.55-6.6v-2.4h-51.61v2.4c3.02,1.6,5.290,3.8,6.8,6.6,1.51,2.8,2.27,7.32,2.27,13.56v67.41l20.7,46.66s0,.01,0,.02c5.76,13.06,9.68,18.49,11.95,20.75,3.37,3.36,5.01,3.53,5.02,3.53,4.97,0,8.99,4.03,8.99,9v.47c5.38,1.28,10.8,1.94,16.27,1.94,3.02,0,6-.2,8.95-.59,4.6-.61,9.13-1.69,13.58-3.25,7.3-2.56,13.8-6.36,19.51-11.4,5.59-4.94,10.13-11.12,13.63-18.52h0c.07-.15.16-.29.22-.44,1.26-3.44,2.62-6.86,3.59-10.4,1.04-3.79,1.44-7.68,1.63-11.59.28-5.92.07-11.9.07-17.83Z"/></svg></div><div class="brand-t"><h1>FILA DE POSTS</h1></div></div>
     <div class="seg" id="seg"><span class="thumb"></span>
       <button class="tab" id="tab-pend" aria-pressed="true">PENDENTES <b id="c-pend">0</b></button>
       <button class="tab" id="tab-done" aria-pressed="false">POSTADOS <b id="c-done">0</b></button>
     </div>
-    <div class="note" id="note">Carregando a fila…</div>
+    <div class="filt" id="filt" role="group" aria-label="Filtrar por dia"></div>
   </div>
 </header>
 <div class="wrap">
@@ -189,20 +208,28 @@ header.top{position:sticky;top:10px;z-index:5;max-width:1288px;margin:10px auto 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
+const SB_URL = 'https://gdtfwmqbvsqtxtccrydv.supabase.co';
+const SB_KEY = 'sb_publishable_siBXDugL8v3hXhCEfZHW9g_WBln-WFt';
 const AU_SVG = '<svg viewBox="56.18 55.44 252.95 195.8" overflow="visible" aria-hidden="true"><path fill="#fff" d="M187.42,205.8c5.1,11.57,9.72,19.4,13.83,23.5,4.11,4.1,7.91,6.15,11.36,6.15v2.41h-71.14v-2.41c1.48,0,3.05-.24,4.69-.72,1.64-.48,3.17-1.28,4.57-2.410,1.4-1.12,2.55-2.61,3.46-4.46.9-1.85,1.36-4.14,1.36-6.87,0-4.01-1.32-9.16-3.95-15.43l-6.18-13.26c-2.96,7.23-6.51,13.86-10.62,19.89-4.12,6.03-8.52,11.17-13.22,15.43-4.69,4.26-9.47,7.59-14.33,10-4.86,2.41-9.6,3.62-14.2,3.62-8.89,0-15.48-2.05-19.76-6.15-4.28-4.1-6.63-10-7.04-17.72-.41-7.71.99-17.11,4.2-28.2,3.21-11.09,7.86-23.62,13.96-37.6l38.29-86.05h2.47l62.25,140.29ZM82.19,185.79c0,8.84,2.47,15.55,7.41,20.13,4.94,4.58,10.78,6.87,17.54,6.87s13.17-2.33,19.76-6.99c6.58-4.66,11.61-11.81,15.07-21.45l-32.11-71.83-18.03,39.05c-3.3,7.55-5.72,14.1-7.29,19.64-1.57,5.54-2.35,10.41-2.35,14.58Z"/><path fill="#fff" d="M299.07,163.84v-83.68c0-16.64-14.91-14.65-14.91-14.65h-16.57v2.4c8.22,1.12,14.26,6.52,18.13,16.2,3.86,9.68,5.79,22.12,5.79,37.33v55.93c0,7.36-1.18,13.88-3.53,19.56-2.35,5.68-5.41,10.36-9.19,14.04-3.78,3.68-8.1,6.48-12.97,8.4-4.87,1.92-9.82,2.88-14.85,2.88-1.38,0-2.76-.08-4.14-.22-3.81-.39-7.59-1.31-11.35-2.78-5.12-2-9.65-5-13.6-9-3.95-4-7.14-9-9.57-15-2.44-6-3.65-13-3.65-21v-86.17c0-6.24.75-10.76,2.27-13.56,1.51-2.8,3.69-5,6.55-6.6v-2.4h-51.61v2.4c3.02,1.6,5.290,3.8,6.8,6.6,1.51,2.8,2.27,7.32,2.27,13.56v67.41l20.7,46.66s0,.01,0,.02c5.76,13.06,9.68,18.49,11.95,20.75,3.37,3.36,5.01,3.53,5.02,3.53,4.97,0,8.99,4.03,8.99,9v.47c5.38,1.28,10.8,1.94,16.27,1.94,3.02,0,6-.2,8.95-.59,4.6-.61,9.13-1.69,13.58-3.25,7.3-2.56,13.8-6.36,19.51-11.4,5.59-4.94,10.13-11.12,13.63-18.52h0c.07-.15.16-.29.22-.44,1.26-3.44,2.62-6.86,3.59-10.4,1.04-3.79,1.44-7.68,1.63-11.59.28-5.92.07-11.9.07-17.83Z"/></svg>';
 const ICON = {
   copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
   dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>'
 };
-const state = { posts: [], view: 'pend', db: null, dl: null, busy: new Set(), capSel: {} };
+const store = { get(k){ try{return localStorage.getItem(k)}catch(_){return null} }, set(k,v){ try{ v==null?localStorage.removeItem(k):localStorage.setItem(k,v) }catch(_){} } };
+const state = { posts: [], view: 'pend', filtro: store.get('fila_filtro') || 'todos', pin: store.get('fila_pin') || '', busy: new Set(), capSel: {}, loaded: false };
 const capOf = p => ({cel: p.legenda_celular || p.legenda || '', pc: p.legenda_pc || ''});
 function capSel(p){ const c=capOf(p); if(!(c.cel&&c.pc)) return c.cel?'cel':'pc'; return state.capSel[p.id] || (window.innerWidth<760?'cel':'pc'); }
 const capText = p => capOf(p)[capSel(p)];
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800); }
+
+async function rpc(fn, body){
+  const r = await fetch(SB_URL+'/rest/v1/rpc/'+fn, {method:'POST', headers:{apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  if(!r.ok){ const e = await r.json().catch(()=>({})); const err = new Error(e.message||r.status); err.code = e.code; throw err; }
+  const txt = await r.text(); return txt ? JSON.parse(txt) : null;
+}
 
 function iso(d){ const z=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate()); }
 const today = () => iso(new Date());
@@ -220,33 +247,31 @@ function fmtPosted(isoStr){
   const d=new Date(isoStr); const z=n=>String(n).padStart(2,'0');
   return 'POSTADO '+z(d.getDate())+'.'+z(d.getMonth()+1)+' ÀS '+z(d.getHours())+':'+z(d.getMinutes());
 }
-const srcOf = f => f.url || ('/_blob/'+f.id);
-
-function kindLabel(p){
-  const n=(p.arquivos||[]).length;
-  if(p.tipo==='CARROSSEL') return 'CARROSSEL · '+n;
-  return p.tipo || (n>1?'CARROSSEL · '+n:'POST');
-}
+function kindLabel(p){ const n=(p.arquivos||[]).length; if(p.tipo==='CARROSSEL') return 'CARROSSEL · '+n; return p.tipo || (n>1?'CARROSSEL · '+n:'POST'); }
+const dayKey = p => !p.dia ? 'sem' : (p.dia < today() ? 'atrasados' : p.dia);
 
 function cardHTML(p){
-  const files=p.arquivos||[];
+  const files = p.arquivos_apagados ? [] : (p.arquivos||[]);
   const multi=files.length>1;
   const slides=files.map((f,i)=>{
     const media = f.kind==='video'
-      ? `<video src="${esc(srcOf(f))}" controls playsinline preload="metadata"></video>`
-      : `<img src="${esc(srcOf(f))}" alt="${esc(p.filme||'')} lâmina ${i+1}" loading="lazy">`;
+      ? `<video src="${esc(f.url)}" controls playsinline preload="metadata"></video>`
+      : `<img src="${esc(f.url)}" alt="${esc(p.filme||'')} lâmina ${i+1}" loading="lazy">`;
     const sdl = multi ? `<button class="pillg sdl" data-act="dl1" data-id="${esc(p.id)}" data-i="${i}" aria-label="Baixar lâmina ${i+1}">${ICON.dl} ${i+1}</button>` : '';
     return `<div class="slide">${media}${sdl}</div>`;
   }).join('');
-  const comp = p.comprimido || files.some(f=>f.comprimido);
-  const media = files.length ? `<div class="media"><div class="track" data-track="${esc(p.id)}">${slides}</div>${comp?`<span class="pillg compb" title="Arquivo mais leve por causa do limite de 20 MB do app. Pra máxima qualidade, poste o original do ZIP.">VERSÃO COMPRIMIDA</span>`:''}${multi?`<span class="pillg count" data-count="${esc(p.id)}">1/${files.length}</span>`:''}</div>${multi?`<div class="dots" data-dots="${esc(p.id)}">${files.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:''}` : '';
+  const comp = p.comprimido && files.length;
+  const media = p.arquivos_apagados
+    ? `<div class="gone">Arquivo apagado do app 3 dias depois de postado.<br>O original continua no ZIP do lote.</div>`
+    : files.length ? `<div class="media"><div class="track" data-track="${esc(p.id)}">${slides}</div>${comp?`<span class="pillg compb">VERSÃO COMPRIMIDA</span>`:''}${multi?`<span class="pillg count" data-count="${esc(p.id)}">1/${files.length}</span>`:''}</div>${multi?`<div class="dots" data-dots="${esc(p.id)}">${files.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:''}` : '';
   const dlLabel = multi ? `BAIXAR ${files.length} LÂMINAS` : (files[0]?.kind==='video'?'BAIXAR VÍDEO':'BAIXAR POST');
   const busy = state.busy.has(p.id);
   const t=today(), tm=tomorrow();
+  const tag = (!p.postado && p.dia) ? `<span class="daytag${p.dia<t?' late':''}">${esc(dayLabel(p.dia))}</span>` : `<span class="kind">${esc(kindLabel(p))}</span>`;
   return `<article class="card${p.postado?' done':''}">
     <div class="head"><span class="num">${esc(String(p.num??'').padStart(2,'0'))}</span>
       <div class="ttl"><strong>${esc(p.filme||p.nome||'Post')}</strong><small>${esc(p.nome||'')}${p.lote?' · LOTE '+esc(p.lote):''}</small></div>
-      <span class="kind">${esc(kindLabel(p))}</span></div>
+      ${tag}</div>
     ${media}
     <div class="body">
       ${(()=>{const c=capOf(p), sel=capSel(p), txt=c[sel];
@@ -254,20 +279,35 @@ function cardHTML(p){
         return tabs + `<div class="cap${txt?'':' empty'}">${txt?esc(txt):'Sem legenda'}</div>`;})()}
       <div class="row">
         <button class="btn gold" data-act="copy" data-id="${esc(p.id)}" ${capText(p)?'':'disabled'}>${ICON.copy} COPIAR LEGENDA</button>
-        <button class="btn" data-act="dl" data-id="${esc(p.id)}" ${(!files.length||busy||!state.dl)?'disabled':''}>${ICON.dl} ${busy?'BAIXANDO…':dlLabel}</button>
+        <button class="btn" data-act="dl" data-id="${esc(p.id)}" ${(!files.length||busy)?'disabled':''}>${ICON.dl} ${busy?'BAIXANDO…':dlLabel}</button>
       </div>
-      ${comp?`<div class="compn">Versão comprimida (limite de 20 MB do app). Pra máxima qualidade, poste o original do ZIP.</div>`:''}
-      <div class="day">
+      ${comp?`<div class="compn">Versão comprimida (limite de 50 MB por arquivo). Pra máxima qualidade, poste o original do ZIP.</div>`:''}
+      ${p.postado ? '' : `<div class="day">
         <label for="d-${esc(p.id)}">DIA</label>
         <input type="date" id="d-${esc(p.id)}" data-act="date" data-id="${esc(p.id)}" value="${esc(p.dia||'')}">
         <button class="chip${p.dia===t?' on':''}" data-act="setday" data-day="${t}" data-id="${esc(p.id)}">HOJE</button>
         <button class="chip${p.dia===tm?' on':''}" data-act="setday" data-day="${tm}" data-id="${esc(p.id)}">AMANHÃ</button>
-      </div>
+      </div>`}
       ${p.postado
-        ? `<div class="row prow"><span class="posted">✓ ${esc(fmtPosted(p.postadoEm))}</span><button class="chip" data-act="undo" data-id="${esc(p.id)}">DESFAZER</button></div>`
+        ? `<div class="row prow"><span class="posted">✓ ${esc(fmtPosted(p.postado_em))}</span><button class="chip" data-act="undo" data-id="${esc(p.id)}">DESFAZER</button></div>`
         : `<button class="btn ok" data-act="posted" data-id="${esc(p.id)}">${ICON.check} MARCAR COMO POSTADO</button>`}
     </div>
   </article>`;
+}
+
+function renderFilters(pend){
+  const counts = new Map(); pend.forEach(p=>{ const k=dayKey(p); counts.set(k,(counts.get(k)||0)+1); });
+  const t=today(), tm=tomorrow();
+  const keys=['todos'];
+  if(counts.has('atrasados')) keys.push('atrasados');
+  keys.push(t, tm);
+  [...counts.keys()].filter(k=>k!=='atrasados'&&k!=='sem'&&k!==t&&k!==tm).sort().forEach(k=>keys.push(k));
+  keys.push('sem');
+  if(!keys.includes(state.filtro)) state.filtro='todos';
+  const label=k=> k==='todos'?'TODOS':k==='atrasados'?'ATRASADOS':k==='sem'?'SEM DIA':dayLabel(k);
+  const n=k=> k==='todos'?pend.length:(counts.get(k)||0);
+  $('#filt').innerHTML = keys.map(k=>`<button class="fc${state.filtro===k?' on':''}${k==='atrasados'?' late':''}" data-act="filtro" data-f="${k}">${label(k)} <b>${n(k)}</b></button>`).join('');
+  $('#filt').style.display = state.view!=='pend' ? 'none' : '';
 }
 
 function render(){
@@ -276,27 +316,21 @@ function render(){
   $('#tab-pend').setAttribute('aria-pressed', state.view==='pend');
   $('#tab-done').setAttribute('aria-pressed', state.view==='done');
   $('#seg').classList.toggle('done', state.view==='done');
+  renderFilters(pend);
   const list=$('#list');
-  const byNum=(a,b)=>(a.lote||'').localeCompare(b.lote||'')||(a.num??0)-(b.num??0);
+  const empty=(t,m)=>`<div class="empty-state"><div class="au">${AU_SVG}</div><strong>${t}</strong>${m}</div>`;
+  if(!state.loaded){ list.innerHTML=empty('CARREGANDO','Buscando a fila…'); return; }
+  let items;
   if(state.view==='done'){
-    if(!done.length){ list.innerHTML=`<div class="empty-state"><div class="au">${AU_SVG}</div><strong>NADA POSTADO AINDA</strong>O que você marcar como postado aparece aqui.</div>`; return; }
-    done.sort((a,b)=>(b.postadoEm||'').localeCompare(a.postadoEm||''));
-    list.innerHTML=`<section class="group"><div class="grid">${done.map(cardHTML).join('')}</div></section>`;
+    items = done.sort((a,b)=>(b.postado_em||'').localeCompare(a.postado_em||''));
+    if(!items.length){ list.innerHTML=empty('NADA POSTADO AINDA','O que você marcar como postado aparece aqui.'); return; }
   } else {
-    if(!pend.length){ list.innerHTML= state.posts.length
-      ? `<div class="empty-state"><div class="au">${AU_SVG}</div><strong>TUDO POSTADO</strong>O próximo lote entra aqui assim que ficar pronto.</div>`
-      : `<div class="empty-state"><div class="au">${AU_SVG}</div><strong>FILA VAZIA</strong>O próximo lote com selo AU entra aqui com prévia e legenda.</div>`; bindTracks(); return; }
-    const t=today(); const groups=new Map();
-    const key=p=>!p.dia?'~':(p.dia<t?'!':p.dia);
-    pend.forEach(p=>{ const k=key(p); if(!groups.has(k)) groups.set(k,[]); groups.get(k).push(p); });
-    const keys=[...groups.keys()].sort((a,b)=>{ const r=k=>k==='!'?'0':k==='~'?'9999':k; return r(a).localeCompare(r(b)); });
-    list.innerHTML=keys.map(k=>{
-      const arr=groups.get(k).sort(byNum);
-      const label=k==='!'?'ATRASADOS':k==='~'?'SEM DIA':dayLabel(k);
-      const cls=k==='!'?' late':k===t?' today':'';
-      return `<section class="group${cls}"><h2>${label}<span class="n">${arr.length} ${arr.length>1?'posts':'post'}</span></h2><div class="grid">${arr.map(cardHTML).join('')}</div></section>`;
-    }).join('');
+    items = state.filtro==='todos' ? pend : pend.filter(p=>dayKey(p)===state.filtro);
+    if(!items.length){ list.innerHTML = !state.posts.length ? empty('FILA VAZIA','O próximo lote com selo AU entra aqui com prévia e legenda.')
+      : !pend.length ? empty('TUDO POSTADO','O próximo lote entra aqui assim que ficar pronto.')
+      : empty('NADA NESSE DIA','Nenhum post pendente marcado pra esse dia.'); return; }
   }
+  list.innerHTML = `<section class="group"><div class="grid">${items.map(cardHTML).join('')}</div></section>`;
   bindTracks();
 }
 
@@ -314,12 +348,27 @@ function bindTracks(){
 }
 
 const find = id => state.posts.find(p=>p.id===id);
+const order = (a,b)=>(b.lote||'').localeCompare(a.lote||'')||(a.num??0)-(b.num??0);
 
-async function save(id, patch){
-  const p=find(id); if(!p||!state.db) return;
-  Object.assign(p, patch); render();
-  try{ await state.db.collection('posts').doc(id).update(patch); }
-  catch(e){ toast('Não salvou. Confere a conexão e tenta de novo.'); }
+async function load(){
+  try{
+    const rows = await rpc('fila_list',{p_pin: state.pin});
+    const sig = JSON.stringify(rows); if(state.loaded && sig===state.sig) return; state.sig = sig;
+    state.posts = (rows||[]).sort(order); state.loaded = true; render();
+  }catch(e){
+    if(e.code==='28000'){ logout('Senha inválida'); return; }
+    if(!state.loaded){ state.loaded=true; render(); }
+    toast('Não deu pra atualizar a fila. Confere a internet.');
+  }
+}
+
+async function setDia(id, dia){
+  const p=find(id); if(!p) return; p.dia = dia || null; render();
+  try{ await rpc('fila_set_dia',{p_pin:state.pin,p_id:id,p_dia:dia||null}); }catch(_){ toast('Não salvou o dia. Tenta de novo.'); load(); }
+}
+async function setPostado(id, v){
+  const p=find(id); if(!p) return; p.postado=v; p.postado_em = v ? new Date().toISOString() : null; render();
+  try{ await rpc('fila_set_postado',{p_pin:state.pin,p_id:id,p_postado:v}); if(v) toast('Marcado como postado'); }catch(_){ toast('Não salvou. Tenta de novo.'); load(); }
 }
 
 async function copyText(text){
@@ -330,62 +379,58 @@ async function copyText(text){
   }
 }
 
-async function downloadFile(f){
-  const res=await fetch(srcOf(f)); if(!res.ok) throw {code:'fetch'};
-  const blob=await res.blob();
-  return state.dl.save({filename:f.nome, data:blob});
-}
-
 async function doDownload(id, only){
-  const p=find(id); if(!p||!state.dl) return;
+  const p=find(id); if(!p) return;
   const files=(p.arquivos||[]).filter((_,i)=>only==null||i===only);
   state.busy.add(id); render();
-  let saved=0;
   try{
-    for(const f of files){ await downloadFile(f); saved++; }
-    toast(saved>1?saved+' arquivos salvos':'Arquivo salvo');
-  }catch(e){
-    const c=e&&e.code;
-    if(c==='declined') toast(saved?saved+' salvos, o resto foi cancelado':'Download cancelado');
-    else if(c==='rate_limited') toast('Espera um segundo e toca de novo');
-    else toast('Não deu pra baixar. Tenta de novo.');
-  }finally{ state.busy.delete(id); render(); }
+    const blobs=[];
+    for(const f of files){ const r=await fetch(f.url); if(!r.ok) throw new Error('fetch'); const b=await r.blob(); blobs.push(new File([b], f.nome, {type: b.type || (f.kind==='video'?'video/mp4':'image/png')})); }
+    if(navigator.canShare && navigator.canShare({files: blobs}) && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
+      await navigator.share({files: blobs});
+    } else {
+      for(const file of blobs){ const u=URL.createObjectURL(file); const a=document.createElement('a'); a.href=u; a.download=file.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),60000); await new Promise(r=>setTimeout(r,400)); }
+      toast(blobs.length>1?blobs.length+' arquivos baixados':'Arquivo baixado');
+    }
+  }catch(e){ if(e && e.name==='AbortError') return; toast('Não deu pra baixar. Tenta de novo.'); }
+  finally{ state.busy.delete(id); render(); }
+}
+
+function logout(msg){ state.pin=''; store.set('fila_pin',null); showLogin(msg); }
+function showLogin(msg){
+  $('#top').hidden=true;
+  $('#list').innerHTML = `<form class="login" id="login"><div class="au">${AU_SVG}</div><strong>FILA DE POSTS</strong>
+    <input id="pin" type="password" autocomplete="current-password" placeholder="SENHA" aria-label="Senha da fila" required>
+    <button class="btn gold" type="submit">ENTRAR</button><div class="err">${esc(msg||'')}</div></form>`;
+  $('#login').addEventListener('submit', async ev=>{ ev.preventDefault(); const v=$('#pin').value.trim().toUpperCase(); if(!v) return;
+    try{ await rpc('fila_list',{p_pin:v}); state.pin=v; store.set('fila_pin',v); start(); }catch(e){ $('.login .err').textContent = e.code==='28000' ? 'Senha errada' : 'Sem conexão. Tenta de novo.'; } });
+  $('#pin').focus();
 }
 
 document.addEventListener('click', async e=>{
   const b=e.target.closest('[data-act]'); if(!b) return;
   const id=b.dataset.id, act=b.dataset.act;
+  if(act==='filtro'){ state.filtro=b.dataset.f; store.set('fila_filtro',state.filtro); render(); window.scrollTo({top:0,behavior:'smooth'}); return; }
   if(act==='capsel'){ state.capSel[id]=b.dataset.v; render(); return; }
   if(act==='copy'){ const p=find(id); if(p&&await copyText(capText(p))) { toast('Legenda copiada'); b.innerHTML=ICON.check+' COPIADA'; setTimeout(()=>{b.innerHTML=ICON.copy+' COPIAR LEGENDA'},1600);} else toast('Não copiou. Segura no texto e copia.'); }
   if(act==='dl') doDownload(id,null);
   if(act==='dl1') doDownload(id,Number(b.dataset.i));
-  if(act==='setday'){ const p=find(id); save(id,{dia: p.dia===b.dataset.day?'':b.dataset.day}); }
-  if(act==='posted') { save(id,{postado:true, postadoEm:new Date().toISOString()}); toast('Marcado como postado'); }
-  if(act==='undo') save(id,{postado:false, postadoEm:null});
+  if(act==='setday'){ const p=find(id); setDia(id, p.dia===b.dataset.day ? null : b.dataset.day); }
+  if(act==='posted') setPostado(id,true);
+  if(act==='undo') setPostado(id,false);
 });
-document.addEventListener('change', e=>{
-  const i=e.target.closest('[data-act="date"]'); if(i) save(i.dataset.id,{dia:i.value||''});
-});
+document.addEventListener('change', e=>{ const i=e.target.closest('[data-act="date"]'); if(i) setDia(i.dataset.id, i.value||null); });
 $('#tab-pend').onclick=()=>{state.view='pend';render();};
 $('#tab-done').onclick=()=>{state.view='done';render();};
 
-render();
-(async()=>{
-  const note=$('#note');
-  if(!window.claude||typeof window.claude.use!=='function'){ note.textContent='Abra pelo link do app (logado) pra carregar a fila.'; note.classList.add('warn'); return; }
-  const [db, dl] = await Promise.all([claude.use('db'), claude.use('downloads')]);
-  state.dl=dl;
-  if(!db){ note.textContent='Abra pelo link do app (logado) pra carregar a fila.'; note.classList.add('warn'); return; }
-  state.db=db;
-  let timer=setTimeout(()=>{ note.textContent='A fila ainda não carregou. Confere a internet.'; note.classList.add('warn'); },10000);
-  db.collection('posts').onSnapshot(snap=>{
-    if(!snap.metadata.fromCache){ clearTimeout(timer); note.classList.remove('warn'); }
-    state.posts=snap.docs.map(d=>({id:d.id, ...structuredClone(d.data())}));
-    const t=today(); const hoje=state.posts.filter(p=>!p.postado&&p.dia===t).length; const sem=state.posts.filter(p=>!p.postado&&!p.dia).length;
-    note.textContent = state.posts.length ? [hoje?hoje+' pra hoje':'', sem?sem+' sem dia':''].filter(Boolean).join(' · ') || 'Fila em dia' : '';
-    render();
-  }, err=>{ clearTimeout(timer); note.textContent='Não deu pra carregar a fila. Recarrega a página.'; note.classList.add('warn'); });
-})();
+let poll;
+function start(){
+  $('#top').hidden=false; render(); load();
+  fetch(SB_URL+'/functions/v1/fila-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cleanup',pin:state.pin})}).then(r=>r.json()).then(r=>{ if(r&&r.apagados) load(); }).catch(()=>{});
+  clearInterval(poll); poll=setInterval(()=>{ if(!document.hidden && ![...document.querySelectorAll('video')].some(v=>!v.paused)) load(); }, 30000);
+}
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden && state.pin) load(); });
+state.pin ? start() : showLogin();
 </script>
 </body>
 </html>
