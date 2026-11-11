@@ -185,7 +185,7 @@ header.top{position:sticky;top:10px;z-index:5;max-width:1288px;margin:10px auto 
 .login .au{margin:0 auto 16px;width:56px;height:56px;border-radius:14px}
 .login .au svg{width:32px;height:24.8px}
 .login strong{display:block;font-family:var(--display);letter-spacing:.16em;font-size:15px;margin-bottom:16px}
-.login input{width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:13px 14px;font-size:16px;text-align:center;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.login input{width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:13px 14px;font-size:16px;text-align:center;letter-spacing:.12em;margin-bottom:10px}
 .login .btn{width:100%}
 .login .err{color:#ff8a82;font-size:12.5px;min-height:18px;margin-top:8px}
 </style>
@@ -402,7 +402,7 @@ function showLogin(msg){
   $('#list').innerHTML = `<form class="login" id="login"><div class="au">${AU_SVG}</div><strong>FILA DE POSTS</strong>
     <input id="pin" type="password" autocomplete="current-password" placeholder="SENHA" aria-label="Senha da fila" required>
     <button class="btn gold" type="submit">ENTRAR</button><div class="err">${esc(msg||'')}</div></form>`;
-  $('#login').addEventListener('submit', async ev=>{ ev.preventDefault(); const v=$('#pin').value.trim().toUpperCase(); if(!v) return;
+  $('#login').addEventListener('submit', async ev=>{ ev.preventDefault(); const v=$('#pin').value.trim(); if(!v) return;
     try{ await rpc('fila_list',{p_pin:v}); state.pin=v; store.set('fila_pin',v); start(); }catch(e){ $('.login .err').textContent = e.code==='28000' ? 'Senha errada' : 'Sem conexão. Tenta de novo.'; } });
   $('#pin').focus();
 }
