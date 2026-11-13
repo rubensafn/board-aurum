@@ -188,6 +188,36 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 @media (max-width:480px){.brand h1{display:none}.bar{gap:8px}.seg{flex:1}.tab{flex:1;justify-content:center;padding:0 8px;font-size:10px;letter-spacing:.08em}}
+
+/* ===== v8: vidro brilhante, ações só com ícone coloridas, capa preenchendo o card ===== */
+:root{
+  --gloss:linear-gradient(180deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,.14) 46%,rgba(255,255,255,0) 52%);
+  --gold-glass:var(--gloss),linear-gradient(135deg,rgba(248,226,140,.92),rgba(217,184,85,.72) 55%,rgba(169,135,66,.86));
+}
+.au,.act.primary,.login .act{background:var(--gold-glass)!important;border:1px solid rgba(255,244,200,.75)!important;-webkit-backdrop-filter:blur(12px) saturate(1.4);backdrop-filter:blur(12px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -3px 8px rgba(120,80,0,.35),0 0 0 1px rgba(255,214,90,.15),0 8px 24px rgba(217,184,85,.35)!important}
+.act.primary,.login .act{color:#1c1305;text-shadow:0 1px 0 rgba(255,255,255,.4)}
+.row{grid-template-columns:84px 1fr;align-items:stretch}
+.thumb{width:84px;height:100%;min-height:150px;aspect-ratio:auto;align-self:stretch}
+@media (min-width:760px){.row{grid-template-columns:140px 1fr}.thumb{width:140px;min-height:230px}}
+.capprev{display:block;min-height:0;color:var(--ink-2)}
+.capprev .clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media (min-width:760px){.capprev .clamp{-webkit-line-clamp:4}}
+.acts{gap:8px;margin-top:auto}
+.ib{position:relative;flex:1;height:44px;border-radius:13px;display:grid;place-items:center;-webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);transition:transform .12s,filter .2s}
+.ib svg{width:19px;height:19px}
+.ib:active{transform:scale(.94)}
+.ib[disabled]{opacity:.35;pointer-events:none}
+.ib.gold{color:#1c1305;background:var(--gold-glass);border:1px solid rgba(255,244,200,.75);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -3px 8px rgba(120,80,0,.35),0 6px 18px rgba(217,184,85,.3)}
+.ib.cyan{color:#a5f3fc;background:var(--gloss),rgba(34,211,238,.16);border:1px solid rgba(103,232,249,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 18px rgba(34,211,238,.14)}
+.ib.green{color:#86efac;background:var(--gloss),rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 18px rgba(74,222,128,.14)}
+.ib.mute{color:var(--ink-2);background:var(--gloss),rgba(255,255,255,.07);border:1px solid var(--hair-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.mini{display:inline-flex;gap:2px;padding:2px;border-radius:9px;background:rgba(0,0,0,.35);border:1px solid var(--hair)}
+.mv{position:relative;height:22px;padding:0 8px;border-radius:7px;font-size:9.5px;font-weight:700;letter-spacing:.1em;color:var(--mute)}
+.mv.on{color:#fff}
+.fname.sh{display:none;font-family:var(--body);text-transform:none;font-weight:500;letter-spacing:.02em;margin-top:3px;white-space:normal}
+@media (min-width:760px){.fname.sh{display:block}.fname{font-size:11px;color:var(--ink-2)}}
+.sh-head .film{display:flex;flex-direction:column}
 </style>
 </head>
 <body>
@@ -269,20 +299,17 @@ function rowHTML(p){
         ${fs.length>1?`<span class="multi">${fs.length}</span>`:''}${f&&f.kind==='video'?`<span class="play">${I.play}</span>`:''}</button>`;
   const dayPill = p.postado ? `<span class="pill done">${I.check} ${esc(postedText(p.postado_em))}</span>`
     : `<label class="pill day" ${t?`data-tone="${t}"`:''}>${I.cal} ${esc(dayText(p.dia))}<input type="date" data-act="date" data-id="${esc(p.id)}" value="${esc(p.dia||'')}" aria-label="Escolher dia"></label>`;
-  const acts = p.postado
-    ? `<button class="act primary" data-act="copy" data-id="${esc(p.id)}" ${c?'':'disabled'}>${I.copy} COPIAR</button>
-       <button class="act sq" data-act="dl" data-id="${esc(p.id)}" aria-label="Baixar" ${fs.length&&!S.busy.has(p.id)?'':'disabled'}>${I.dl}</button>
-       <button class="act sq undo" data-act="undo" data-id="${esc(p.id)}" aria-label="Desfazer postado" title="Desfazer">${I.undo}</button>`
-    : `<button class="act primary" data-act="copy" data-id="${esc(p.id)}" ${c?'':'disabled'}>${I.copy} COPIAR</button>
-       <button class="act sq" data-act="dl" data-id="${esc(p.id)}" aria-label="Baixar" ${fs.length&&!S.busy.has(p.id)?'':'disabled'}>${I.dl}</button>
-       <button class="act sq ok" data-act="posted" data-id="${esc(p.id)}" aria-label="Marcar como postado" title="Marcar como postado">${I.check}</button>`;
+  const acts = `<button class="ib gold" data-act="copy" data-id="${esc(p.id)}" aria-label="Copiar legenda" title="Copiar legenda" ${c?'':'disabled'}>${I.copy}</button>
+       <button class="ib cyan" data-act="dl" data-id="${esc(p.id)}" aria-label="Baixar" title="Baixar" ${fs.length&&!S.busy.has(p.id)?'':'disabled'}>${I.dl}</button>
+       ${p.postado?`<button class="ib mute" data-act="undo" data-id="${esc(p.id)}" aria-label="Desfazer postado" title="Desfazer postado">${I.undo}</button>`
+                  :`<button class="ib green" data-act="posted" data-id="${esc(p.id)}" aria-label="Marcar como postado" title="Marcar como postado">${I.check}</button>`}`;
   return `<article class="row glass${S.copied===p.id?' copied':''}" data-row="${esc(p.id)}">
     ${thumb}
     <div class="info">
       <div class="l1"><span class="num">${esc(pad(p.num??0))}</span><span class="film">${esc(p.filme||p.nome||'Post')}</span></div>
       <div class="fname">${esc(p.nome||'')}</div>
-      <div class="meta">${dayPill}${S.copied===p.id?`<span class="pill cp">${I.copy} COPIADA · ${verOf(p)==='cel'?'CEL':'PC'}</span>`:''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
-      <button class="capprev" data-act="cap" data-id="${esc(p.id)}">${c?esc(c):'<i>Sem legenda</i>'}</button>
+      <div class="meta">${dayPill}${(caps(p).cel&&caps(p).pc)?`<span class="mini" role="group" aria-label="Versão da legenda"><button class="mv${verOf(p)==='cel'?' on':''}" data-act="vrow" data-v="cel" data-id="${esc(p.id)}">CEL</button><button class="mv${verOf(p)==='pc'?' on':''}" data-act="vrow" data-v="pc" data-id="${esc(p.id)}">PC</button></span>`:''}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
+      <button class="capprev" data-act="cap" data-id="${esc(p.id)}"><span class="clamp">${c?esc(c):'<i>Sem legenda</i>'}</span></button>
       <div class="acts">${acts}</div>
     </div>
   </article>`;
@@ -375,7 +402,7 @@ async function doDownload(id,only){
 function openSheet(id,mode){
   const p=find(id); if(!p) return; S.sheet={id,mode};
   const fs=files(p), c=caps(p), v=verOf(p);
-  const head=`<div class="grab"></div><div class="sh-head"><span class="num">${esc(pad(p.num??0))}</span><span class="film">${esc(p.filme||'')}</span><button class="icon-btn glass" data-act="close" aria-label="Fechar">${I.x}</button></div>`;
+  const head=`<div class="grab"></div><div class="sh-head"><span class="num">${esc(pad(p.num??0))}</span><span class="film">${esc(p.filme||'')}<small class="fname sh">${esc(p.nome||'')}</small></span><button class="icon-btn glass" data-act="close" aria-label="Fechar">${I.x}</button></div>`;
   let body='';
   if(mode==='media'){
     const slides=fs.map(f=>f.kind==='video'?`<video src="${esc(f.url)}" ${f.poster?`poster="${esc(f.poster)}"`:''} controls playsinline autoplay preload="auto"></video>`:`<img src="${esc(f.url)}" alt="">`).join('');
@@ -420,6 +447,7 @@ document.addEventListener('click',e=>{
   else if(a==='cap') openSheet(id,'cap');
   else if(a==='close') closeSheet();
   else if(a==='ver'){ S.ver[id]=b.dataset.v; openSheet(id,'cap'); }
+  else if(a==='vrow'){ S.ver[id]=b.dataset.v; patchRow(id); }
   else if(a==='copy') doCopy(id);
   else if(a==='dl') doDownload(id,null);
   else if(a==='posted') setPostado(id,true);
