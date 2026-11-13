@@ -194,9 +194,6 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
   --gloss:linear-gradient(180deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,.14) 46%,rgba(255,255,255,0) 52%);
   --gold-glass:var(--gloss),linear-gradient(135deg,rgba(248,226,140,.92),rgba(217,184,85,.72) 55%,rgba(169,135,66,.86));
 }
-.au,.act.primary,.login .act{background:var(--gold-glass)!important;border:1px solid rgba(255,244,200,.75)!important;-webkit-backdrop-filter:blur(12px) saturate(1.4);backdrop-filter:blur(12px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -3px 8px rgba(120,80,0,.35),0 0 0 1px rgba(255,214,90,.15),0 8px 24px rgba(217,184,85,.35)!important}
-.act.primary,.login .act{color:#1c1305;text-shadow:0 1px 0 rgba(255,255,255,.4)}
 .row{grid-template-columns:84px 1fr;align-items:stretch}
 .thumb{width:84px;height:100%;min-height:150px;aspect-ratio:auto;align-self:stretch}
 @media (min-width:760px){.row{grid-template-columns:140px 1fr}.thumb{width:140px;min-height:230px}}
@@ -226,9 +223,55 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 .capprev .more{position:absolute;right:10px;bottom:6px;font-family:var(--display);font-weight:700;font-size:9px;letter-spacing:.14em;color:var(--gold)}
 
 .envtag{font-size:9px;font-weight:800;letter-spacing:.16em;padding:4px 7px;border-radius:7px;color:#67e8f9;border:1px solid rgba(103,232,249,.45);background:rgba(103,232,249,.08)}
+
+/* ===================================================================
+   TEMA DO CLIENTE — pra fazer a versão de outro cliente, troque só isto
+   (e o desenho do logo na constante AU, lá no script).
+   =================================================================== */
+:root{
+  --brand-1:#f8e08e;   /* cor clara da marca */
+  --brand-2:#d9b855;   /* cor principal da marca */
+  --brand-3:#a98742;   /* cor escura da marca */
+  --c-copy:#f3d977; --c-dl:#67e8f9; --c-ok:#4ade80;
+}
+/* ===== v9: vidro estilo menus do iPhone — escuro, translúcido, luz fina só na borda de cima e de baixo ===== */
+.glass,.ib,.act,.seg,.vers{position:relative;isolation:isolate}
+.glass{background:rgba(24,24,30,.52)!important;-webkit-backdrop-filter:blur(30px) saturate(1.8);backdrop-filter:blur(30px) saturate(1.8);border:0!important;box-shadow:0 10px 30px rgba(0,0,0,.35)!important}
+.glass::after,.ib::after,.act::after,.seg::after,.vers::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:2;
+  background:linear-gradient(180deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.06) 22%,rgba(255,255,255,.02) 50%,rgba(255,255,255,.05) 78%,rgba(255,255,255,.18) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.row.copied{box-shadow:0 10px 30px rgba(0,0,0,.35),0 0 0 1px rgba(243,217,119,.45),0 0 22px rgba(243,217,119,.14)!important}
+.seg,.vers{background:rgba(255,255,255,.05);border:0}
+/* AU: vidro dentro do vidro, AU dourado */
+.au{background:rgba(255,255,255,.07)!important;border:0!important;position:relative;box-shadow:0 0 18px rgba(243,217,119,.10)!important}
+.au::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.05) 30%,rgba(255,255,255,.03) 70%,rgba(243,217,119,.35));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.au svg{width:25px;height:19.4px;filter:drop-shadow(0 0 6px rgba(243,217,119,.35))}
+.login .au svg,.empty .au svg{width:32px;height:24.8px}
+/* botões de ação: mesmo vidro, só o ícone colorido */
+.ib,.ib.gold,.ib.cyan,.ib.green,.ib.mute{background:rgba(255,255,255,.06)!important;border:0!important;box-shadow:none!important;color:var(--ink-2)}
+.ib.gold{color:var(--c-copy)}.ib.cyan{color:var(--c-dl)}.ib.green{color:var(--c-ok)}
+.ib.gold svg{filter:drop-shadow(0 0 6px rgba(243,217,119,.45))}
+.ib.cyan svg{filter:drop-shadow(0 0 6px rgba(103,232,249,.45))}
+.ib.green svg{filter:drop-shadow(0 0 6px rgba(74,222,128,.45))}
+.ib:hover{background:rgba(255,255,255,.1)!important}
+.act,.act.primary,.login .act{background:rgba(255,255,255,.06)!important;border:0!important;box-shadow:none!important;color:var(--ink);text-shadow:none}
+.act.primary,.login .act{color:var(--c-copy);background:rgba(243,217,119,.08)!important}
+.act.primary svg{filter:drop-shadow(0 0 6px rgba(243,217,119,.45))}
+.capprev{border:0!important;background:rgba(255,255,255,.04)!important}
+.dtile{background:rgba(24,24,30,.52)!important}
+.field{border:0;background:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(255,255,255,.12),inset 0 2px 8px rgba(0,0,0,.35)}
+.icon-btn.glass{background:rgba(255,255,255,.06)!important;box-shadow:none!important}
+/* selecionado mantém a borda neon colorida por cima da luz fina */
+.on::before{z-index:3}
+
+.sheet:not(.open){visibility:hidden;transition:transform .32s cubic-bezier(.2,.9,.25,1),visibility 0s .32s}
+.captext{max-height:48vh;overflow:auto}
+
+.sheet.glass,.toast.glass{position:fixed}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="augold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8e08e"/><stop offset=".55" stop-color="#d9b855"/><stop offset="1" stop-color="#a98742"/></linearGradient></defs></svg>
 <div class="bg" aria-hidden="true"></div>
 <header class="top" id="top" hidden>
   <div class="bar glass">
@@ -249,7 +292,7 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 <script>
 const SB_URL='https://gdtfwmqbvsqtxtccrydv.supabase.co', SB_KEY='sb_publishable_siBXDugL8v3hXhCEfZHW9g_WBln-WFt';
 const SESSAO_HORAS=8;
-const AU='<svg viewBox="56.18 55.44 252.95 195.8" aria-hidden="true"><path fill="#fff" d="M187.42,205.8c5.1,11.57,9.72,19.4,13.83,23.5,4.11,4.1,7.91,6.15,11.36,6.15v2.41h-71.14v-2.41c1.48,0,3.05-.24,4.69-.72,1.64-.48,3.170-1.28,4.57-2.41,1.4-1.12,2.55-2.61,3.46-4.46.9-1.85,1.36-4.14,1.36-6.87,0-4.01-1.32-9.16-3.95-15.43l-6.18-13.26c-2.96,7.23-6.51,13.86-10.62,19.89-4.12,6.03-8.52,11.17-13.22,15.43-4.69,4.26-9.47,7.59-14.33,10-4.86,2.41-9.6,3.62-14.2,3.62-8.89,0-15.48-2.05-19.76-6.15-4.28-4.1-6.63-10-7.04-17.72-.41-7.71.99-17.11,4.2-28.2,3.21-11.09,7.86-23.62,13.96-37.6l38.29-86.05h2.47l62.25,140.29ZM82.19,185.79c0,8.84,2.47,15.55,7.41,20.13,4.94,4.58,10.78,6.87,17.54,6.87s13.17-2.33,19.76-6.99c6.58-4.66,11.61-11.81,15.07-21.45l-32.11-71.83-18.03,39.05c-3.3,7.55-5.72,14.1-7.29,19.64-1.570,5.54-2.35,10.41-2.35,14.58Z"/><path fill="#fff" d="M299.07,163.84v-83.68c0-16.64-14.91-14.65-14.91-14.65h-16.57v2.4c8.22,1.12,14.26,6.52,18.13,16.2,3.86,9.68,5.79,22.12,5.79,37.33v55.93c0,7.36-1.18,13.88-3.53,19.56-2.35,5.68-5.41,10.36-9.19,14.04-3.78,3.68-8.1,6.48-12.97,8.4-4.87,1.92-9.82,2.88-14.85,2.88-1.38,0-2.76-.08-4.14-.22-3.81-.39-7.59-1.31-11.35-2.78-5.12-2-9.65-5-13.6-9-3.95-4-7.14-9-9.57-15-2.44-6-3.65-13-3.65-21v-86.17c0-6.24.75-10.76,2.27-13.56,1.51-2.8,3.69-5,6.55-6.6v-2.4h-51.61v2.4c3.02,1.6,5.29,3.8,6.8,6.6,1.51,2.8,2.27,7.32,2.27,13.56v67.41l20.7,46.66s0,.01,0,.02c5.76,13.06,9.68,18.49,11.95,20.75,3.37,3.36,5.01,3.53,5.02,3.53,4.97,0,8.99,4.03,8.99,9v.47c5.38,1.28,10.8,1.94,16.27,1.94,3.02,0,6-.2,8.95-.59,4.6-.61,9.13-1.69,13.58-3.25,7.3-2.56,13.8-6.36,19.51-11.4,5.59-4.94,10.13-11.12,13.63-18.52h0c.07-.15.16-.29.22-.44,1.26-3.44,2.62-6.86,3.59-10.4,1.04-3.79,1.44-7.68,1.63-11.59.28-5.920.07-11.9.07-17.83Z"/></svg>';
+const AU='<svg viewBox="56.18 55.44 252.95 195.8" aria-hidden="true"><path fill="url(#augold)" d="M187.42,205.8c5.1,11.57,9.72,19.4,13.83,23.5,4.11,4.1,7.91,6.15,11.36,6.15v2.41h-71.14v-2.41c1.48,0,3.05-.24,4.69-.72,1.64-.48,3.170-1.28,4.57-2.41,1.4-1.12,2.55-2.61,3.46-4.46.9-1.85,1.36-4.14,1.36-6.87,0-4.01-1.32-9.16-3.95-15.43l-6.18-13.26c-2.96,7.23-6.51,13.86-10.62,19.89-4.12,6.03-8.52,11.17-13.22,15.43-4.69,4.26-9.47,7.59-14.33,10-4.86,2.41-9.6,3.62-14.2,3.62-8.89,0-15.48-2.05-19.76-6.15-4.28-4.1-6.63-10-7.04-17.72-.41-7.71.99-17.11,4.2-28.2,3.21-11.09,7.86-23.62,13.96-37.6l38.29-86.05h2.47l62.25,140.29ZM82.19,185.79c0,8.84,2.47,15.55,7.41,20.13,4.94,4.58,10.78,6.87,17.54,6.87s13.17-2.33,19.76-6.99c6.58-4.66,11.61-11.81,15.07-21.45l-32.11-71.83-18.03,39.05c-3.3,7.55-5.72,14.1-7.29,19.64-1.570,5.54-2.35,10.41-2.35,14.58Z"/><path fill="url(#augold)" d="M299.07,163.84v-83.68c0-16.64-14.91-14.65-14.91-14.65h-16.57v2.4c8.22,1.12,14.26,6.52,18.13,16.2,3.86,9.68,5.79,22.12,5.79,37.33v55.93c0,7.36-1.18,13.88-3.53,19.56-2.35,5.68-5.41,10.36-9.19,14.04-3.78,3.68-8.1,6.48-12.97,8.4-4.87,1.92-9.82,2.88-14.85,2.88-1.38,0-2.76-.08-4.14-.22-3.81-.39-7.59-1.31-11.35-2.78-5.12-2-9.65-5-13.6-9-3.95-4-7.14-9-9.57-15-2.44-6-3.65-13-3.65-21v-86.17c0-6.24.75-10.76,2.27-13.56,1.51-2.8,3.69-5,6.55-6.6v-2.4h-51.61v2.4c3.02,1.6,5.29,3.8,6.8,6.6,1.51,2.8,2.27,7.32,2.27,13.56v67.41l20.7,46.66s0,.01,0,.02c5.76,13.06,9.68,18.49,11.95,20.75,3.37,3.36,5.01,3.53,5.02,3.53,4.97,0,8.99,4.03,8.99,9v.47c5.38,1.28,10.8,1.94,16.27,1.94,3.02,0,6-.2,8.95-.59,4.6-.61,9.13-1.69,13.58-3.25,7.3-2.56,13.8-6.36,19.51-11.4,5.59-4.94,10.13-11.12,13.63-18.52h0c.07-.15.16-.29.22-.44,1.26-3.44,2.62-6.86,3.59-10.4,1.04-3.79,1.44-7.68,1.63-11.59.28-5.920.07-11.9.07-17.83Z"/></svg>';
 const I={
   copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
   dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>',
