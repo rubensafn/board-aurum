@@ -326,6 +326,20 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 .dclear{height:42px;width:100%;justify-content:center;gap:8px;color:#fca5a5}
 .dclear svg{width:14px;height:14px}
 body:has(.sheet.open) .envtag{display:none}
+/* filtro rola junto; quando some, vira botãozinho flutuante */
+.days{position:relative;z-index:1}
+.fchip{position:fixed!important;left:14px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;height:44px;padding:0 14px 0 12px;border-radius:14px;display:flex;align-items:center;gap:8px;
+  font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.12em;color:#fff;
+  box-shadow:0 0 0 1px rgba(167,139,250,.5),0 0 18px rgba(167,139,250,.25),0 10px 30px rgba(0,0,0,.45)!important;
+  opacity:0;transform:translateY(20px);pointer-events:none;transition:opacity .2s,transform .2s}
+.fchip.show{opacity:1;transform:none;pointer-events:auto}
+.fchip svg{width:16px;height:16px;color:var(--violet)}
+.fchip b{font-family:var(--body);font-size:11px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.12)}
+body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-events:none}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:12px;padding:8px 4px 4px}
+.fgrid .dtile{min-width:0;width:100%}
+/* topo grudado mais fechado: o texto dos cards não aparece por trás */
+.top .bar.glass{background:rgba(14,14,20,.84)!important}
 </style>
 </head>
 <body>
@@ -341,8 +355,9 @@ body:has(.sheet.open) .envtag{display:none}
     </div>
     <button class="icon-btn" id="logout" aria-label="Sair" title="Sair"></button>
   </div>
-  <nav class="days" id="days" aria-label="Filtrar por dia"></nav>
 </header>
+<nav class="days" id="days" aria-label="Filtrar por dia"></nav>
+<button class="fchip glass" id="fchip" data-act="fsheet" aria-label="Filtrar por dia"></button>
 <main class="wrap"><div class="list" id="list"></div></main>
 <div class="sheet-bg" id="sheetBg"></div>
 <section class="sheet glass" id="sheet" role="dialog" aria-modal="true" aria-label="Detalhes do post"></section>
@@ -428,13 +443,15 @@ function patchRow(id){ const el=document.querySelector(`[data-row="${CSS.escape(
 
 /* ---- filtro de dias ---- */
 function renderDays(pend){
-  const nav=$('#days'); if(S.view!=='pend'){nav.style.display='none';return;} nav.style.display='';
+  const nav=$('#days'); if(S.view!=='pend'){nav.style.display='none';$('#fchip').classList.remove('show');return;} nav.style.display='';
   const cnt=new Map(); pend.forEach(p=>{const k=dayKey(p);cnt.set(k,(cnt.get(k)||0)+1);});
   const t=today(), tm=tomorrow();
   const keys=['todos']; if(cnt.has('atrasados')) keys.push('atrasados');
   keys.push(t,tm); [...cnt.keys()].filter(k=>!['atrasados','sem',t,tm].includes(k)).sort().forEach(k=>keys.push(k)); keys.push('sem');
   if(!keys.includes(S.filtro)) S.filtro='todos';
   const n=k=>k==='todos'?pend.length:(cnt.get(k)||0);
+  const cur=S.filtro, tc=cur==='todos'?'TODOS':cur==='sem'?'SEM DIA':cur==='atrasados'?'ATRASO':cur===t?'HOJE':cur===tm?'AMANHÃ':(p=>p.w+' '+p.d)(parts(cur));
+  $('#fchip').innerHTML=`${I.cal}<span>${tc}</span><b>${n(cur)}</b>`;
   nav.innerHTML=keys.map(k=>{
     let w,num,cls='dtile glass',tn='';
     if(k==='todos'){w='FILA';num='TODOS';cls+=' wide';}
@@ -522,6 +539,18 @@ function daySheetHTML(p){
     ${p.dia?`<button class="act dclear" data-act="setday" data-d="" data-id="${esc(p.id)}">${I.x} TIRAR O DIA</button>`:''}`;
 }
 
+/* ---- filtro no painel (quando os dias já saíram da tela) ---- */
+function openFilterSheet(){
+  S.fsheet=true;
+  $('#sheet').innerHTML=`<div class="grab"></div><div class="sh-head"><span class="film">FILTRAR POR DIA</span><button class="icon-btn glass" data-act="fclose" aria-label="Fechar">${I.x}</button></div><div class="sh-body"><div class="fgrid">${$('#days').innerHTML}</div></div>`;
+  $('#sheet').classList.add('open'); $('#sheetBg').classList.add('open'); document.body.style.overflow='hidden';
+}
+function closeFilterSheet(){
+  S.fsheet=false; $('#sheet').classList.remove('open'); $('#sheetBg').classList.remove('open'); document.body.style.overflow='';
+  setTimeout(()=>{ if(!S.sheet&&!S.fsheet) $('#sheet').innerHTML=''; },320);
+}
+new IntersectionObserver(([e])=>{ $('#fchip').classList.toggle('show',!e.isIntersecting&&S.view==='pend'&&!!S.pin&&e.boundingClientRect.top<0); },{rootMargin:'-70px 0px 0px 0px'}).observe($('#days'));
+
 /* ---- painel ---- */
 function openSheet(id,mode){
   const p=find(id); if(!p) return; S.sheet={id,mode};
@@ -568,8 +597,10 @@ function showLogin(msg){
 /* ---- eventos ---- */
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]'); if(!b) return; const id=b.dataset.id, a=b.dataset.act;
-  if(a==='filtro'){ S.filtro=b.dataset.f; store.set('fila_filtro',S.filtro); render(); window.scrollTo({top:0}); }
+  if(a==='filtro'){ if(S.fsheet) closeFilterSheet(); S.filtro=b.dataset.f; store.set('fila_filtro',S.filtro); render(); window.scrollTo({top:0}); }
+  else if(a==='fsheet') openFilterSheet();
   else if(a==='open') openSheet(id,'media');
+  else if(a==='fclose') closeFilterSheet();
   else if(a==='day') openSheet(id,'day');
   else if(a==='setday'){ closeSheet(); setDia(id,b.dataset.d||null); }
   else if(a==='go') doDownload(id,null,true);
@@ -583,8 +614,8 @@ document.addEventListener('click',e=>{
   else if(a==='undo') setPostado(id,false);
 });
 document.addEventListener('change',e=>{ const i=e.target.closest('[data-act="date"]'); if(i){ if(S.sheet) closeSheet(); setDia(i.dataset.id,i.value||null); } });
-$('#sheetBg').addEventListener('click',closeSheet);
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSheet(); });
+$('#sheetBg').addEventListener('click',()=>{ if(S.fsheet) closeFilterSheet(); else closeSheet(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(S.fsheet) closeFilterSheet(); else closeSheet(); } });
 $('#tab-pend').onclick=()=>{S.view='pend';render();window.scrollTo({top:0});};
 $('#tab-done').onclick=()=>{S.view='done';render();window.scrollTo({top:0});};
 $('#logout').innerHTML=I.out+'<span>SAIR</span>'; $('#logout').onclick=()=>logout('');
