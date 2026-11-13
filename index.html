@@ -224,13 +224,15 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 .capprev:active{transform:scale(.99)}
 .capprev:hover{border-color:rgba(243,217,119,.4)}
 .capprev .more{position:absolute;right:10px;bottom:6px;font-family:var(--display);font-weight:700;font-size:9px;letter-spacing:.14em;color:var(--gold)}
+
+.envtag{font-size:9px;font-weight:800;letter-spacing:.16em;padding:4px 7px;border-radius:7px;color:#67e8f9;border:1px solid rgba(103,232,249,.45);background:rgba(103,232,249,.08)}
 </style>
 </head>
 <body>
 <div class="bg" aria-hidden="true"></div>
 <header class="top" id="top" hidden>
   <div class="bar glass">
-    <div class="brand"><div class="au" id="logo"></div><h1>FILA DE POSTS</h1></div>
+    <div class="brand"><div class="au" id="logo"></div><h1>FILA DE POSTS</h1><span class="envtag" id="envtag" hidden>DEV</span></div>
     <div class="seg" role="tablist">
       <button class="tab on" id="tab-pend" role="tab">PENDENTES <b id="c-pend">0</b></button>
       <button class="tab" id="tab-done" role="tab">POSTADOS <b id="c-done">0</b></button>
@@ -466,6 +468,7 @@ $('#tab-pend').onclick=()=>{S.view='pend';render();window.scrollTo({top:0});};
 $('#tab-done').onclick=()=>{S.view='done';render();window.scrollTo({top:0});};
 $('#logout').innerHTML=I.out; $('#logout').onclick=()=>logout('');
 $('#logo').innerHTML=AU;
+if(!/^board\.aurumcinema\.com\.br$/.test(location.hostname)) $('#envtag').hidden=false; // selo DEV fora do link oficial
 
 let poll;
 function start(){
