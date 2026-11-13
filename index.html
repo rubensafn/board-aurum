@@ -308,6 +308,24 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 .dtile.on .w,.dtile.on .n,.tab.on,.ver.on{text-shadow:none!important}
 .dtile.on .c{background:rgba(255,255,255,.16)!important;color:#fff!important}
 #logo svg{filter:drop-shadow(0 0 6px rgba(167,139,250,.30))}
+
+/* ===== v12 (pente fino) ===== */
+/* 1. vidro só no topo, filtros e botões — o card do post fica liso e escuro */
+.row.glass{background:rgba(16,16,22,.88)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:0 8px 24px rgba(0,0,0,.28)!important}
+.row.glass::after{background:none;border:1px solid rgba(255,255,255,.06);padding:0;-webkit-mask:none;mask:none}
+.row.copied{box-shadow:0 8px 24px rgba(0,0,0,.28),0 0 0 1px rgba(243,217,119,.45),0 0 22px rgba(243,217,119,.12)!important}
+/* 2. cor forte só no que é ação; etiquetas mais calmas */
+.pill{background:rgba(255,255,255,.04)!important;border-color:rgba(255,255,255,.08)!important}
+.pill.day{cursor:pointer}
+.capprev .more{color:rgba(243,217,119,.8)}
+/* C. seletor rápido de dia */
+.dpick{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.dpick .dtile{min-width:0;height:64px}
+.dother{position:relative;height:46px;width:100%;justify-content:center;gap:8px;color:var(--ink)}
+.dother input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.dclear{height:42px;width:100%;justify-content:center;gap:8px;color:#fca5a5}
+.dclear svg{width:14px;height:14px}
+body:has(.sheet.open) .envtag{display:none}
 </style>
 </head>
 <body>
@@ -390,9 +408,9 @@ function rowHTML(p){
         ${f?`<img src="${esc(f.poster||(f.kind==='video'?'':f.url))}" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:''}
         ${fs.length>1?`<span class="multi">${fs.length}</span>`:''}${f&&f.kind==='video'?`<span class="play">${I.play}</span>`:''}</button>`;
   const dayPill = p.postado ? `<span class="pill done">${I.check} ${esc(postedText(p.postado_em))}</span>`
-    : `<label class="pill day" ${t?`data-tone="${t}"`:''}>${I.cal} ${esc(dayText(p.dia))}<input type="date" data-act="date" data-id="${esc(p.id)}" value="${esc(p.dia||'')}" aria-label="Escolher dia"></label>`;
+    : `<button class="pill day" ${t?`data-tone="${t}"`:''} data-act="day" data-id="${esc(p.id)}" aria-label="Escolher dia">${I.cal} ${esc(dayText(p.dia))}</button>`;
   const acts = `<button class="ib gold" data-act="copy" data-id="${esc(p.id)}" aria-label="Copiar legenda" title="Copiar legenda" ${c?'':'disabled'}>${I.copy}</button>
-       <button class="ib cyan" data-act="dl" data-id="${esc(p.id)}" aria-label="Baixar" title="Baixar" ${fs.length&&!S.busy.has(p.id)?'':'disabled'}>${I.dl}</button>
+       <button class="ib cyan" data-act="go" data-id="${esc(p.id)}" aria-label="Baixar e copiar legenda" title="Baixar e copiar legenda" ${fs.length&&!S.busy.has(p.id)?'':'disabled'}>${I.dl}</button>
        ${p.postado?`<button class="ib mute" data-act="undo" data-id="${esc(p.id)}" aria-label="Desfazer postado" title="Desfazer postado">${I.undo}</button>`
                   :`<button class="ib green" data-act="posted" data-id="${esc(p.id)}" aria-label="Marcar como postado" title="Marcar como postado">${I.check}</button>`}`;
   return `<article class="row glass${S.copied===p.id?' copied':''}" data-row="${esc(p.id)}">
@@ -479,15 +497,29 @@ async function doCopy(id){
   if(prev&&prev!==id) patchRow(prev); patchRow(id);
   toast('Legenda '+(verOf(p)==='cel'?'CELULAR':'PC')+' copiada · '+pad(p.num??0)+' '+(p.filme||''));
 }
-async function doDownload(id,only){
+async function doDownload(id,only,comCopia){
   const p=find(id); if(!p) return; const fs=files(p).filter((_,i)=>only==null||i===only); if(!fs.length) return;
-  S.busy.add(id); patchRow(id); toast('Baixando…');
+  let copiou=false;
+  if(comCopia&&capOf(p)&&await copyText(capOf(p))){ copiou=true; const prev=S.copied; S.copied=id; store.set('fila_copied',id); if(prev&&prev!==id) patchRow(prev); }
+  S.busy.add(id); patchRow(id); toast(copiou?'Legenda copiada · baixando…':'Baixando…');
   try{
     const out=[]; for(const f of fs){ const r=await fetch(f.url); if(!r.ok) throw new Error(); const b=await r.blob(); out.push(new File([b],f.nome,{type:b.type||(f.kind==='video'?'video/mp4':'image/jpeg')})); }
-    if(isMobile()&&navigator.canShare&&navigator.canShare({files:out})){ await navigator.share({files:out}); toast('Pronto'); }
-    else { for(const file of out){ const u=URL.createObjectURL(file),a=document.createElement('a'); a.href=u; a.download=file.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),60000); await new Promise(r=>setTimeout(r,350)); } toast(out.length>1?out.length+' arquivos baixados':'Arquivo baixado'); }
+    if(isMobile()&&navigator.canShare&&navigator.canShare({files:out})){ await navigator.share({files:out}); }
+    else { for(const file of out){ const u=URL.createObjectURL(file),a=document.createElement('a'); a.href=u; a.download=file.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),60000); await new Promise(r=>setTimeout(r,350)); } }
+    perguntaPostou(id,(out.length>1?out.length+' arquivos baixados':'Baixado')+(copiou?' + legenda copiada':''));
   }catch(e){ if(!(e&&e.name==='AbortError')) toast('Não deu pra baixar. Tenta de novo.'); }
   finally{ S.busy.delete(id); patchRow(id); }
+}
+
+function perguntaPostou(id,msg){ const p=find(id); if(!p||p.postado){ toast(msg); return; } toast(msg+' · Postou?','SIM, POSTEI',()=>setPostado(id,true),10000); }
+
+/* ---- seletor rápido de dia ---- */
+function daySheetHTML(p){
+  const opts=[]; for(let i=0;i<5;i++){ const d=new Date(); d.setDate(d.getDate()+i); const k=iso(d), pp=parts(k);
+    opts.push({k,w:i===0?'HOJE':i===1?'AMANHÃ':pp.w,n:pp.d,tn:i===0?'today':i===1?'tomorrow':''}); }
+  return `<div class="dpick">${opts.map(o=>`<button class="dtile glass${p.dia===o.k?' on':''}" ${o.tn?`data-tone="${o.tn}"`:''} data-act="setday" data-d="${o.k}" data-id="${esc(p.id)}"><span class="w">${o.w}</span><span class="n">${o.n}</span></button>`).join('')}</div>
+    <label class="act dother">${I.cal} OUTRA DATA<input type="date" data-act="date" data-id="${esc(p.id)}" value="${esc(p.dia||'')}" aria-label="Outra data"></label>
+    ${p.dia?`<button class="act dclear" data-act="setday" data-d="" data-id="${esc(p.id)}">${I.x} TIRAR O DIA</button>`:''}`;
 }
 
 /* ---- painel ---- */
@@ -496,7 +528,9 @@ function openSheet(id,mode){
   const fs=files(p), c=caps(p), v=verOf(p);
   const head=`<div class="grab"></div><div class="sh-head"><span class="num">${esc(pad(p.num??0))}</span><span class="film">${esc(p.filme||'')}<small class="fname sh">${esc(p.nome||'')}</small></span><button class="icon-btn glass" data-act="close" aria-label="Fechar">${I.x}</button></div>`;
   let body='';
-  if(mode==='media'){
+  if(mode==='day'){
+    body=daySheetHTML(p);
+  } else if(mode==='media'){
     const slides=fs.map(f=>f.kind==='video'?`<video src="${esc(f.url)}" ${f.poster?`poster="${esc(f.poster)}"`:''} controls playsinline autoplay preload="auto"></video>`:`<img src="${esc(f.url)}" alt="">`).join('');
     body=`<div class="player" style="--ar:${ar(fs[0])}">${fs.length>1?`<div class="track">${slides}</div>`:slides}</div>
       <div class="sh-acts"><button class="act" data-act="dl" data-id="${esc(p.id)}">${I.dl} ${fs.length>1?'BAIXAR '+fs.length+' LÂMINAS':fs[0]&&fs[0].kind==='video'?'BAIXAR VÍDEO':'BAIXAR POST'}</button>
@@ -517,7 +551,7 @@ function closeSheet(){
 
 /* ---- toast ---- */
 let tt;
-function toast(msg,btn='',fn=null){ const t=$('#toast'); $('#toastMsg').textContent=msg; const b=$('#toastBtn'); b.textContent=btn; b.onclick=fn?()=>{t.classList.remove('show');fn();}:null; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),fn?5000:2200); }
+function toast(msg,btn='',fn=null,ms){ const t=$('#toast'); $('#toastMsg').textContent=msg; const b=$('#toastBtn'); b.textContent=btn; b.onclick=fn?()=>{t.classList.remove('show');fn();}:null; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),ms||(fn?5000:2200)); }
 
 /* ---- login ---- */
 function logout(msg){ S.pin=''; store.set('fila_sess',null); closeSheet(); showLogin(msg); }
@@ -536,6 +570,9 @@ document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]'); if(!b) return; const id=b.dataset.id, a=b.dataset.act;
   if(a==='filtro'){ S.filtro=b.dataset.f; store.set('fila_filtro',S.filtro); render(); window.scrollTo({top:0}); }
   else if(a==='open') openSheet(id,'media');
+  else if(a==='day') openSheet(id,'day');
+  else if(a==='setday'){ closeSheet(); setDia(id,b.dataset.d||null); }
+  else if(a==='go') doDownload(id,null,true);
   else if(a==='cap') openSheet(id,'cap');
   else if(a==='close') closeSheet();
   else if(a==='ver'){ S.ver[id]=b.dataset.v; openSheet(id,'cap'); }
@@ -545,7 +582,7 @@ document.addEventListener('click',e=>{
   else if(a==='posted') setPostado(id,true);
   else if(a==='undo') setPostado(id,false);
 });
-document.addEventListener('change',e=>{ const i=e.target.closest('[data-act="date"]'); if(i) setDia(i.dataset.id,i.value||null); });
+document.addEventListener('change',e=>{ const i=e.target.closest('[data-act="date"]'); if(i){ if(S.sheet) closeSheet(); setDia(i.dataset.id,i.value||null); } });
 $('#sheetBg').addEventListener('click',closeSheet);
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSheet(); });
 $('#tab-pend').onclick=()=>{S.view='pend';render();window.scrollTo({top:0});};
