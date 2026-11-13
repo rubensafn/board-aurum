@@ -292,10 +292,24 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 /* Pendentes/Postados: o ativo também acende */
 .tab.on{background:linear-gradient(160deg,rgba(167,139,250,.28),rgba(103,232,249,.12))!important;box-shadow:0 0 18px rgba(167,139,250,.32)!important;text-shadow:0 0 10px rgba(255,255,255,.35)}
 .ver.on{background:linear-gradient(160deg,rgba(243,217,119,.26),rgba(243,217,119,.08))!important;box-shadow:0 0 16px rgba(243,217,119,.28)!important;color:#fff6d6}
+
+/* ===== v11: AU colorido solto no topo, sair mais claro, topo e seletor totalmente arredondados ===== */
+#logo{background:none!important;box-shadow:none!important;width:44px}
+#logo::after{display:none}
+#logo svg{width:34px;height:26.3px;filter:drop-shadow(0 0 8px rgba(167,139,250,.45)) drop-shadow(0 0 4px rgba(243,217,119,.3))}
+#logo svg path{fill:url(#aucolor)}
+.bar{border-radius:999px!important;padding:6px 8px 6px 14px}
+.seg{border-radius:999px}
+.tab{border-radius:999px;padding:0 14px}
+#logout{width:auto;padding:0 12px;gap:6px;display:flex;align-items:center;border-radius:999px;color:#fca5a5;background:rgba(248,113,113,.08)!important;box-shadow:0 0 0 1px rgba(248,113,113,.35)!important;font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.12em}
+#logout svg{width:15px;height:15px}
+@media (max-width:480px){#logout span{display:none}#logout{padding:0;width:38px;justify-content:center}.bar{padding:6px 6px 6px 10px}}
+
+@media (max-width:480px){.bar{position:relative}.envtag{position:absolute;top:-7px;left:16px;padding:2px 6px;font-size:8px;background:rgba(10,20,26,.9)}}
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="augold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8e08e"/><stop offset=".55" stop-color="#d9b855"/><stop offset="1" stop-color="#a98742"/></linearGradient></defs></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="augold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8e08e"/><stop offset=".55" stop-color="#d9b855"/><stop offset="1" stop-color="#a98742"/></linearGradient><linearGradient id="aucolor" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3d977"/><stop offset=".35" stop-color="#fb7185"/><stop offset=".7" stop-color="#a78bfa"/><stop offset="1" stop-color="#67e8f9"/></linearGradient></defs></svg>
 <div class="bg" aria-hidden="true"></div>
 <header class="top" id="top" hidden>
   <div class="bar glass">
@@ -533,7 +547,7 @@ $('#sheetBg').addEventListener('click',closeSheet);
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSheet(); });
 $('#tab-pend').onclick=()=>{S.view='pend';render();window.scrollTo({top:0});};
 $('#tab-done').onclick=()=>{S.view='done';render();window.scrollTo({top:0});};
-$('#logout').innerHTML=I.out; $('#logout').onclick=()=>logout('');
+$('#logout').innerHTML=I.out+'<span>SAIR</span>'; $('#logout').onclick=()=>logout('');
 $('#logo').innerHTML=AU;
 if(!/^board\.aurumcinema\.com\.br$/.test(location.hostname)) $('#envtag').hidden=false; // selo DEV fora do link oficial
 
