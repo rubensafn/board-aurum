@@ -617,7 +617,7 @@ document.addEventListener('click',e=>{
 document.addEventListener('focusin',e=>{ const i=e.target.closest('[data-act="date"]'); if(i) i.dataset.orig=i.value; });
 document.addEventListener('focusout',e=>{ const i=e.target.closest('[data-act="date"]'); if(!i) return; const v=i.value||'';
   if(v===(i.dataset.orig||'')) return; if(S.sheet) closeSheet(); setDia(i.dataset.id,v||null); });
-document.addEventListener('change',e=>{ const i=e.target.closest('[data-act="date"]'); if(!i||isMobile()) return; if(S.sheet) closeSheet(); setDia(i.dataset.id,i.value||null); });
+document.addEventListener('change',e=>{ const i=e.target.closest('[data-act="date"]'); if(!i||isMobile()) return; i.dataset.orig=i.value; if(S.sheet) closeSheet(); setDia(i.dataset.id,i.value||null); });
 $('#sheetBg').addEventListener('click',()=>{ if(S.fsheet) closeFilterSheet(); else closeSheet(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(S.fsheet) closeFilterSheet(); else closeSheet(); } });
 $('#tab-pend').onclick=()=>{S.view='pend';render();window.scrollTo({top:0});};
