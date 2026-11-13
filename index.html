@@ -298,14 +298,16 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 #logo::after{display:none}
 #logo svg{width:34px;height:26.3px;filter:drop-shadow(0 0 8px rgba(167,139,250,.45)) drop-shadow(0 0 4px rgba(243,217,119,.3))}
 #logo svg path{fill:url(#aucolor)}
-.bar{border-radius:999px!important;padding:6px 8px 6px 14px}
-.seg{border-radius:999px}
-.tab{border-radius:999px;padding:0 14px}
-#logout{width:auto;padding:0 12px;gap:6px;display:flex;align-items:center;border-radius:999px;color:#fca5a5;background:rgba(248,113,113,.08)!important;box-shadow:0 0 0 1px rgba(248,113,113,.35)!important;font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.12em}
+#logout{width:auto;padding:0 12px;gap:6px;display:flex;align-items:center;border-radius:12px;color:#fca5a5;background:rgba(248,113,113,.08)!important;box-shadow:0 0 0 1px rgba(248,113,113,.35)!important;font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.12em}
 #logout svg{width:15px;height:15px}
-@media (max-width:480px){#logout span{display:none}#logout{padding:0;width:38px;justify-content:center}.bar{padding:6px 6px 6px 10px}}
+@media (max-width:480px){#logout span{display:none}#logout{padding:0;width:38px;justify-content:center}}
 
 @media (max-width:480px){.bar{position:relative}.envtag{position:absolute;top:-7px;left:16px;padding:2px 6px;font-size:8px;background:rgba(10,20,26,.9)}}
+
+/* sem brilho branco: o aceso brilha só na cor */
+.dtile.on .w,.dtile.on .n,.tab.on,.ver.on{text-shadow:none!important}
+.dtile.on .c{background:rgba(255,255,255,.16)!important;color:#fff!important}
+#logo svg{filter:drop-shadow(0 0 6px rgba(167,139,250,.30))}
 </style>
 </head>
 <body>
