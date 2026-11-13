@@ -222,7 +222,7 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 .capprev:hover{border-color:rgba(243,217,119,.4)}
 .capprev .more{position:absolute;right:10px;bottom:6px;font-family:var(--display);font-weight:700;font-size:9px;letter-spacing:.14em;color:var(--gold)}
 
-.envtag{font-size:9px;font-weight:800;letter-spacing:.16em;padding:4px 7px;border-radius:7px;color:#67e8f9;border:1px solid rgba(103,232,249,.45);background:rgba(103,232,249,.08)}
+.envtag{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:60;pointer-events:none;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:9px;font-weight:800;letter-spacing:.16em;padding:4px 7px;border-radius:7px;color:#67e8f9;border:1px solid rgba(103,232,249,.45);background:rgba(10,20,26,.75)}
 
 /* ===================================================================
    TEMA DO CLIENTE — pra fazer a versão de outro cliente, troque só isto
@@ -302,7 +302,7 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 #logout svg{width:15px;height:15px}
 @media (max-width:480px){#logout span{display:none}#logout{padding:0;width:38px;justify-content:center}}
 
-@media (max-width:480px){.bar{position:relative}.envtag{position:absolute;top:-7px;left:16px;padding:2px 6px;font-size:8px;background:rgba(10,20,26,.9)}}
+@media (max-width:480px){.envtag{padding:3px 6px;font-size:8px}}
 
 /* sem brilho branco: o aceso brilha só na cor */
 .dtile.on .w,.dtile.on .n,.tab.on,.ver.on{text-shadow:none!important}
@@ -311,11 +311,12 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 </style>
 </head>
 <body>
+<span class="envtag" id="envtag" hidden>DEV</span>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="augold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8e08e"/><stop offset=".55" stop-color="#d9b855"/><stop offset="1" stop-color="#a98742"/></linearGradient><linearGradient id="aucolor" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3d977"/><stop offset=".35" stop-color="#fb7185"/><stop offset=".7" stop-color="#a78bfa"/><stop offset="1" stop-color="#67e8f9"/></linearGradient></defs></svg>
 <div class="bg" aria-hidden="true"></div>
 <header class="top" id="top" hidden>
   <div class="bar glass">
-    <div class="brand"><div class="au" id="logo"></div><h1>FILA DE POSTS</h1><span class="envtag" id="envtag" hidden>DEV</span></div>
+    <div class="brand"><div class="au" id="logo"></div><h1>FILA DE POSTS</h1></div>
     <div class="seg" role="tablist">
       <button class="tab on" id="tab-pend" role="tab">PENDENTES <b id="c-pend">0</b></button>
       <button class="tab" id="tab-done" role="tab">POSTADOS <b id="c-done">0</b></button>
