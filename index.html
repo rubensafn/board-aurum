@@ -268,6 +268,30 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 .captext{max-height:48vh;overflow:auto}
 
 .sheet.glass,.toast.glass{position:fixed}
+
+/* ===== v10 ===== */
+/* ENTRAR / ação principal do painel: vidro dourado translúcido */
+.login .act,.act.primary{color:#fff6d6!important;background:linear-gradient(135deg,rgba(248,224,142,.30),rgba(217,184,85,.16) 55%,rgba(169,135,66,.24))!important;
+  box-shadow:0 0 0 1px rgba(243,217,119,.55),0 0 18px rgba(243,217,119,.22),inset 0 0 14px rgba(243,217,119,.10)!important;text-shadow:0 0 10px rgba(243,217,119,.45)}
+.login .act::after,.act.primary::after{background:linear-gradient(180deg,rgba(255,246,214,.7),rgba(255,255,255,.05) 30%,rgba(255,255,255,.03) 70%,rgba(243,217,119,.5))}
+/* botões do card: bordinha neon da própria cor */
+.ib.gold{box-shadow:0 0 0 1px rgba(243,217,119,.55),0 0 14px rgba(243,217,119,.20),inset 0 0 12px rgba(243,217,119,.06)!important}
+.ib.cyan{box-shadow:0 0 0 1px rgba(103,232,249,.55),0 0 14px rgba(103,232,249,.20),inset 0 0 12px rgba(103,232,249,.06)!important}
+.ib.green{box-shadow:0 0 0 1px rgba(74,222,128,.55),0 0 14px rgba(74,222,128,.20),inset 0 0 12px rgba(74,222,128,.06)!important}
+.ib.mute{box-shadow:0 0 0 1px rgba(255,255,255,.22)!important}
+/* filtro de dias: desligado apagadinho, ligado ACENDE (vidro colorido + brilho + borda neon) */
+.dtile{transition:transform .2s,box-shadow .25s,background .25s}
+.dtile:not(.on){opacity:.78}
+.dtile.on{opacity:1;transform:translateY(-2px);background:linear-gradient(160deg,rgba(167,139,250,.32),rgba(103,232,249,.14) 60%,rgba(243,217,119,.16))!important;
+  box-shadow:0 0 26px rgba(167,139,250,.38),0 10px 30px rgba(0,0,0,.4)!important}
+.dtile.on[data-tone="today"]{background:linear-gradient(160deg,rgba(251,191,36,.34),rgba(243,217,119,.12))!important;box-shadow:0 0 26px rgba(251,191,36,.38),0 10px 30px rgba(0,0,0,.4)!important}
+.dtile.on[data-tone="tomorrow"]{background:linear-gradient(160deg,rgba(167,139,250,.40),rgba(139,92,246,.14))!important;box-shadow:0 0 26px rgba(167,139,250,.45),0 10px 30px rgba(0,0,0,.4)!important}
+.dtile.on[data-tone="late"]{background:linear-gradient(160deg,rgba(248,113,113,.34),rgba(248,113,113,.10))!important;box-shadow:0 0 26px rgba(248,113,113,.38),0 10px 30px rgba(0,0,0,.4)!important}
+.dtile.on .w,.dtile.on .n{color:#fff!important;text-shadow:0 0 12px rgba(255,255,255,.45)}
+.dtile.on .c{background:#fff!important;color:#141018!important}
+/* Pendentes/Postados: o ativo também acende */
+.tab.on{background:linear-gradient(160deg,rgba(167,139,250,.28),rgba(103,232,249,.12))!important;box-shadow:0 0 18px rgba(167,139,250,.32)!important;text-shadow:0 0 10px rgba(255,255,255,.35)}
+.ver.on{background:linear-gradient(160deg,rgba(243,217,119,.26),rgba(243,217,119,.08))!important;box-shadow:0 0 16px rgba(243,217,119,.28)!important;color:#fff6d6}
 </style>
 </head>
 <body>
