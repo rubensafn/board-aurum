@@ -218,6 +218,12 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 .fname.sh{display:none;font-family:var(--body);text-transform:none;font-weight:500;letter-spacing:.02em;margin-top:3px;white-space:normal}
 @media (min-width:760px){.fname.sh{display:block}.fname{font-size:11px;color:var(--ink-2)}}
 .sh-head .film{display:flex;flex-direction:column}
+
+/* prévia da legenda com cara de botão */
+.capprev{position:relative;padding:9px 11px 24px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.015)),rgba(0,0,0,.18);border:1px solid var(--hair-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);transition:border-color .2s,background .2s}
+.capprev:active{transform:scale(.99)}
+.capprev:hover{border-color:rgba(243,217,119,.4)}
+.capprev .more{position:absolute;right:10px;bottom:6px;font-family:var(--display);font-weight:700;font-size:9px;letter-spacing:.14em;color:var(--gold)}
 </style>
 </head>
 <body>
@@ -308,8 +314,8 @@ function rowHTML(p){
     <div class="info">
       <div class="l1"><span class="num">${esc(pad(p.num??0))}</span><span class="film">${esc(p.filme||p.nome||'Post')}</span></div>
       <div class="fname">${esc(p.nome||'')}</div>
-      <div class="meta">${dayPill}${(caps(p).cel&&caps(p).pc)?`<span class="mini" role="group" aria-label="Versão da legenda"><button class="mv${verOf(p)==='cel'?' on':''}" data-act="vrow" data-v="cel" data-id="${esc(p.id)}">CEL</button><button class="mv${verOf(p)==='pc'?' on':''}" data-act="vrow" data-v="pc" data-id="${esc(p.id)}">PC</button></span>`:''}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
-      <button class="capprev" data-act="cap" data-id="${esc(p.id)}"><span class="clamp">${c?esc(c):'<i>Sem legenda</i>'}</span></button>
+      <div class="meta">${dayPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
+      <button class="capprev" data-act="cap" data-id="${esc(p.id)}"><span class="clamp">${c?esc(c):'<i>Sem legenda</i>'}</span><span class="more">VER LEGENDA ›</span></button>
       <div class="acts">${acts}</div>
     </div>
   </article>`;
