@@ -208,6 +208,7 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 .ib.gold{color:#1c1305;background:var(--gold-glass);border:1px solid rgba(255,244,200,.75);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -3px 8px rgba(120,80,0,.35),0 6px 18px rgba(217,184,85,.3)}
 .ib.cyan{color:#a5f3fc;background:var(--gloss),rgba(34,211,238,.16);border:1px solid rgba(103,232,249,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 18px rgba(34,211,238,.14)}
 .ib.green{color:#86efac;background:var(--gloss),rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 18px rgba(74,222,128,.14)}
+.ib.red{flex:0 0 44px;color:#fca5a5;background:var(--gloss),rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 18px rgba(248,113,113,.12)}
 .ib.mute{color:var(--ink-2);background:var(--gloss),rgba(255,255,255,.07);border:1px solid var(--hair-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
 .mini{display:inline-flex;gap:2px;padding:2px;border-radius:9px;background:rgba(0,0,0,.35);border:1px solid var(--hair)}
 .mv{position:relative;height:22px;padding:0 8px;border-radius:7px;font-size:9.5px;font-weight:700;letter-spacing:.1em;color:var(--mute)}
@@ -381,6 +382,7 @@ const I={
   cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
   undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>',
   out:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h3a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>',
   x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>'
 };
 const $=s=>document.querySelector(s);
@@ -433,7 +435,8 @@ function rowHTML(p){
   const acts = `<button class="ib gold" data-act="copy" data-id="${esc(p.id)}" aria-label="Copiar legenda" title="Copiar legenda" ${c?'':'disabled'}>${I.copy}</button>
        <button class="ib cyan" data-act="go" data-id="${esc(p.id)}" aria-label="Baixar e copiar legenda" title="Baixar e copiar legenda" ${fs.length&&!S.busy.has(p.id)?'':'disabled'}>${I.dl}</button>
        ${p.postado?`<button class="ib mute" data-act="undo" data-id="${esc(p.id)}" aria-label="Desfazer postado" title="Desfazer postado">${I.undo}</button>`
-                  :`<button class="ib green" data-act="posted" data-id="${esc(p.id)}" aria-label="Marcar como postado" title="Marcar como postado">${I.check}</button>`}`;
+                  :`<button class="ib green" data-act="posted" data-id="${esc(p.id)}" aria-label="Marcar como postado" title="Marcar como postado">${I.check}</button>`}
+       <button class="ib red" data-act="del" data-id="${esc(p.id)}" aria-label="Apagar post" title="Apagar post e arquivos">${I.trash}</button>`;
   return `<article class="row glass${S.copied===p.id?' copied':''}" data-row="${esc(p.id)}">
     ${thumb}
     <div class="info">
@@ -534,6 +537,17 @@ async function doDownload(id,only,comCopia){
   finally{ S.busy.delete(id); patchRow(id); }
 }
 
+/* ---- apagar post + arquivos (pede confirmação no aviso de baixo) ---- */
+function pedeApagar(id){ const p=find(id); if(!p) return; toast('Apagar '+pad(p.num??0)+' '+(p.filme||'')+' e os arquivos?','APAGAR',()=>apagar(id),6000); }
+async function apagar(id){
+  const el=document.querySelector(`[data-row="${CSS.escape(id)}"]`);
+  try{
+    const r=await fetch(SB_URL+'/functions/v1/fila-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete',pin:S.pin,id})}).then(r=>r.json());
+    if(!r||!r.ok) throw new Error();
+    if(el){ el.classList.add('leaving'); await new Promise(r=>setTimeout(r,280)); }
+    S.posts=S.posts.filter(x=>x.id!==id); if(S.copied===id){S.copied='';store.set('fila_copied',null);} S.sig=''; render(); toast('Post e arquivos apagados');
+  }catch(_){ toast('Não apagou. Tenta de novo.'); }
+}
 function perguntaPostou(id,msg){ const p=find(id); if(!p||p.postado){ toast(msg); return; } toast(msg+' · Postou?','SIM, POSTEI',()=>setPostado(id,true),10000); }
 
 /* ---- seletor rápido de dia ---- */
@@ -618,6 +632,7 @@ document.addEventListener('click',e=>{
   else if(a==='dl') doDownload(id,null);
   else if(a==='posted') setPostado(id,true);
   else if(a==='undo') setPostado(id,false);
+  else if(a==='del') pedeApagar(id);
 });
 /* calendário do iPhone: só salva quando ele FECHA (o ✓ ou o Reset), não no primeiro toque */
 document.addEventListener('focusin',e=>{ const i=e.target.closest('[data-act="date"]'); if(i) i.dataset.orig=i.value; });
