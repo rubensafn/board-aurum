@@ -398,6 +398,16 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .aviso{display:flex;align-items:flex-start;gap:8px;padding:9px 11px;border-radius:12px;font-size:11.5px;line-height:1.4;font-weight:600;color:#fecdd3;
   background:rgba(251,113,133,.10);box-shadow:0 0 0 1px rgba(251,113,133,.45),0 0 14px rgba(251,113,133,.14)}
 .aviso svg{width:15px;height:15px;flex:none;margin-top:1px;color:var(--rose);filter:drop-shadow(0 0 6px rgba(251,113,133,.5))}
+/* ===== v15: POSTADOS · APAGAR TODOS (some do board, histórico fica no banco) ===== */
+.donebar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 2px 0}
+.donebar span{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.12em;color:var(--mute)}
+.donebar span b{font-family:var(--body);color:var(--green);font-variant-numeric:tabular-nums;margin-right:4px}
+.clearall{flex:none;height:36px;padding:0 14px;border-radius:12px;display:flex;align-items:center;gap:7px;font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.1em;
+  color:var(--red);background:rgba(248,113,113,.07);box-shadow:0 0 0 1px rgba(248,113,113,.5),0 0 14px rgba(248,113,113,.16),inset 0 0 12px rgba(248,113,113,.06);transition:transform .12s}
+.clearall svg{width:15px;height:15px;filter:drop-shadow(0 0 6px rgba(248,113,113,.4))}
+.clearall:active{transform:scale(.97)}
+.clearall[disabled]{opacity:.5;pointer-events:none}
+.list.clearing .row{opacity:0;transform:scale(.98);transition:opacity .28s,transform .28s}
 .hother{display:grid;grid-template-columns:1fr 1fr auto;align-items:center;gap:8px}
 .hother>span{display:flex;align-items:center;gap:7px;font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.1em;color:var(--ink-2)}
 .hother>span svg{width:15px;height:15px}
@@ -664,7 +674,8 @@ function render(){
     if(!items.length){ list.innerHTML=emptyHTML('NADA APROVADO','O que você aprovar fica aqui esperando o horário de postar.'); }
     else list.innerHTML=items.map(rowHTML).join(''); return; }
   if(S.view==='done'){ items=done.slice().sort((a,b)=>(b.postado_em||'').localeCompare(a.postado_em||''));
-    if(!items.length){ list.innerHTML=emptyHTML('NADA POSTADO AINDA','O que você marcar como postado aparece aqui.'); return; } }
+    if(!items.length){ list.innerHTML=emptyHTML('NADA POSTADO AINDA','O que você marcar como postado aparece aqui.'); return; }
+    list.innerHTML=`<div class="donebar"><span><b>${items.length}</b>${items.length>1?'POSTADOS':'POSTADO'}</span><button class="clearall" data-act="clearall">${I.trash} APAGAR TODOS</button></div>`+items.map(rowHTML).join(''); return; }
   else { items=S.filtro==='todos'?pend:pend.filter(p=>dayKey(p)===S.filtro);
     if(!items.length){ list.innerHTML=!S.posts.length?emptyHTML('FILA VAZIA','O próximo lote com selo AU entra aqui.'):!pend.length?emptyHTML('TUDO POSTADO','O próximo lote entra aqui assim que ficar pronto.'):emptyHTML('NADA NESSE DIA','Nenhum post pendente marcado pra esse dia.'); return; } }
   list.innerHTML=items.map(rowHTML).join('');
@@ -753,6 +764,18 @@ async function apagar(id){
     if(el){ el.classList.add('leaving'); await new Promise(r=>setTimeout(r,280)); }
     S.posts=S.posts.filter(x=>x.id!==id); if(S.copied===id){S.copied='';store.set('fila_copied',null);} S.sig=''; render(); toast('Post e arquivos apagados');
   }catch(_){ toast('Não apagou. Tenta de novo.'); }
+}
+/* ---- apagar todos os postados: sai do board, mas fica no banco como histórico (o que já foi postado) ---- */
+function pedeLimpar(){ const n=S.posts.filter(p=>p.postado).length; if(!n) return; toast('Tirar '+n+(n>1?' postados':' postado')+' do board?','APAGAR TODOS',limparPostados,6000); }
+async function limparPostados(){
+  const list=$('#list'), bt=document.querySelector('[data-act="clearall"]'); if(bt) bt.disabled=true;
+  try{
+    const n=await rpc('fila_arquivar_postados',{p_pin:S.pin});
+    list.classList.add('clearing'); await new Promise(r=>setTimeout(r,280)); list.classList.remove('clearing');
+    const ids=new Set(S.posts.filter(p=>p.postado).map(p=>p.id)); S.posts=S.posts.filter(p=>!p.postado);
+    if(ids.has(S.copied)){S.copied='';store.set('fila_copied',null);} S.sig=''; render();
+    toast((n||ids.size)+((n||ids.size)>1?' postados saíram':' postado saiu')+' do board · histórico salvo');
+  }catch(e){ if(bt) bt.disabled=false; if(e.code==='28000'){logout('Senha inválida');return;} toast('Não apagou. Tenta de novo.'); }
 }
 function perguntaPostou(id,msg){ const p=find(id); if(!p||p.postado){ toast(msg); return; } toast(msg+' · Postou?','SIM, POSTEI',()=>setPostado(id,true),10000); }
 
@@ -902,6 +925,7 @@ document.addEventListener('click',e=>{
   else if(a==='dl') doDownload(id,null);
   else if(a==='posted') setPostado(id,true);
   else if(a==='undo') setPostado(id,false);
+  else if(a==='clearall') pedeLimpar();
   else if(a==='del') pedeApagar(id);
   else if(a==='slide'){ const tr=$('#track'); if(tr) tr.scrollBy({left:tr.clientWidth*(+b.dataset.d),behavior:'smooth'}); }
   else if(a==='hora') openSheet(id,'hora');
