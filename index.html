@@ -405,7 +405,8 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .hother .act{height:46px;padding:0 16px}
 @media (max-width:420px){.hother{grid-template-columns:1fr auto}.hother>span{grid-column:1/-1}}
 .pill.dest.fixo{cursor:default}
-.pill.bang{cursor:pointer;width:22px;padding:0;justify-content:center;font-weight:800;font-size:12px;color:var(--amber)!important;border-color:rgba(251,191,36,.45)!important;background:rgba(251,191,36,.10)!important}
+@media (max-width:420px){.meta{gap:4px}.meta .pill{padding:0 6px;gap:4px;letter-spacing:.05em}.meta .pill svg{width:10px;height:10px}.meta .pill.dest svg{display:none}}
+.pill.dest.st.sel{color:var(--rose)!important;background:rgba(251,113,133,.10)!important;border-color:rgba(251,113,133,.45)!important}
 .hpick{grid-template-columns:repeat(3,1fr)}
 .hpick .dtile{height:78px}
 .hpick .dtile .x{font-size:9.5px;font-weight:700;letter-spacing:.06em;color:var(--mute);margin-top:2px}
@@ -521,7 +522,7 @@ function rowHTML(p){
     : p.ig_status==='erro' ? `<span class="pill late" title="${esc(p.ig_erro||'')}">ERRO AO POSTAR</span>` : '';
   const dFeed=p.destino==='feed'||p.destino==='feed_story', dStory=p.destino==='story'||p.destino==='feed_story', travaDest=trava||p.aprovado||p.postado;
   const fixo=destFixo(p);
-  const destPills = fixo ? `<span class="pill dest sel fixo">${fixo==='story'?'SÓ STORY':'FEED'}</span>${fixo==='feed'&&!p.postado?`<button class="pill bang" data-act="bang" aria-label="Quer no story também?" title="Quer no story também?">!</button>`:''}` : p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
+  const destPills = fixo ? `<span class="pill dest sel fixo${fixo==='story'?' st':''}">${fixo==='story'?'STORY':'FEED'}</span>` : p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest st${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
   const quando = p.dia&&p.hora ? dayText(p.dia)+' '+p.hora : '';
   const aprov = p.postado||trava ? '' : p.aprovado
     ? `<div class="aprov ok"><span>${I.check} APROVADO · ${esc(quando)}${p.destino==='feed_story'?' · FEED+STORY':p.destino==='story'?' · STORY':''}</span><button data-act="desaprovar" data-id="${esc(p.id)}" aria-label="Desfazer aprovação" title="Desfazer aprovação">${I.undo}</button></div>`
@@ -787,7 +788,6 @@ document.addEventListener('click',e=>{
   else if(a==='slide'){ const tr=$('#track'); if(tr) tr.scrollBy({left:tr.clientWidth*(+b.dataset.d),behavior:'smooth'}); }
   else if(a==='hora') openSheet(id,'hora');
   else if(a==='hset'){ const v=($('#hin')||{}).value||''; if(!/^\d{2}:\d{2}$/.test(v)){ toast('Digita o horário (ex.: 18:45)'); return; } closeSheet(); setHora(id,v); }
-  else if(a==='bang'){ toast('É de feed. Quer no story também? Depois que postar, encaminha o post e adiciona ao story pelo app.','',null,7000); }
   else if(a==='sethora'){ closeSheet(); setHora(id,b.dataset.h||null); }
   else if(a==='aprovar') setAprovado(id,true);
   else if(a==='dest') toggleDestino(id,b.dataset.v);
