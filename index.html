@@ -406,6 +406,14 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 @media (max-width:420px){.hother{grid-template-columns:1fr auto}.hother>span{grid-column:1/-1}}
 .pill.dest.fixo{cursor:default}
 @media (max-width:420px){.meta{gap:4px}.meta .pill{padding:0 6px;gap:4px;letter-spacing:.05em}.meta .pill svg{width:10px;height:10px}.meta .pill.dest svg{display:none}}
+.aprov-bts{display:flex;flex:none;gap:2px}
+.aprov .apl{font-style:normal}
+.ed-sec{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.12em;color:var(--ink-2);margin:2px 0 -2px}
+.ed-res{padding:12px;border-radius:14px;text-align:center;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.08em;color:#c4b5fd;box-shadow:0 0 0 1px rgba(167,139,250,.3);background:rgba(167,139,250,.06)}
+.ed-save{width:100%;min-height:50px;flex:none;justify-content:center}
+.edw{display:grid;gap:10px}
+.edw .dpick .dtile{height:56px}.edw .hpick .dtile{height:56px}
+@media (max-width:420px){.aprov.ok span{letter-spacing:.03em;font-size:9.5px;gap:5px}.aprov.ok .apl{display:none}.edw .hother .field{height:42px}}
 .cfm{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;background:rgba(5,5,10,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .2s}
 .cfm.show{opacity:1;pointer-events:auto}
 .cfm-box{width:min(380px,100%);border-radius:22px;padding:22px 20px 18px;display:grid;gap:10px;text-align:center;justify-items:center;transform:scale(.96);transition:transform .2s}
@@ -471,6 +479,7 @@ const I={
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>',
   play:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15l13-7.5z"/></svg>',
   cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
+  pen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
   undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>',
   out:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h3a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg>',
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>',
@@ -538,7 +547,7 @@ function rowHTML(p){
   const destPills = fixo ? `<span class="pill dest sel fixo${fixo==='story'?' st':''}">${fixo==='story'?'STORY':'FEED'}</span>` : p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest st${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
   const quando = p.dia&&p.hora ? dayText(p.dia)+' '+p.hora : '';
   const aprov = p.postado||trava ? '' : p.aprovado
-    ? `<div class="aprov ok"><span>${I.check} APROVADO · ${esc(quando)}${p.destino==='feed_story'?' · FEED+STORY':p.destino==='story'?' · STORY':''}</span><button data-act="desaprovar" data-id="${esc(p.id)}" aria-label="Desfazer aprovação" title="Desfazer aprovação">${I.undo}</button></div>`
+    ? `<div class="aprov ok"><span>${I.check} <i class="apl">APROVADO · </i>${esc(quando)}${p.destino==='feed_story'?' · FEED+STORY':p.destino==='story'?' · STORY':''}</span><span class="aprov-bts"><button data-act="editar" data-id="${esc(p.id)}" aria-label="Editar dia e horário" title="Editar dia e horário">${I.pen}</button><button data-act="desaprovar" data-id="${esc(p.id)}" aria-label="Desfazer aprovação" title="Desfazer aprovação">${I.undo}</button></span></div>`
     : `<button class="aprov" data-act="aprovar" data-id="${esc(p.id)}">${I.send} ${p.ig_status==='erro'?'TENTAR DE NOVO':'APROVAR'}${quando?' · '+esc(quando):''}</button>`;
   const acts = `<button class="ib gold" data-act="copy" data-id="${esc(p.id)}" aria-label="Copiar legenda" title="Copiar legenda" ${c?'':'disabled'}>${I.copy}</button>
        <button class="ib cyan" data-act="go" data-id="${esc(p.id)}" aria-label="Baixar e copiar legenda" title="Baixar e copiar legenda" ${fs.length&&!S.busy.has(p.id)?'':'disabled'}>${I.dl}</button>
@@ -696,6 +705,31 @@ function daySheetHTML(p){
     ${p.dia?`<button class="act dclear" data-act="setday" data-d="" data-id="${esc(p.id)}">${I.x} TIRAR O DIA</button>`:''}`;
 }
 
+/* ---- editar agendamento de um aprovado (sem voltar pra pendente) ---- */
+function editSheetHTML(p){
+  const e=S.ed, opts=[]; for(let i=0;i<5;i++){ const d=new Date(); d.setDate(d.getDate()+i); const k=iso(d), pp=parts(k);
+    opts.push({k,w:i===0?'HOJE':i===1?'AMANHÃ':pp.w,n:pp.d,tn:i===0?'today':i===1?'tomorrow':''}); }
+  return `<div class="edw"><span class="ed-sec">DIA</span>
+    <div class="dpick">${opts.map(o=>`<button class="dtile glass${e.dia===o.k?' on':''}" ${o.tn?`data-tone="${o.tn}"`:''} data-act="eday" data-d="${o.k}"><span class="w">${o.w}</span><span class="n">${o.n}</span></button>`).join('')}</div>
+    <label class="act dother">${I.cal} OUTRA DATA<input type="date" id="edate" value="${esc(e.dia||'')}" aria-label="Outra data"></label>
+    <span class="ed-sec">HORÁRIO</span>
+    <div class="dpick hpick">${HORAS.map(h=>`<button class="dtile glass${e.hora===h?' on':''}" data-act="ehora" data-h="${h}"><span class="w">${h==='12:30'?'ALMOÇO':h==='15:00'?'TARDE':h==='17:30'?'FIM TARDE':'NOITE'}</span><span class="n">${h}</span></button>`).join('')}</div>
+    <div class="hother"><span>${I.clock} OUTRO HORÁRIO</span><input class="field" type="time" id="ehin" value="${esc(e.hora||'')}" step="60" aria-label="Outro horário"></div>
+    <div class="ed-res" id="edres">POSTA ${esc(dayText(e.dia))} ÀS ${esc(e.hora)}</div>
+    <button class="act primary ed-save" data-act="esave" data-id="${esc(p.id)}">${I.check} SALVAR ALTERAÇÕES</button></div>`;
+}
+function edRefresh(){ const p=find(S.sheet&&S.sheet.id); if(!p) return; $('#sheet .sh-body').innerHTML=editSheetHTML(p); }
+async function edSalvar(id,agoraOk){
+  const p=find(id); if(!p) return; const h=($('#ehin')||{}).value||S.ed.hora, d=S.ed.dia;
+  if(!d||!/^\d{2}:\d{2}$/.test(h)){ toast('Escolhe o dia e o horário'); return; }
+  const quando=new Date(d+'T'+h+':00');
+  if(!agoraOk&&quando.getTime()<=Date.now()+5*60e3){ confirmar(quando<Date.now()?'ESSE HORÁRIO JÁ PASSOU':'FALTA MENOS DE 5 MIN',(quando<Date.now()?'O horário '+h+' já passou.':'Fica marcado pra '+h+'.')+' Salvando, o post vai pro Instagram em até 5 minutos.','POSTAR AGORA',()=>edSalvar(id,true)); return; }
+  closeSheet();
+  try{ if(d!==p.dia) await rpc('fila_set_dia',{p_pin:S.pin,p_id:id,p_dia:d}); if(h!==p.hora) await rpc('fila_set_hora',{p_pin:S.pin,p_id:id,p_hora:h});
+    p.dia=d; p.hora=h; S.sig=''; render(); toast('Alteração salva · posta '+dayText(d)+' às '+h); }
+  catch(_){ toast('Não salvou. Tenta de novo.'); load(); }
+}
+
 /* ---- seletor rápido de horário ---- */
 const HORAS=['12:30','15:00','17:30','20:30'];
 /* alcance x média do @aurum.cinema — últimos 200 posts (06/10 a 14/11/2026) */
@@ -738,6 +772,8 @@ function openSheet(id,mode){
     body=daySheetHTML(p);
   } else if(mode==='hora'){
     body=horaSheetHTML(p);
+  } else if(mode==='edit'){
+    S.ed={dia:p.dia,hora:p.hora}; body=editSheetHTML(p);
   } else if(mode==='media'){
     const slides=fs.map(f=>f.kind==='video'?`<video src="${esc(f.url)}" ${f.poster?`poster="${esc(f.poster)}"`:''} controls playsinline autoplay preload="auto"></video>`:`<img src="${esc(f.url)}" alt="">`).join('');
     body=`<div class="player" style="--ar:${ar(fs[0])}">${fs.length>1?`<div class="track" id="track">${slides}</div>
@@ -791,6 +827,10 @@ document.addEventListener('click',e=>{
   else if(a==='open') openSheet(id,'media');
   else if(a==='fclose') closeFilterSheet();
   else if(a==='day') openSheet(id,'day');
+  else if(a==='editar') openSheet(id,'edit');
+  else if(a==='eday'){ S.ed.dia=b.dataset.d; edRefresh(); }
+  else if(a==='ehora'){ S.ed.hora=b.dataset.h; edRefresh(); }
+  else if(a==='esave') edSalvar(id);
   else if(a==='setday'){ closeSheet(); setDia(id,b.dataset.d||null); }
   else if(a==='go') doDownload(id,null,true);
   else if(a==='cap') openSheet(id,'cap');
@@ -818,6 +858,7 @@ document.addEventListener('focusout',e=>{ const i=e.target.closest('[data-act="d
 document.addEventListener('focusin',e=>{ const i=e.target.closest('[data-act="time"]'); if(i) i.dataset.orig=i.value; });
 document.addEventListener('focusout',e=>{ const i=e.target.closest('[data-act="time"]'); if(!i) return; const v=i.value||''; if(v===(i.dataset.orig||'')) return; if(S.sheet) closeSheet(); setHora(i.dataset.id,v||null); });
 document.addEventListener('change',e=>{ const i=e.target.closest('[data-act="time"]'); if(!i||isMobile()) return; i.dataset.orig=i.value; if(S.sheet) closeSheet(); setHora(i.dataset.id,i.value||null); });
+document.addEventListener('change',e=>{ if(e.target.id==='edate'&&e.target.value){ S.ed.dia=e.target.value; edRefresh(); return; } if(e.target.id==='ehin'&&e.target.value){ S.ed.hora=e.target.value; const r=$('#edres'); if(r) r.textContent='POSTA '+dayText(S.ed.dia)+' ÀS '+S.ed.hora; return; } });
 document.addEventListener('change',e=>{ const i=e.target.closest('[data-act="date"]'); if(!i||isMobile()) return; i.dataset.orig=i.value; if(S.sheet) closeSheet(); setDia(i.dataset.id,i.value||null); });
 $('#sheetBg').addEventListener('click',()=>{ if(S.fsheet) closeFilterSheet(); else closeSheet(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(S.fsheet) closeFilterSheet(); else closeSheet(); } });
