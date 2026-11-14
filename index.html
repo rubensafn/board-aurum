@@ -294,6 +294,12 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 .ver.on{background:linear-gradient(160deg,rgba(243,217,119,.26),rgba(243,217,119,.08))!important;box-shadow:0 0 16px rgba(243,217,119,.28)!important;color:#fff6d6}
 
 /* ===== v11: AU colorido solto no topo, sair mais claro, topo e seletor totalmente arredondados ===== */
+/* login: centralizado também no PC (fora da grade de 2 colunas) e AU colorido igual ao do topo */
+.list>.login{grid-column:1/-1;justify-self:center;width:100%;max-width:360px}
+.login .au{background:none!important;box-shadow:none!important;width:64px;height:54px}
+.login .au::after{display:none}
+.login .au svg{width:46px;height:35.6px;filter:drop-shadow(0 0 10px rgba(167,139,250,.45)) drop-shadow(0 0 5px rgba(243,217,119,.3))}
+.login .au svg path{fill:url(#aucolor)}
 #logo{background:none!important;box-shadow:none!important;width:44px}
 #logo::after{display:none}
 #logo svg{width:34px;height:26.3px;filter:drop-shadow(0 0 8px rgba(167,139,250,.45)) drop-shadow(0 0 4px rgba(243,217,119,.3))}
