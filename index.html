@@ -406,6 +406,16 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 @media (max-width:420px){.hother{grid-template-columns:1fr auto}.hother>span{grid-column:1/-1}}
 .pill.dest.fixo{cursor:default}
 @media (max-width:420px){.meta{gap:4px}.meta .pill{padding:0 6px;gap:4px;letter-spacing:.05em}.meta .pill svg{width:10px;height:10px}.meta .pill.dest svg{display:none}}
+.cfm{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;background:rgba(5,5,10,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .2s}
+.cfm.show{opacity:1;pointer-events:auto}
+.cfm-box{width:min(380px,100%);border-radius:22px;padding:22px 20px 18px;display:grid;gap:10px;text-align:center;justify-items:center;transform:scale(.96);transition:transform .2s}
+.cfm.show .cfm-box{transform:none}
+.cfm-ic{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:var(--amber);background:rgba(251,191,36,.10);box-shadow:0 0 0 1px rgba(251,191,36,.4),0 0 22px rgba(251,191,36,.25)}
+.cfm-ic svg{width:22px;height:22px}
+.cfm-box b{font-family:var(--display);font-size:17px;letter-spacing:.06em}
+.cfm-box p{margin:0;font-size:13px;line-height:1.45;color:var(--ink-2)}
+.cfm-bt{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:6px}
+.cfm-bt .act{height:46px;justify-content:center}
 .pill.dest.st.sel{color:var(--rose)!important;background:rgba(251,113,133,.10)!important;border-color:rgba(251,113,133,.45)!important}
 .hpick{grid-template-columns:repeat(4,1fr)}
 .hpick .dtile .x.tst{color:var(--violet)}
@@ -444,6 +454,7 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 <main class="wrap"><div class="list" id="list"></div></main>
 <div class="sheet-bg" id="sheetBg"></div>
 <section class="sheet glass" id="sheet" role="dialog" aria-modal="true" aria-label="Detalhes do post"></section>
+<div class="cfm" id="cfm" role="alertdialog" aria-modal="true" aria-labelledby="cfmT"><div class="cfm-box glass"><span class="cfm-ic" id="cfmIc"></span><b id="cfmT"></b><p id="cfmP"></p><div class="cfm-bt"><button class="act" id="cfmNo">CANCELAR</button><button class="act primary" id="cfmOk"></button></div></div></div>
 <div class="toast glass" id="toast" role="status" aria-live="polite"><span id="toastMsg"></span><button id="toastBtn"></button></div>
 
 <script>
@@ -617,7 +628,7 @@ async function toggleDestino(id,which){
 async function setAprovado(id,v,agoraOk){
   const p=find(id); if(!p) return;
   if(v&&p.dia&&p.hora&&!agoraOk){ const quando=new Date(p.dia+'T'+p.hora+':00');
-    if(quando.getTime()<=Date.now()+5*60e3){ toast(quando<Date.now()?'Esse horário ('+p.hora+') já passou: aprovando, posta AGORA (em até 5 min).':'Falta menos de 5 min: posta logo em seguida.','POSTAR AGORA',()=>setAprovado(id,true,true),9000); return; } }
+    if(quando.getTime()<=Date.now()+5*60e3){ confirmar(quando<Date.now()?'ESSE HORÁRIO JÁ PASSOU':'FALTA MENOS DE 5 MIN', (quando<Date.now()?'O horário '+p.hora+' já passou.':'Está marcado pra '+p.hora+'.')+' Se aprovar agora, o post vai pro Instagram em até 5 minutos.','POSTAR AGORA',()=>setAprovado(id,true,true)); return; } }
   if(v&&(!p.dia||!p.hora)){ toast(!p.dia&&!p.hora?'Escolhe o dia e o horário antes de aprovar':!p.dia?'Escolhe o dia antes de aprovar':'Escolhe o horário antes de aprovar'); return; }
   const fx=destFixo(p);
   if(v&&fx&&p.destino!==fx){ try{ await rpc('fila_set_destino',{p_pin:S.pin,p_id:id,p_destino:fx}); p.destino=fx; }catch(_){ toast('Não salvou. Tenta de novo.'); return; } }
@@ -755,6 +766,9 @@ function closeSheet(){
 
 /* ---- toast ---- */
 let tt;
+function confirmar(t,msg,ok,fn){ const c=$('#cfm'); $('#cfmIc').innerHTML=I.clock; $('#cfmT').textContent=t; $('#cfmP').textContent=msg; $('#cfmOk').textContent=ok;
+  const fechar=()=>{c.classList.remove('show');document.removeEventListener('keydown',esc_)}, esc_=e=>{if(e.key==='Escape')fechar();};
+  $('#cfmOk').onclick=()=>{fechar();fn();}; $('#cfmNo').onclick=fechar; c.onclick=e=>{if(e.target===c)fechar();}; document.addEventListener('keydown',esc_); c.classList.add('show'); setTimeout(()=>$('#cfmOk').focus(),50); }
 function toast(msg,btn='',fn=null,ms){ const t=$('#toast'); $('#toastMsg').textContent=msg; const b=$('#toastBtn'); b.textContent=btn; b.onclick=fn?()=>{t.classList.remove('show');fn();}:null; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),ms||(fn?5000:2200)); }
 
 /* ---- login ---- */
