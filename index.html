@@ -366,7 +366,7 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .aprov.ok{justify-content:space-between;color:#c4b5fd;background:rgba(167,139,250,.06);box-shadow:0 0 0 1px rgba(167,139,250,.28)}
 .aprov.ok span{letter-spacing:.06em;font-size:10px;display:flex;align-items:center;gap:7px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .aprov.ok button{flex:none;color:var(--mute);padding:6px 2px 6px 8px;display:grid;place-items:center}.aprov.ok button svg{width:16px;height:16px;filter:none}
-.hpick{grid-template-columns:repeat(3,1fr)}
+.hpick{grid-template-columns:repeat(4,1fr)}
 .hpick .dtile .w{font-size:8.5px}
 .player .nav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:26px;line-height:1;color:#fff;padding-bottom:3px;
   background:rgba(10,10,14,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 0 0 1px rgba(255,255,255,.22)}
@@ -407,7 +407,9 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .pill.dest.fixo{cursor:default}
 @media (max-width:420px){.meta{gap:4px}.meta .pill{padding:0 6px;gap:4px;letter-spacing:.05em}.meta .pill svg{width:10px;height:10px}.meta .pill.dest svg{display:none}}
 .pill.dest.st.sel{color:var(--rose)!important;background:rgba(251,113,133,.10)!important;border-color:rgba(251,113,133,.45)!important}
-.hpick{grid-template-columns:repeat(3,1fr)}
+.hpick{grid-template-columns:repeat(4,1fr)}
+.hpick .dtile .x.tst{color:var(--violet)}
+@media (max-width:420px){.hpick{gap:6px}.hpick .dtile{padding:6px 2px}.hpick .dtile .n{font-size:17px}.hpick .dtile .x{font-size:8.5px;letter-spacing:.02em}}
 .hpick .dtile{height:78px}
 .hpick .dtile .x{font-size:9.5px;font-weight:700;letter-spacing:.06em;color:var(--mute);margin-top:2px}
 .hpick .dtile .x.up{color:#4ade80}
@@ -684,20 +686,21 @@ function daySheetHTML(p){
 }
 
 /* ---- seletor rápido de horário ---- */
-const HORAS=['12:30','15:00','17:30'];
+const HORAS=['12:30','15:00','17:30','20:30'];
 /* alcance x média do @aurum.cinema — últimos 200 posts (06/10 a 14/11/2026) */
 const HDADOS={
   reels:{t:'REELS',fx:[['14h–16h',1.08,'15:00'],['17h–18h',1.03,'17:30'],['19h–20h',.92,'']],n:'Reels: melhor entre 14h e 16h. Depois das 19h cai.'},
   est:{t:'ESTÁTICO / CARROSSEL',fx:[['11h–13h',1.32,'12:30'],['14h+',1.0,'15:00 17:30']],n:'Estático: almoço (11h–13h) foi bem acima (16 posts). 21h+ teve poucos posts, pouco pra confiar.'}};
 function hdOf(p){ const f=(p.arquivos||[])[0]; return f&&f.kind==='video'?HDADOS.reels:HDADOS.est; }
-function hTag(d,h){ const r=d.fx.find(x=>x[2].split(' ').includes(h)); if(!r) return {t:'SEM DADO',c:''}; const v=Math.round((r[1]-1)*100); return {t:v>0?'+'+v+'% ALCANCE':v<0?v+'% ALCANCE':'NA MÉDIA',c:v>0?'up':'',v}; }
+const HMERC='Estudos 2026: no Brasil o pico de uso do Instagram é 18h–22h (Metricool: 19h–21h; Sociality: 20h–0h). No @aurum.cinema quase não tem post à noite: 20:30 é TESTE pra medir.';
+function hTag(d,h){ if(h==='20:30') return {t:'TESTE',c:'tst'}; const r=d.fx.find(x=>x[2].split(' ').includes(h)); if(!r) return {t:'SEM DADO',c:''}; const v=Math.round((r[1]-1)*100); return {t:v>0?'+'+v+'% ALCANCE':v<0?v+'% ALCANCE':'NA MÉDIA',c:v>0?'up':'',v}; }
 function horaSheetHTML(p){
   const d=hdOf(p), tags=HORAS.map(h=>hTag(d,h)), best=Math.max(...tags.map(t=>t.v??-99));
   const mx=Math.max(...d.fx.map(x=>x[1]));
-  return `<div class="dpick hpick">${HORAS.map((h,i)=>`<button class="dtile glass${p.hora===h?' on':''}${tags[i].v===best&&best>0?' best':''}" data-act="sethora" data-h="${h}" data-id="${esc(p.id)}"><span class="w">${h==='12:30'?'ALMOÇO':h==='15:00'?'TARDE':'FIM DE TARDE'}</span><span class="n">${h}</span><span class="x ${tags[i].c}">${tags[i].t}</span></button>`).join('')}</div>
+  return `<div class="dpick hpick">${HORAS.map((h,i)=>`<button class="dtile glass${p.hora===h?' on':''}${tags[i].v===best&&best>0?' best':''}" data-act="sethora" data-h="${h}" data-id="${esc(p.id)}"><span class="w">${h==='12:30'?'ALMOÇO':h==='15:00'?'TARDE':h==='17:30'?'FIM TARDE':'NOITE'}</span><span class="n">${h}</span><span class="x ${tags[i].c}">${tags[i].t}</span></button>`).join('')}</div>
     <div class="hdata glass"><span class="ht">ALCANCE x MÉDIA · ${d.t} · ÚLTIMOS 200 POSTS</span>
       ${d.fx.map(x=>{const v=Math.round((x[1]-1)*100);return `<div class="hr ${v>0?'up':v<0?'dn':''}"><span>${x[0]}</span><b style="width:${Math.round(x[1]/mx*100)}%"></b><span>${v>0?'+':''}${v}%</span></div>`}).join('')}
-      <span class="hn">${d.n}</span></div>
+      <span class="hn">${d.n}</span><span class="hn">${HMERC}</span></div>
     <div class="hother"><span>${I.clock} OUTRO HORÁRIO</span><input class="field" type="time" id="hin" value="${esc(p.hora||'')}" step="60" aria-label="Outro horário"><button class="act primary" data-act="hset" data-id="${esc(p.id)}">USAR</button></div>
     ${p.hora?`<button class="act dclear" data-act="sethora" data-h="" data-id="${esc(p.id)}">${I.x} TIRAR O HORÁRIO</button>`:''}`;
 }
