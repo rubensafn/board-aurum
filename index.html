@@ -368,6 +368,13 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .aprov.ok button{flex:none;color:var(--mute);padding:6px 2px 6px 8px;display:grid;place-items:center}.aprov.ok button svg{width:16px;height:16px;filter:none}
 .hpick{grid-template-columns:repeat(3,1fr)}
 .hpick .dtile .w{font-size:8.5px}
+.player .nav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:26px;line-height:1;color:#fff;padding-bottom:3px;
+  background:rgba(10,10,14,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 0 0 1px rgba(255,255,255,.22)}
+.player .nav.prev{left:8px}.player .nav.next{right:8px}.player .nav[hidden]{display:none}
+.player .dots{position:absolute;left:0;right:0;bottom:10px;z-index:3;display:flex;justify-content:center;gap:6px;pointer-events:none}
+.player .dots span{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.4);transition:width .2s,background .2s}
+.player .dots span.cur{width:16px;background:#fff}
+.player .cnt{position:absolute;top:10px;right:10px;z-index:3;padding:3px 8px;border-radius:8px;font-size:11px;font-weight:700;background:rgba(10,10,14,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 </style>
 </head>
 <body>
@@ -635,7 +642,9 @@ function openSheet(id,mode){
     body=horaSheetHTML(p);
   } else if(mode==='media'){
     const slides=fs.map(f=>f.kind==='video'?`<video src="${esc(f.url)}" ${f.poster?`poster="${esc(f.poster)}"`:''} controls playsinline autoplay preload="auto"></video>`:`<img src="${esc(f.url)}" alt="">`).join('');
-    body=`<div class="player" style="--ar:${ar(fs[0])}">${fs.length>1?`<div class="track">${slides}</div>`:slides}</div>
+    body=`<div class="player" style="--ar:${ar(fs[0])}">${fs.length>1?`<div class="track" id="track">${slides}</div>
+        <button class="nav prev" data-act="slide" data-d="-1" aria-label="Lâmina anterior" hidden>‹</button><button class="nav next" data-act="slide" data-d="1" aria-label="Próxima lâmina">›</button>
+        <div class="dots">${fs.map((_,i)=>`<span class="${i?'':'cur'}"></span>`).join('')}</div><span class="cnt" id="cnt">1/${fs.length}</span>`:slides}</div>
       <div class="sh-acts"><button class="act" data-act="dl" data-id="${esc(p.id)}">${I.dl} ${fs.length>1?'BAIXAR '+fs.length+' LÂMINAS':fs[0]&&fs[0].kind==='video'?'BAIXAR VÍDEO':'BAIXAR POST'}</button>
       <button class="act primary" data-act="copy" data-id="${esc(p.id)}">${I.copy} COPIAR LEGENDA</button></div>`;
   } else {
@@ -645,7 +654,12 @@ function openSheet(id,mode){
   }
   $('#sheet').innerHTML=head+`<div class="sh-body">${body}</div>`;
   $('#sheet').classList.add('open'); $('#sheetBg').classList.add('open'); document.body.style.overflow='hidden';
+  const tr=$('#track'); if(tr) tr.addEventListener('scroll',()=>slideUI(tr),{passive:true});
 }
+function slideUI(tr){ const n=tr.children.length, i=Math.round(tr.scrollLeft/tr.clientWidth);
+  const pl=tr.parentElement; pl.querySelectorAll('.dots span').forEach((d,k)=>d.classList.toggle('cur',k===i));
+  pl.querySelector('.prev').hidden=i<=0; pl.querySelector('.next').hidden=i>=n-1; const c=pl.querySelector('.cnt'); if(c) c.textContent=(i+1)+'/'+n;
+  tr.querySelectorAll('video').forEach((v,k)=>{ if(k!==i) v.pause(); }); }
 function closeSheet(){
   if(!S.sheet) return; const v=$('#sheet video'); if(v) v.pause();
   $('#sheet').classList.remove('open'); $('#sheetBg').classList.remove('open'); document.body.style.overflow='';
@@ -687,6 +701,7 @@ document.addEventListener('click',e=>{
   else if(a==='posted') setPostado(id,true);
   else if(a==='undo') setPostado(id,false);
   else if(a==='del') pedeApagar(id);
+  else if(a==='slide'){ const tr=$('#track'); if(tr) tr.scrollBy({left:tr.clientWidth*(+b.dataset.d),behavior:'smooth'}); }
   else if(a==='hora') openSheet(id,'hora');
   else if(a==='sethora'){ closeSheet(); setHora(id,b.dataset.h||null); }
   else if(a==='aprovar') setAprovado(id,true);
