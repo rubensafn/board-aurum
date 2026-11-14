@@ -584,8 +584,10 @@ async function toggleDestino(id,which){
   p.destino=f&&st?'feed_story':f?'feed':st?'story':null; patchRow(id);
   try{ await rpc('fila_set_destino',{p_pin:S.pin,p_id:id,p_destino:p.destino}); S.sig=''; }catch(_){ toast('Não salvou. Tenta de novo.'); load(); }
 }
-async function setAprovado(id,v){
+async function setAprovado(id,v,agoraOk){
   const p=find(id); if(!p) return;
+  if(v&&p.dia&&p.hora&&!agoraOk){ const quando=new Date(p.dia+'T'+p.hora+':00');
+    if(quando.getTime()<=Date.now()+5*60e3){ toast(quando<Date.now()?'Esse horário ('+p.hora+') já passou: aprovando, posta AGORA (em até 5 min).':'Falta menos de 5 min: posta logo em seguida.','POSTAR AGORA',()=>setAprovado(id,true,true),9000); return; } }
   if(v&&(!p.dia||!p.hora)){ toast(!p.dia&&!p.hora?'Escolhe o dia e o horário antes de aprovar':!p.dia?'Escolhe o dia antes de aprovar':'Escolhe o horário antes de aprovar'); return; }
   if(v&&!p.destino){ toast('Escolhe FEED, STORY ou os dois antes de aprovar'); return; }
   const el=document.querySelector(`[data-row="${CSS.escape(id)}"]`);
