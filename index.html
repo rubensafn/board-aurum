@@ -480,6 +480,21 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
   #logo svg{width:24px!important;height:18.6px!important}
   .bar .seg{gap:2px!important;padding:2px!important}
 }
+/* filtro de dias compacto numa linha + selo AU do vazio (14/11) */
+#days{gap:6px!important;padding:6px 14px 8px!important;align-items:center}
+#days .dtile,.fgrid .dtile{flex:none;min-width:0!important;height:32px!important;padding:0 6px 0 13px!important;border-radius:999px!important;flex-direction:row!important;gap:6px!important}
+#days .dtile .w,.fgrid .dtile .w{font-size:10px!important;letter-spacing:.1em!important}
+#days .dtile .n,.fgrid .dtile .n{font-size:13px!important;line-height:1!important;margin-left:-1px}
+#days .dtile .c,.fgrid .dtile .c{position:static!important;min-width:20px!important;height:20px!important;border-radius:999px!important;font-size:10px!important;margin-left:2px;border:0!important}
+#days .dtile.on,.fgrid .dtile.on{box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),inset 0 0 14px rgba(167,139,250,.4)!important}
+#days .dtile.on[data-tone="today"],.fgrid .dtile.on[data-tone="today"]{box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),inset 0 0 14px rgba(251,191,36,.4)!important}
+#days .dtile.on[data-tone="late"],.fgrid .dtile.on[data-tone="late"]{box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),inset 0 0 14px rgba(248,113,113,.4)!important}
+.empty .au{position:relative;width:56px!important;height:56px!important;border-radius:16px!important;background:#0d0c14!important;box-shadow:0 0 22px rgba(167,139,250,.18)!important}
+.empty .au::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;background:linear-gradient(135deg,#f3d977,#fb7185 35%,#a78bfa 70%,#67e8f9);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.empty .au::after{display:none!important}
+.empty .au svg{width:30px!important;height:23.2px!important;filter:none!important}
+.empty .au svg path{fill:#fff!important}
 </style>
 </head>
 <body>
@@ -621,11 +636,11 @@ function renderDays(pend){
   $('#fchip').innerHTML=`${I.cal}<span>${tc}</span><b>${n(cur)}</b>`;
   nav.innerHTML=keys.map(k=>{
     let w,num,cls='dtile glass',tn='';
-    if(k==='todos'){w='FILA';num='TODOS';cls+=' wide';}
-    else if(k==='sem'){w='SEM';num='DIA';cls+=' wide';}
-    else if(k==='atrasados'){w='ATRASO';num='!';tn='late';}
+    if(k==='todos'){w='TODOS';num='';}
+    else if(k==='sem'){w='SEM DIA';num='';}
+    else if(k==='atrasados'){w='ATRASO';num='';tn='late';}
     else {const p=parts(k);w=k===t?'HOJE':k===tm?'AMANHÃ':p.w;num=p.d;tn=k===t?'today':k===tm?'tomorrow':'';}
-    return `<button class="${cls}${S.filtro===k?' on':''}" ${tn?`data-tone="${tn}"`:''} data-act="filtro" data-f="${k}" aria-pressed="${S.filtro===k}"><span class="w">${w}</span><span class="n">${num}</span><span class="c">${n(k)}</span></button>`;
+    return `<button class="${cls}${S.filtro===k?' on':''}" ${tn?`data-tone="${tn}"`:''} data-act="filtro" data-f="${k}" aria-pressed="${S.filtro===k}"><span class="w">${w}</span>${num?`<span class="n">${num}</span>`:''}<span class="c">${n(k)}</span></button>`;
   }).join('');
 }
 
