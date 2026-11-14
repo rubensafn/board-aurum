@@ -495,6 +495,10 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .empty .au::after{display:none!important}
 .empty .au svg{width:30px!important;height:23.2px!important;filter:none!important}
 .empty .au svg path{fill:#fff!important}
+/* alinhamento: dias e cards no mesmo limite do navbar (14/11) */
+.wrap{max-width:1268px!important}
+#days{max-width:1268px!important;padding-left:14px!important;padding-right:14px!important;scroll-padding-inline:14px;scroll-snap-type:none!important}
+#days::after{content:"";flex:none;width:1px}
 </style>
 </head>
 <body>
