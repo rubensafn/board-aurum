@@ -405,6 +405,20 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .hother .act{height:46px;padding:0 16px}
 @media (max-width:420px){.hother{grid-template-columns:1fr auto}.hother>span{grid-column:1/-1}}
 .pill.dest.fixo{cursor:default}
+.pill.bang{cursor:pointer;width:22px;padding:0;justify-content:center;font-weight:800;font-size:12px;color:var(--amber)!important;border-color:rgba(251,191,36,.45)!important;background:rgba(251,191,36,.10)!important}
+.hpick{grid-template-columns:repeat(3,1fr)}
+.hpick .dtile{height:78px}
+.hpick .dtile .x{font-size:9.5px;font-weight:700;letter-spacing:.06em;color:var(--mute);margin-top:2px}
+.hpick .dtile .x.up{color:#4ade80}
+.hpick .dtile.best{border-color:rgba(74,222,128,.5)}
+.hdata{padding:11px 12px;border-radius:14px;display:grid;gap:7px}
+.hdata .ht{font-family:var(--display);font-weight:700;font-size:9.5px;letter-spacing:.12em;color:var(--ink-2)}
+.hdata .hr{display:grid;grid-template-columns:62px 1fr 46px;align-items:center;gap:8px;font-size:11px;font-variant-numeric:tabular-nums}
+.hdata .hr b{display:block;height:7px;border-radius:4px;background:linear-gradient(90deg,#a78bfa,#67e8f9)}
+.hdata .hr.up b{background:linear-gradient(90deg,#67e8f9,#4ade80)}
+.hdata .hr.dn b{background:rgba(255,255,255,.22)}
+.hdata .hr span:last-child{text-align:right;color:var(--ink-2)}
+.hdata .hn{font-size:10.5px;color:var(--mute);line-height:1.35}
 </style>
 </head>
 <body>
@@ -487,7 +501,9 @@ const ar=f=>f&&f.w&&f.h?(f.w+'/'+f.h):(f&&/1080X1(440|350)/.test(f.nome||'')?'3/
 
 /* ---- destino fixo pelo formato: estático 9:16 = só Story; estático/carrossel/vídeo de feed = só Feed; só vídeo 9:16 escolhe ---- */
 function destFixo(p){ const fs=p.arquivos||[], f=fs[0]; if(!f) return null; const alto=f.w&&f.h&&f.h/f.w>1.6;
-  if(fs.length>1) return 'feed'; if(f.kind!=='video') return alto?'story':'feed'; return alto?null:'feed'; }
+  if(fs.length>1) return 'feed'; if(f.kind!=='video') return alto?'story':'feed';
+  if(alto&&/(^|_)STORY_/i.test(f.nome||'')) return 'story'; /* versão story de um post que já tem a versão de feed */
+  return alto?null:'feed'; }
 /* ---- linha (card) ---- */
 function rowHTML(p){
   const fs=files(p), f=fs[0], t=tone(p.dia), c=capOf(p);
@@ -505,7 +521,7 @@ function rowHTML(p){
     : p.ig_status==='erro' ? `<span class="pill late" title="${esc(p.ig_erro||'')}">ERRO AO POSTAR</span>` : '';
   const dFeed=p.destino==='feed'||p.destino==='feed_story', dStory=p.destino==='story'||p.destino==='feed_story', travaDest=trava||p.aprovado||p.postado;
   const fixo=destFixo(p);
-  const destPills = fixo ? `<span class="pill dest sel fixo">${fixo==='story'?'SÓ STORY':'FEED'}</span>` : p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
+  const destPills = fixo ? `<span class="pill dest sel fixo">${fixo==='story'?'SÓ STORY':'FEED'}</span>${fixo==='feed'&&!p.postado?`<button class="pill bang" data-act="bang" aria-label="Quer no story também?" title="Quer no story também?">!</button>`:''}` : p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
   const quando = p.dia&&p.hora ? dayText(p.dia)+' '+p.hora : '';
   const aprov = p.postado||trava ? '' : p.aprovado
     ? `<div class="aprov ok"><span>${I.check} APROVADO · ${esc(quando)}${p.destino==='feed_story'?' · FEED+STORY':p.destino==='story'?' · STORY':''}</span><button data-act="desaprovar" data-id="${esc(p.id)}" aria-label="Desfazer aprovação" title="Desfazer aprovação">${I.undo}</button></div>`
@@ -667,9 +683,20 @@ function daySheetHTML(p){
 }
 
 /* ---- seletor rápido de horário ---- */
-const HORAS=['14:00','17:00','19:30'];
+const HORAS=['12:30','15:00','17:30'];
+/* alcance x média do @aurum.cinema — últimos 200 posts (06/10 a 14/11/2026) */
+const HDADOS={
+  reels:{t:'REELS',fx:[['14h–16h',1.08,'15:00'],['17h–18h',1.03,'17:30'],['19h–20h',.92,'']],n:'Reels: melhor entre 14h e 16h. Depois das 19h cai.'},
+  est:{t:'ESTÁTICO / CARROSSEL',fx:[['11h–13h',1.32,'12:30'],['14h+',1.0,'15:00 17:30']],n:'Estático: almoço (11h–13h) foi bem acima (16 posts). 21h+ teve poucos posts, pouco pra confiar.'}};
+function hdOf(p){ const f=(p.arquivos||[])[0]; return f&&f.kind==='video'?HDADOS.reels:HDADOS.est; }
+function hTag(d,h){ const r=d.fx.find(x=>x[2].split(' ').includes(h)); if(!r) return {t:'SEM DADO',c:''}; const v=Math.round((r[1]-1)*100); return {t:v>0?'+'+v+'% ALCANCE':v<0?v+'% ALCANCE':'NA MÉDIA',c:v>0?'up':'',v}; }
 function horaSheetHTML(p){
-  return `<div class="dpick hpick">${HORAS.map(h=>`<button class="dtile glass${p.hora===h?' on':''}" data-act="sethora" data-h="${h}" data-id="${esc(p.id)}"><span class="w">${h==='14:00'?'TARDE':h==='17:00'?'FIM DE TARDE':'NOITE'}</span><span class="n">${h}</span></button>`).join('')}</div>
+  const d=hdOf(p), tags=HORAS.map(h=>hTag(d,h)), best=Math.max(...tags.map(t=>t.v??-99));
+  const mx=Math.max(...d.fx.map(x=>x[1]));
+  return `<div class="dpick hpick">${HORAS.map((h,i)=>`<button class="dtile glass${p.hora===h?' on':''}${tags[i].v===best&&best>0?' best':''}" data-act="sethora" data-h="${h}" data-id="${esc(p.id)}"><span class="w">${h==='12:30'?'ALMOÇO':h==='15:00'?'TARDE':'FIM DE TARDE'}</span><span class="n">${h}</span><span class="x ${tags[i].c}">${tags[i].t}</span></button>`).join('')}</div>
+    <div class="hdata glass"><span class="ht">ALCANCE x MÉDIA · ${d.t} · ÚLTIMOS 200 POSTS</span>
+      ${d.fx.map(x=>{const v=Math.round((x[1]-1)*100);return `<div class="hr ${v>0?'up':v<0?'dn':''}"><span>${x[0]}</span><b style="width:${Math.round(x[1]/mx*100)}%"></b><span>${v>0?'+':''}${v}%</span></div>`}).join('')}
+      <span class="hn">${d.n}</span></div>
     <div class="hother"><span>${I.clock} OUTRO HORÁRIO</span><input class="field" type="time" id="hin" value="${esc(p.hora||'')}" step="60" aria-label="Outro horário"><button class="act primary" data-act="hset" data-id="${esc(p.id)}">USAR</button></div>
     ${p.hora?`<button class="act dclear" data-act="sethora" data-h="" data-id="${esc(p.id)}">${I.x} TIRAR O HORÁRIO</button>`:''}`;
 }
@@ -760,6 +787,7 @@ document.addEventListener('click',e=>{
   else if(a==='slide'){ const tr=$('#track'); if(tr) tr.scrollBy({left:tr.clientWidth*(+b.dataset.d),behavior:'smooth'}); }
   else if(a==='hora') openSheet(id,'hora');
   else if(a==='hset'){ const v=($('#hin')||{}).value||''; if(!/^\d{2}:\d{2}$/.test(v)){ toast('Digita o horário (ex.: 18:45)'); return; } closeSheet(); setHora(id,v); }
+  else if(a==='bang'){ toast('É de feed. Quer no story também? Depois que postar, encaminha o post e adiciona ao story pelo app.','',null,7000); }
   else if(a==='sethora'){ closeSheet(); setHora(id,b.dataset.h||null); }
   else if(a==='aprovar') setAprovado(id,true);
   else if(a==='dest') toggleDestino(id,b.dataset.v);
