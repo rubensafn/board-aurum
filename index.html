@@ -398,6 +398,12 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .aviso{display:flex;align-items:flex-start;gap:8px;padding:9px 11px;border-radius:12px;font-size:11.5px;line-height:1.4;font-weight:600;color:#fecdd3;
   background:rgba(251,113,133,.10);box-shadow:0 0 0 1px rgba(251,113,133,.45),0 0 14px rgba(251,113,133,.14)}
 .aviso svg{width:15px;height:15px;flex:none;margin-top:1px;color:var(--rose);filter:drop-shadow(0 0 6px rgba(251,113,133,.5))}
+.hother{display:grid;grid-template-columns:1fr 1fr auto;align-items:center;gap:8px}
+.hother>span{display:flex;align-items:center;gap:7px;font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.1em;color:var(--ink-2)}
+.hother>span svg{width:15px;height:15px}
+.hother .field{margin:0;height:46px;font-size:18px;letter-spacing:.06em;color-scheme:dark}
+.hother .act{height:46px;padding:0 16px}
+@media (max-width:420px){.hother{grid-template-columns:1fr auto}.hother>span{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -657,7 +663,7 @@ function daySheetHTML(p){
 const HORAS=['14:00','17:00','19:30'];
 function horaSheetHTML(p){
   return `<div class="dpick hpick">${HORAS.map(h=>`<button class="dtile glass${p.hora===h?' on':''}" data-act="sethora" data-h="${h}" data-id="${esc(p.id)}"><span class="w">${h==='14:00'?'TARDE':h==='17:00'?'FIM DE TARDE':'NOITE'}</span><span class="n">${h}</span></button>`).join('')}</div>
-    <label class="act dother">${I.clock} OUTRO HORÁRIO<input type="time" data-act="time" data-id="${esc(p.id)}" value="${esc(p.hora||'')}" aria-label="Outro horário"></label>
+    <div class="hother"><span>${I.clock} OUTRO HORÁRIO</span><input class="field" type="time" id="hin" value="${esc(p.hora||'')}" step="60" aria-label="Outro horário"><button class="act primary" data-act="hset" data-id="${esc(p.id)}">USAR</button></div>
     ${p.hora?`<button class="act dclear" data-act="sethora" data-h="" data-id="${esc(p.id)}">${I.x} TIRAR O HORÁRIO</button>`:''}`;
 }
 
@@ -746,6 +752,7 @@ document.addEventListener('click',e=>{
   else if(a==='del') pedeApagar(id);
   else if(a==='slide'){ const tr=$('#track'); if(tr) tr.scrollBy({left:tr.clientWidth*(+b.dataset.d),behavior:'smooth'}); }
   else if(a==='hora') openSheet(id,'hora');
+  else if(a==='hset'){ const v=($('#hin')||{}).value||''; if(!/^\d{2}:\d{2}$/.test(v)){ toast('Digita o horário (ex.: 18:45)'); return; } closeSheet(); setHora(id,v); }
   else if(a==='sethora'){ closeSheet(); setHora(id,b.dataset.h||null); }
   else if(a==='aprovar') setAprovado(id,true);
   else if(a==='dest') toggleDestino(id,b.dataset.v);
