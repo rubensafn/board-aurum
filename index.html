@@ -376,6 +376,25 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .player .dots span.cur{width:16px;background:#fff}
 .player .cnt{position:absolute;top:10px;right:10px;z-index:3;padding:3px 8px;border-radius:8px;font-size:11px;font-weight:700;background:rgba(10,10,14,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .pill.story{color:var(--rose)!important}
+
+/* ===== v14: aba APROVADOS, cor por aba, FEED/STORY ===== */
+.tab.t-pend b{color:var(--amber)}.tab.t-apr b{color:var(--violet)}.tab.t-done b{color:var(--green)}
+.tab.t-pend.on{background:linear-gradient(160deg,rgba(251,191,36,.26),rgba(251,191,36,.08))!important;box-shadow:0 0 16px rgba(251,191,36,.28)!important;color:#fde68a}
+.tab.t-apr.on{background:linear-gradient(160deg,rgba(167,139,250,.30),rgba(139,92,246,.10))!important;box-shadow:0 0 16px rgba(167,139,250,.32)!important;color:#ddd6fe}
+.tab.t-done.on{background:linear-gradient(160deg,rgba(74,222,128,.24),rgba(74,222,128,.07))!important;box-shadow:0 0 16px rgba(74,222,128,.26)!important;color:#bbf7d0}
+.tab.on b{color:#fff!important}
+.tab.on::before{display:none}
+@media (max-width:620px){
+  .bar{flex-wrap:wrap}
+  .bar .brand{flex:1}
+  .bar .seg{order:3;flex:1 0 100%}
+  .bar .tab{flex:1;justify-content:center;padding:0 6px;font-size:9.5px;letter-spacing:.06em;gap:5px}
+}
+.pill.dest{cursor:pointer;color:var(--mute)}
+.pill.dest svg{width:10px;height:10px}
+.pill.dest.sel{color:var(--cyan)!important;background:rgba(103,232,249,.10)!important;border-color:rgba(103,232,249,.45)!important}
+.pill.dest[disabled].sel{opacity:.9}
+.pill.dest[disabled]:not(.sel){display:none}
 </style>
 </head>
 <body>
@@ -386,8 +405,9 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
   <div class="bar glass">
     <div class="brand"><div class="au" id="logo"></div><h1>FILA DE POSTS</h1></div>
     <div class="seg" role="tablist">
-      <button class="tab on" id="tab-pend" role="tab">PENDENTES <b id="c-pend">0</b></button>
-      <button class="tab" id="tab-done" role="tab">POSTADOS <b id="c-done">0</b></button>
+      <button class="tab t-pend on" id="tab-pend" role="tab">PENDENTES <b id="c-pend">0</b></button>
+      <button class="tab t-apr" id="tab-apr" role="tab">APROVADOS <b id="c-apr">0</b></button>
+      <button class="tab t-done" id="tab-done" role="tab">POSTADOS <b id="c-done">0</b></button>
     </div>
     <button class="icon-btn" id="logout" aria-label="Sair" title="Sair"></button>
   </div>
@@ -469,9 +489,11 @@ function rowHTML(p){
   const stPill = p.ig_status==='publicado' ? (p.ig_permalink?`<a class="pill igok" href="${esc(p.ig_permalink)}" target="_blank" rel="noopener">${I.ig} NO INSTAGRAM ›</a>`:`<span class="pill igok">${I.ig} NO INSTAGRAM</span>`)
     : p.ig_status==='criando' ? `<span class="pill apr">${I.send} POSTANDO…</span>`
     : p.ig_status==='erro' ? `<span class="pill late" title="${esc(p.ig_erro||'')}">ERRO AO POSTAR</span>` : '';
+  const dFeed=p.destino==='feed'||p.destino==='feed_story', dStory=p.destino==='story'||p.destino==='feed_story', travaDest=trava||p.aprovado||p.postado;
+  const destPills = p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
   const quando = p.dia&&p.hora ? dayText(p.dia)+' '+p.hora : '';
   const aprov = p.postado||trava ? '' : p.aprovado
-    ? `<div class="aprov ok"><span>${I.check} APROVADO · ${esc(quando)}</span><button data-act="desaprovar" data-id="${esc(p.id)}" aria-label="Desfazer aprovação" title="Desfazer aprovação">${I.undo}</button></div>`
+    ? `<div class="aprov ok"><span>${I.check} APROVADO · ${esc(quando)}${p.destino==='feed_story'?' · FEED+STORY':p.destino==='story'?' · STORY':''}</span><button data-act="desaprovar" data-id="${esc(p.id)}" aria-label="Desfazer aprovação" title="Desfazer aprovação">${I.undo}</button></div>`
     : `<button class="aprov" data-act="aprovar" data-id="${esc(p.id)}">${I.send} ${p.ig_status==='erro'?'TENTAR DE NOVO':'APROVAR'}${quando?' · '+esc(quando):''}</button>`;
   const acts = `<button class="ib gold" data-act="copy" data-id="${esc(p.id)}" aria-label="Copiar legenda" title="Copiar legenda" ${c?'':'disabled'}>${I.copy}</button>
        <button class="ib cyan" data-act="go" data-id="${esc(p.id)}" aria-label="Baixar e copiar legenda" title="Baixar e copiar legenda" ${fs.length&&!S.busy.has(p.id)?'':'disabled'}>${I.dl}</button>
@@ -483,7 +505,7 @@ function rowHTML(p){
     <div class="info">
       <div class="l1"><span class="num">${esc(pad(p.num??0))}</span><span class="film">${esc(p.filme||p.nome||'Post')}</span></div>
       <div class="fname">${esc(p.nome||'')}</div>
-      <div class="meta">${String(p.tipo||'').toUpperCase()==='STORY'?'<span class="pill story">STORY</span>':''}${dayPill}${horaPill}${stPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
+      <div class="meta">${dayPill}${horaPill}${destPills}${stPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
       <button class="capprev" data-act="cap" data-id="${esc(p.id)}"><span class="clamp">${c?esc(c):'<i>Sem legenda</i>'}</span><span class="more">VER LEGENDA ›</span></button>
       ${aprov}<div class="acts">${acts}</div>
     </div>
@@ -516,13 +538,16 @@ function renderDays(pend){
 const order=(a,b)=>(b.lote||'').localeCompare(a.lote||'')||(a.num??0)-(b.num??0);
 function emptyHTML(t,m){return `<div class="empty glass"><div class="au">${AU}</div><strong>${t}</strong>${m}</div>`;}
 function render(){
-  const pend=S.posts.filter(p=>!p.postado), done=S.posts.filter(p=>p.postado);
-  $('#c-pend').textContent=pend.length; $('#c-done').textContent=done.length;
-  $('#tab-pend').classList.toggle('on',S.view==='pend'); $('#tab-done').classList.toggle('on',S.view==='done');
+  const pend=S.posts.filter(p=>!p.postado&&!p.aprovado), apr=S.posts.filter(p=>!p.postado&&p.aprovado), done=S.posts.filter(p=>p.postado);
+  $('#c-pend').textContent=pend.length; $('#c-apr').textContent=apr.length; $('#c-done').textContent=done.length;
+  $('#tab-pend').classList.toggle('on',S.view==='pend'); $('#tab-apr').classList.toggle('on',S.view==='apr'); $('#tab-done').classList.toggle('on',S.view==='done');
   renderDays(pend);
   const list=$('#list');
   if(!S.loaded){ list.innerHTML='<div class="sk"></div><div class="sk"></div><div class="sk"></div>'; return; }
   let items;
+  if(S.view==='apr'){ items=apr.slice().sort((a,b)=>((a.dia||'')+(a.hora||'')).localeCompare((b.dia||'')+(b.hora||'')));
+    if(!items.length){ list.innerHTML=emptyHTML('NADA APROVADO','O que você aprovar fica aqui esperando o horário de postar.'); }
+    else list.innerHTML=items.map(rowHTML).join(''); return; }
   if(S.view==='done'){ items=done.slice().sort((a,b)=>(b.postado_em||'').localeCompare(a.postado_em||''));
     if(!items.length){ list.innerHTML=emptyHTML('NADA POSTADO AINDA','O que você marcar como postado aparece aqui.'); return; } }
   else { items=S.filtro==='todos'?pend:pend.filter(p=>dayKey(p)===S.filtro);
@@ -540,17 +565,27 @@ async function load(){
 }
 async function setDia(id,dia){
   const p=find(id); if(!p) return; p.dia=dia||null;
-  if(S.view==='pend'&&S.filtro!=='todos'&&dayKey(p)!==S.filtro) render(); else { patchRow(id); renderDays(S.posts.filter(x=>!x.postado)); }
+  if(S.view==='pend'&&S.filtro!=='todos'&&dayKey(p)!==S.filtro) render(); else { patchRow(id); renderDays(S.posts.filter(x=>!x.postado&&!x.aprovado)); }
   try{ await rpc('fila_set_dia',{p_pin:S.pin,p_id:id,p_dia:dia||null}); S.sig=''; }catch(_){ toast('Não salvou o dia.'); load(); }
 }
 async function setHora(id,h){
   const p=find(id); if(!p) return; p.hora=h||null; patchRow(id);
   try{ await rpc('fila_set_hora',{p_pin:S.pin,p_id:id,p_hora:h||null}); S.sig=''; }catch(_){ toast('Não salvou o horário.'); load(); }
 }
+async function toggleDestino(id,which){
+  const p=find(id); if(!p) return;
+  let f=p.destino==='feed'||p.destino==='feed_story', st=p.destino==='story'||p.destino==='feed_story';
+  if(which==='feed') f=!f; else st=!st;
+  p.destino=f&&st?'feed_story':f?'feed':st?'story':null; patchRow(id);
+  try{ await rpc('fila_set_destino',{p_pin:S.pin,p_id:id,p_destino:p.destino}); S.sig=''; }catch(_){ toast('Não salvou. Tenta de novo.'); load(); }
+}
 async function setAprovado(id,v){
   const p=find(id); if(!p) return;
   if(v&&(!p.dia||!p.hora)){ toast(!p.dia&&!p.hora?'Escolhe o dia e o horário antes de aprovar':!p.dia?'Escolhe o dia antes de aprovar':'Escolhe o horário antes de aprovar'); return; }
-  p.aprovado=v; if(v&&p.ig_status==='erro'){p.ig_status=null;p.ig_erro=null;} patchRow(id);
+  if(v&&!p.destino){ toast('Escolhe FEED, STORY ou os dois antes de aprovar'); return; }
+  const el=document.querySelector(`[data-row="${CSS.escape(id)}"]`);
+  if(el){ el.classList.add('leaving'); await new Promise(r=>setTimeout(r,280)); }
+  p.aprovado=v; if(v&&p.ig_status==='erro'){p.ig_status=null;p.ig_erro=null;} render();
   toast(v?'Aprovado · posta '+dayText(p.dia)+' às '+p.hora:'Aprovação desfeita', v?'DESFAZER':'', v?()=>setAprovado(id,false):null);
   try{ await rpc('fila_set_aprovado',{p_pin:S.pin,p_id:id,p_aprovado:v}); S.sig=''; }catch(_){ toast('Não salvou. Tenta de novo.'); load(); }
 }
@@ -706,6 +741,7 @@ document.addEventListener('click',e=>{
   else if(a==='hora') openSheet(id,'hora');
   else if(a==='sethora'){ closeSheet(); setHora(id,b.dataset.h||null); }
   else if(a==='aprovar') setAprovado(id,true);
+  else if(a==='dest') toggleDestino(id,b.dataset.v);
   else if(a==='desaprovar') setAprovado(id,false);
 });
 /* calendário do iPhone: só salva quando ele FECHA (o ✓ ou o Reset), não no primeiro toque */
@@ -721,6 +757,7 @@ $('#sheetBg').addEventListener('click',()=>{ if(S.fsheet) closeFilterSheet(); el
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(S.fsheet) closeFilterSheet(); else closeSheet(); } });
 $('#tab-pend').onclick=()=>{S.view='pend';render();window.scrollTo({top:0});};
 $('#tab-done').onclick=()=>{S.view='done';render();window.scrollTo({top:0});};
+$('#tab-apr').onclick=()=>{S.view='apr';render();window.scrollTo({top:0});};
 $('#logout').innerHTML=I.out+'<span>SAIR</span>'; $('#logout').onclick=()=>logout('');
 $('#logo').innerHTML=AU;
 if(!/^board\.aurumcinema\.com\.br$/.test(location.hostname)) $('#envtag').hidden=false; // selo DEV fora do link oficial
