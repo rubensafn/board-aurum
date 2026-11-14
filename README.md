@@ -4,6 +4,7 @@ Board de controle de postagem do AURUM Cinema (board.aurumcinema.com.br). Cada p
 
 - **Front:** `index.html` (página única, sem build), publicada pela Vercel a partir deste repo.
 - **Dados:** Supabase, projeto `aurum_db_dev` — tabela `fila_posts` (fechada: só funções RPC com a senha da fila), bucket público `fila-posts` (caminhos aleatórios), Edge Function `fila-admin` (upload assinado, gravação de posts e limpeza).
+- **Histórico:** nada sai do banco. A lixeira do card e o APAGAR TODOS (aba Postados) só arquivam (`arquivado = true`): somem do board, mas a linha fica (filme, legenda, quando postou, link do IG) pra varredura agendada saber o que já foi baixado/postado. A lixeira também tira os arquivos do storage na hora. Um gatilho no banco (`fila_posts_nao_apaga`) transforma qualquer DELETE em arquivar; apagar de verdade só com `set local fila.apagar_de_vez = 'on';`.
 - **Limpeza:** 3 dias depois de marcado como postado, o vídeo sai do Supabase (o card e a legenda continuam). Limite do plano grátis: 50 MB por arquivo, 1 GB no total.
 - Não mexe em nada do sistema de cortesias, que usa o mesmo projeto.
 

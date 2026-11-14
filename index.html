@@ -754,15 +754,15 @@ async function doDownload(id,only,comCopia){
   finally{ S.busy.delete(id); patchRow(id); }
 }
 
-/* ---- apagar post + arquivos (pede confirmação no aviso de baixo) ---- */
-function pedeApagar(id){ const p=find(id); if(!p) return; toast('Apagar '+pad(p.num??0)+' '+(p.filme||'')+' e os arquivos?','APAGAR',()=>apagar(id),6000); }
+/* ---- apagar post: arquivos saem do storage, a linha fica no banco como histórico (arquivada) — pede confirmação no aviso de baixo ---- */
+function pedeApagar(id){ const p=find(id); if(!p) return; toast('Apagar '+pad(p.num??0)+' '+(p.filme||'')+' do board?','APAGAR',()=>apagar(id),6000); }
 async function apagar(id){
   const el=document.querySelector(`[data-row="${CSS.escape(id)}"]`);
   try{
     const r=await fetch(SB_URL+'/functions/v1/fila-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete',pin:S.pin,id})}).then(r=>r.json());
     if(!r||!r.ok) throw new Error();
     if(el){ el.classList.add('leaving'); await new Promise(r=>setTimeout(r,280)); }
-    S.posts=S.posts.filter(x=>x.id!==id); if(S.copied===id){S.copied='';store.set('fila_copied',null);} S.sig=''; render(); toast('Post e arquivos apagados');
+    S.posts=S.posts.filter(x=>x.id!==id); if(S.copied===id){S.copied='';store.set('fila_copied',null);} S.sig=''; render(); toast('Saiu do board · histórico salvo');
   }catch(_){ toast('Não apagou. Tenta de novo.'); }
 }
 /* ---- apagar todos os postados: sai do board, mas fica no banco como histórico (o que já foi postado) ---- */
