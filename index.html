@@ -404,6 +404,7 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .hother .field{margin:0;height:46px;font-size:18px;letter-spacing:.06em;color-scheme:dark}
 .hother .act{height:46px;padding:0 16px}
 @media (max-width:420px){.hother{grid-template-columns:1fr auto}.hother>span{grid-column:1/-1}}
+.pill.dest.fixo{cursor:default}
 </style>
 </head>
 <body>
@@ -484,6 +485,9 @@ const files=p=>p.arquivos_apagados?[]:(p.arquivos||[]);
 const find=id=>S.posts.find(p=>p.id===id);
 const ar=f=>f&&f.w&&f.h?(f.w+'/'+f.h):(f&&/1080X1(440|350)/.test(f.nome||'')?'3/4':'9/16');
 
+/* ---- destino fixo pelo formato: estático 9:16 = só Story; estático/carrossel/vídeo de feed = só Feed; só vídeo 9:16 escolhe ---- */
+function destFixo(p){ const fs=p.arquivos||[], f=fs[0]; if(!f) return null; const alto=f.w&&f.h&&f.h/f.w>1.6;
+  if(fs.length>1) return 'feed'; if(f.kind!=='video') return alto?'story':'feed'; return alto?null:'feed'; }
 /* ---- linha (card) ---- */
 function rowHTML(p){
   const fs=files(p), f=fs[0], t=tone(p.dia), c=capOf(p);
@@ -500,7 +504,8 @@ function rowHTML(p){
     : p.ig_status==='criando' ? `<span class="pill apr">${I.send} POSTANDO…</span>`
     : p.ig_status==='erro' ? `<span class="pill late" title="${esc(p.ig_erro||'')}">ERRO AO POSTAR</span>` : '';
   const dFeed=p.destino==='feed'||p.destino==='feed_story', dStory=p.destino==='story'||p.destino==='feed_story', travaDest=trava||p.aprovado||p.postado;
-  const destPills = p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
+  const fixo=destFixo(p);
+  const destPills = fixo ? `<span class="pill dest sel fixo">${fixo==='story'?'SÓ STORY':'FEED'}</span>` : p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
   const quando = p.dia&&p.hora ? dayText(p.dia)+' '+p.hora : '';
   const aprov = p.postado||trava ? '' : p.aprovado
     ? `<div class="aprov ok"><span>${I.check} APROVADO · ${esc(quando)}${p.destino==='feed_story'?' · FEED+STORY':p.destino==='story'?' · STORY':''}</span><button data-act="desaprovar" data-id="${esc(p.id)}" aria-label="Desfazer aprovação" title="Desfazer aprovação">${I.undo}</button></div>`
@@ -517,7 +522,7 @@ function rowHTML(p){
       <div class="fname">${esc(p.nome||'')}</div>
       <div class="meta">${dayPill}${horaPill}${destPills}${stPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
       ${p.aviso&&!p.postado?`<div class="aviso">${I.hand}<span>${esc(p.aviso)}</span></div>`:''}
-      <button class="capprev" data-act="cap" data-id="${esc(p.id)}"><span class="clamp">${c?esc(c):'<i>Sem legenda</i>'}</span><span class="more">VER LEGENDA ›</span></button>
+      ${destFixo(p)==='story'&&!c?'':`<button class="capprev" data-act="cap" data-id="${esc(p.id)}"><span class="clamp">${c?esc(c):'<i>Sem legenda</i>'}</span><span class="more">VER LEGENDA ›</span></button>`}
       ${aprov}<div class="acts">${acts}</div>
     </div>
   </article>`;
@@ -595,6 +600,8 @@ async function setAprovado(id,v,agoraOk){
   if(v&&p.dia&&p.hora&&!agoraOk){ const quando=new Date(p.dia+'T'+p.hora+':00');
     if(quando.getTime()<=Date.now()+5*60e3){ toast(quando<Date.now()?'Esse horário ('+p.hora+') já passou: aprovando, posta AGORA (em até 5 min).':'Falta menos de 5 min: posta logo em seguida.','POSTAR AGORA',()=>setAprovado(id,true,true),9000); return; } }
   if(v&&(!p.dia||!p.hora)){ toast(!p.dia&&!p.hora?'Escolhe o dia e o horário antes de aprovar':!p.dia?'Escolhe o dia antes de aprovar':'Escolhe o horário antes de aprovar'); return; }
+  const fx=destFixo(p);
+  if(v&&fx&&p.destino!==fx){ try{ await rpc('fila_set_destino',{p_pin:S.pin,p_id:id,p_destino:fx}); p.destino=fx; }catch(_){ toast('Não salvou. Tenta de novo.'); return; } }
   if(v&&!p.destino){ toast('Escolhe FEED, STORY ou os dois antes de aprovar'); return; }
   const el=document.querySelector(`[data-row="${CSS.escape(id)}"]`);
   if(el){ el.classList.add('leaving'); await new Promise(r=>setTimeout(r,280)); }
