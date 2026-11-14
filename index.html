@@ -350,6 +350,24 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 /* apagar: lixeira vermelha, menor, mesma bordinha neon dos outros */
 .ib.red{flex:0 0 44px;color:var(--red)!important;box-shadow:0 0 0 1px rgba(248,113,113,.5),0 0 14px rgba(248,113,113,.16),inset 0 0 12px rgba(248,113,113,.06)!important}
 .ib.red svg{filter:drop-shadow(0 0 6px rgba(248,113,113,.4))}
+
+/* ===== v13: horário + aprovação + postagem automática no Instagram ===== */
+.pill.hora{cursor:pointer;color:var(--ink-2)}
+.pill.hora.set{color:var(--cyan)}
+.pill[disabled]{cursor:default;opacity:.85}
+.pill.apr{color:var(--violet)!important}
+.pill.igok{color:var(--green)!important;text-decoration:none}
+.pill.late{color:var(--red)!important}
+.aprov{position:relative;width:100%;min-height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 12px;
+  font-family:var(--display);font-weight:700;font-size:10.5px;letter-spacing:.1em;color:#ddd6fe;background:rgba(167,139,250,.10);
+  box-shadow:0 0 0 1px rgba(167,139,250,.55),0 0 14px rgba(167,139,250,.20),inset 0 0 12px rgba(167,139,250,.06);transition:transform .12s}
+.aprov svg{width:15px;height:15px;flex:none;filter:drop-shadow(0 0 6px rgba(167,139,250,.5))}
+.aprov:active{transform:scale(.98)}
+.aprov.ok{justify-content:space-between;color:#c4b5fd;background:rgba(167,139,250,.06);box-shadow:0 0 0 1px rgba(167,139,250,.28)}
+.aprov.ok span{letter-spacing:.06em;font-size:10px;display:flex;align-items:center;gap:7px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aprov.ok button{flex:none;color:var(--mute);padding:6px 2px 6px 8px;display:grid;place-items:center}.aprov.ok button svg{width:16px;height:16px;filter:none}
+.hpick{grid-template-columns:repeat(3,1fr)}
+.hpick .dtile .w{font-size:8.5px}
 </style>
 </head>
 <body>
@@ -378,6 +396,9 @@ const SB_URL='https://gdtfwmqbvsqtxtccrydv.supabase.co', SB_KEY='sb_publishable_
 const SESSAO_HORAS=8;
 const AU='<svg viewBox="56.18 55.44 252.95 195.8" aria-hidden="true"><path fill="url(#augold)" d="M187.42,205.8c5.1,11.57,9.72,19.4,13.83,23.5,4.11,4.1,7.91,6.15,11.36,6.15v2.41h-71.14v-2.41c1.48,0,3.05-.24,4.69-.72,1.64-.48,3.170-1.28,4.57-2.41,1.4-1.12,2.55-2.61,3.46-4.46.9-1.85,1.36-4.14,1.36-6.87,0-4.01-1.32-9.16-3.95-15.43l-6.18-13.26c-2.96,7.23-6.51,13.86-10.62,19.89-4.12,6.03-8.52,11.17-13.22,15.43-4.69,4.26-9.47,7.59-14.33,10-4.86,2.41-9.6,3.62-14.2,3.62-8.89,0-15.48-2.05-19.76-6.15-4.28-4.1-6.63-10-7.04-17.72-.41-7.71.99-17.11,4.2-28.2,3.21-11.09,7.86-23.62,13.96-37.6l38.29-86.05h2.47l62.25,140.29ZM82.19,185.79c0,8.84,2.47,15.55,7.41,20.13,4.94,4.58,10.78,6.87,17.54,6.87s13.17-2.33,19.76-6.99c6.58-4.66,11.61-11.81,15.07-21.45l-32.11-71.83-18.03,39.05c-3.3,7.55-5.72,14.1-7.29,19.64-1.570,5.54-2.35,10.41-2.35,14.58Z"/><path fill="url(#augold)" d="M299.07,163.84v-83.68c0-16.64-14.91-14.65-14.91-14.65h-16.57v2.4c8.22,1.12,14.26,6.52,18.13,16.2,3.86,9.68,5.79,22.12,5.79,37.33v55.93c0,7.36-1.18,13.88-3.53,19.56-2.35,5.68-5.41,10.36-9.19,14.04-3.78,3.68-8.1,6.48-12.97,8.4-4.87,1.92-9.82,2.88-14.85,2.88-1.38,0-2.76-.08-4.14-.22-3.81-.39-7.59-1.31-11.35-2.78-5.12-2-9.65-5-13.6-9-3.95-4-7.14-9-9.57-15-2.44-6-3.65-13-3.65-21v-86.17c0-6.24.75-10.76,2.27-13.56,1.51-2.8,3.69-5,6.55-6.6v-2.4h-51.61v2.4c3.02,1.6,5.29,3.8,6.8,6.6,1.51,2.8,2.27,7.32,2.27,13.56v67.41l20.7,46.66s0,.01,0,.02c5.76,13.06,9.68,18.49,11.95,20.75,3.37,3.36,5.01,3.53,5.02,3.53,4.97,0,8.99,4.03,8.99,9v.47c5.38,1.28,10.8,1.94,16.27,1.94,3.02,0,6-.2,8.95-.59,4.6-.61,9.13-1.69,13.58-3.25,7.3-2.56,13.8-6.36,19.51-11.4,5.59-4.94,10.13-11.12,13.63-18.52h0c.07-.15.16-.29.22-.44,1.26-3.44,2.62-6.86,3.59-10.4,1.04-3.79,1.44-7.68,1.63-11.59.28-5.920.07-11.9.07-17.83Z"/></svg>';
 const I={
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  send:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>',
+  ig:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>',
   copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
   dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>',
@@ -434,7 +455,16 @@ function rowHTML(p){
         ${f?`<img src="${esc(f.poster||(f.kind==='video'?'':f.url))}" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:''}
         ${fs.length>1?`<span class="multi">${fs.length}</span>`:''}${f&&f.kind==='video'?`<span class="play">${I.play}</span>`:''}</button>`;
   const dayPill = p.postado ? `<span class="pill done">${I.check} ${esc(postedText(p.postado_em))}</span>`
-    : `<button class="pill day" ${t?`data-tone="${t}"`:''} data-act="day" data-id="${esc(p.id)}" aria-label="Escolher dia">${I.cal} ${esc(dayText(p.dia))}</button>`;
+    : `<button class="pill day" ${t?`data-tone="${t}"`:''} data-act="day" data-id="${esc(p.id)}" aria-label="Escolher dia" ${p.aprovado||p.ig_status==='criando'?'disabled':''}>${I.cal} ${esc(dayText(p.dia))}</button>`;
+  const trava = p.ig_status==='criando'||p.ig_status==='publicado';
+  const horaPill = p.postado ? '' : `<button class="pill hora${p.hora?' set':''}" data-act="hora" data-id="${esc(p.id)}" aria-label="Escolher horário" ${trava||p.aprovado?'disabled':''}>${I.clock} ${esc(p.hora||'HORÁRIO')}</button>`;
+  const stPill = p.ig_status==='publicado' ? (p.ig_permalink?`<a class="pill igok" href="${esc(p.ig_permalink)}" target="_blank" rel="noopener">${I.ig} NO INSTAGRAM ›</a>`:`<span class="pill igok">${I.ig} NO INSTAGRAM</span>`)
+    : p.ig_status==='criando' ? `<span class="pill apr">${I.send} POSTANDO…</span>`
+    : p.ig_status==='erro' ? `<span class="pill late" title="${esc(p.ig_erro||'')}">ERRO AO POSTAR</span>` : '';
+  const quando = p.dia&&p.hora ? dayText(p.dia)+' '+p.hora : '';
+  const aprov = p.postado||trava ? '' : p.aprovado
+    ? `<div class="aprov ok"><span>${I.check} APROVADO · ${esc(quando)}</span><button data-act="desaprovar" data-id="${esc(p.id)}" aria-label="Desfazer aprovação" title="Desfazer aprovação">${I.undo}</button></div>`
+    : `<button class="aprov" data-act="aprovar" data-id="${esc(p.id)}">${I.send} ${p.ig_status==='erro'?'TENTAR DE NOVO':'APROVAR'}${quando?' · '+esc(quando):''}</button>`;
   const acts = `<button class="ib gold" data-act="copy" data-id="${esc(p.id)}" aria-label="Copiar legenda" title="Copiar legenda" ${c?'':'disabled'}>${I.copy}</button>
        <button class="ib cyan" data-act="go" data-id="${esc(p.id)}" aria-label="Baixar e copiar legenda" title="Baixar e copiar legenda" ${fs.length&&!S.busy.has(p.id)?'':'disabled'}>${I.dl}</button>
        ${p.postado?`<button class="ib mute" data-act="undo" data-id="${esc(p.id)}" aria-label="Desfazer postado" title="Desfazer postado">${I.undo}</button>`
@@ -445,9 +475,9 @@ function rowHTML(p){
     <div class="info">
       <div class="l1"><span class="num">${esc(pad(p.num??0))}</span><span class="film">${esc(p.filme||p.nome||'Post')}</span></div>
       <div class="fname">${esc(p.nome||'')}</div>
-      <div class="meta">${dayPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
+      <div class="meta">${dayPill}${horaPill}${stPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
       <button class="capprev" data-act="cap" data-id="${esc(p.id)}"><span class="clamp">${c?esc(c):'<i>Sem legenda</i>'}</span><span class="more">VER LEGENDA ›</span></button>
-      <div class="acts">${acts}</div>
+      ${aprov}<div class="acts">${acts}</div>
     </div>
   </article>`;
 }
@@ -504,6 +534,17 @@ async function setDia(id,dia){
   const p=find(id); if(!p) return; p.dia=dia||null;
   if(S.view==='pend'&&S.filtro!=='todos'&&dayKey(p)!==S.filtro) render(); else { patchRow(id); renderDays(S.posts.filter(x=>!x.postado)); }
   try{ await rpc('fila_set_dia',{p_pin:S.pin,p_id:id,p_dia:dia||null}); S.sig=''; }catch(_){ toast('Não salvou o dia.'); load(); }
+}
+async function setHora(id,h){
+  const p=find(id); if(!p) return; p.hora=h||null; patchRow(id);
+  try{ await rpc('fila_set_hora',{p_pin:S.pin,p_id:id,p_hora:h||null}); S.sig=''; }catch(_){ toast('Não salvou o horário.'); load(); }
+}
+async function setAprovado(id,v){
+  const p=find(id); if(!p) return;
+  if(v&&(!p.dia||!p.hora)){ toast(!p.dia&&!p.hora?'Escolhe o dia e o horário antes de aprovar':!p.dia?'Escolhe o dia antes de aprovar':'Escolhe o horário antes de aprovar'); return; }
+  p.aprovado=v; if(v&&p.ig_status==='erro'){p.ig_status=null;p.ig_erro=null;} patchRow(id);
+  toast(v?'Aprovado · posta '+dayText(p.dia)+' às '+p.hora:'Aprovação desfeita', v?'DESFAZER':'', v?()=>setAprovado(id,false):null);
+  try{ await rpc('fila_set_aprovado',{p_pin:S.pin,p_id:id,p_aprovado:v}); S.sig=''; }catch(_){ toast('Não salvou. Tenta de novo.'); load(); }
 }
 async function setPostado(id,v){
   const p=find(id); if(!p) return;
@@ -562,6 +603,14 @@ function daySheetHTML(p){
     ${p.dia?`<button class="act dclear" data-act="setday" data-d="" data-id="${esc(p.id)}">${I.x} TIRAR O DIA</button>`:''}`;
 }
 
+/* ---- seletor rápido de horário ---- */
+const HORAS=['14:00','17:00','19:30'];
+function horaSheetHTML(p){
+  return `<div class="dpick hpick">${HORAS.map(h=>`<button class="dtile glass${p.hora===h?' on':''}" data-act="sethora" data-h="${h}" data-id="${esc(p.id)}"><span class="w">${h==='14:00'?'TARDE':h==='17:00'?'FIM DE TARDE':'NOITE'}</span><span class="n">${h}</span></button>`).join('')}</div>
+    <label class="act dother">${I.clock} OUTRO HORÁRIO<input type="time" data-act="time" data-id="${esc(p.id)}" value="${esc(p.hora||'')}" aria-label="Outro horário"></label>
+    ${p.hora?`<button class="act dclear" data-act="sethora" data-h="" data-id="${esc(p.id)}">${I.x} TIRAR O HORÁRIO</button>`:''}`;
+}
+
 /* ---- filtro no painel (quando os dias já saíram da tela) ---- */
 function openFilterSheet(){
   S.fsheet=true;
@@ -582,6 +631,8 @@ function openSheet(id,mode){
   let body='';
   if(mode==='day'){
     body=daySheetHTML(p);
+  } else if(mode==='hora'){
+    body=horaSheetHTML(p);
   } else if(mode==='media'){
     const slides=fs.map(f=>f.kind==='video'?`<video src="${esc(f.url)}" ${f.poster?`poster="${esc(f.poster)}"`:''} controls playsinline autoplay preload="auto"></video>`:`<img src="${esc(f.url)}" alt="">`).join('');
     body=`<div class="player" style="--ar:${ar(fs[0])}">${fs.length>1?`<div class="track">${slides}</div>`:slides}</div>
@@ -636,11 +687,19 @@ document.addEventListener('click',e=>{
   else if(a==='posted') setPostado(id,true);
   else if(a==='undo') setPostado(id,false);
   else if(a==='del') pedeApagar(id);
+  else if(a==='hora') openSheet(id,'hora');
+  else if(a==='sethora'){ closeSheet(); setHora(id,b.dataset.h||null); }
+  else if(a==='aprovar') setAprovado(id,true);
+  else if(a==='desaprovar') setAprovado(id,false);
 });
 /* calendário do iPhone: só salva quando ele FECHA (o ✓ ou o Reset), não no primeiro toque */
 document.addEventListener('focusin',e=>{ const i=e.target.closest('[data-act="date"]'); if(i) i.dataset.orig=i.value; });
 document.addEventListener('focusout',e=>{ const i=e.target.closest('[data-act="date"]'); if(!i) return; const v=i.value||'';
   if(v===(i.dataset.orig||'')) return; if(S.sheet) closeSheet(); setDia(i.dataset.id,v||null); });
+/* horário: mesmo esquema do calendário (no celular salva ao fechar) */
+document.addEventListener('focusin',e=>{ const i=e.target.closest('[data-act="time"]'); if(i) i.dataset.orig=i.value; });
+document.addEventListener('focusout',e=>{ const i=e.target.closest('[data-act="time"]'); if(!i) return; const v=i.value||''; if(v===(i.dataset.orig||'')) return; if(S.sheet) closeSheet(); setHora(i.dataset.id,v||null); });
+document.addEventListener('change',e=>{ const i=e.target.closest('[data-act="time"]'); if(!i||isMobile()) return; i.dataset.orig=i.value; if(S.sheet) closeSheet(); setHora(i.dataset.id,i.value||null); });
 document.addEventListener('change',e=>{ const i=e.target.closest('[data-act="date"]'); if(!i||isMobile()) return; i.dataset.orig=i.value; if(S.sheet) closeSheet(); setDia(i.dataset.id,i.value||null); });
 $('#sheetBg').addEventListener('click',()=>{ if(S.fsheet) closeFilterSheet(); else closeSheet(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(S.fsheet) closeFilterSheet(); else closeSheet(); } });
