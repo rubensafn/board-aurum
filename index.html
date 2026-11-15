@@ -632,6 +632,9 @@ html,body{max-width:100%;overflow-x:hidden}
 html{overscroll-behavior-x:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .aviso,.aviso span,.capprev,.capprev .clamp,.fname,.film,.cfm-box p,.cfm-box b,#toastMsg,.sheet,.sh-body,.row .info{overflow-wrap:anywhere;word-break:break-word;min-width:0}
 .row,.row .info,.wrap,.list{min-width:0;max-width:100%}
+/* v32: AU clicável (volta pro topo) */
+#logo{cursor:pointer;background:none;border:0;padding:0;-webkit-tap-highlight-color:transparent;transition:transform .15s,opacity .15s}
+#logo:active{transform:scale(.9);opacity:.8}
 </style>
 </head>
 <body>
@@ -640,7 +643,7 @@ html{overscroll-behavior-x:none;-webkit-text-size-adjust:100%;text-size-adjust:1
 <div class="bg" aria-hidden="true"></div>
 <header class="top" id="top" hidden>
   <div class="bar glass">
-    <div class="brand"><div class="au" id="logo" role="img" aria-label="Aurum · Board"></div></div>
+    <div class="brand"><button type="button" class="au" id="logo" aria-label="Voltar pro topo" title="Voltar pro topo"></button></div>
     <div class="seg" role="tablist"><span class="seg-ind" id="segInd" aria-hidden="true"></span>
       <button class="tab t-pend on" id="tab-pend" role="tab">PENDENTES <b id="c-pend">0</b></button>
       <button class="tab t-apr" id="tab-apr" role="tab">APROVADOS <b id="c-apr">0</b></button>
@@ -686,7 +689,7 @@ const isMobile=()=>window.matchMedia('(max-width:759px)').matches;
 function readSession(){ try{ const s=JSON.parse(store.get('fila_sess')||'null'); if(s&&s.pin&&s.exp>Date.now()) return s.pin; }catch(_){} store.set('fila_sess',null); store.set('fila_pin',null); return ''; }
 function saveSession(pin){ store.set('fila_sess',JSON.stringify({pin,exp:Date.now()+SESSAO_HORAS*3600e3})); store.set('fila_pin',null); }
 
-const S={posts:[],view:'pend',filtros:{pend:store.get('fila_filtro')||'todos',apr:store.get('fila_filtro_apr')||'todos',done:store.get('fila_filtro_done')||'todos'},pin:readSession(),ver:{},copied:store.get('fila_copied')||'',loaded:false,sig:'',sheet:null,busy:new Set()};
+const S={posts:[],view:(v=>['pend','apr','done'].includes(v)?v:'pend')(store.get('fila_view')),filtros:{pend:store.get('fila_filtro')||'todos',apr:store.get('fila_filtro_apr')||'todos',done:store.get('fila_filtro_done')||'todos'},pin:readSession(),ver:{},copied:store.get('fila_copied')||'',loaded:false,sig:'',sheet:null,busy:new Set()};
 
 async function rpc(fn,body){
   const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -1088,7 +1091,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(S.fsheet) clos
 let vAnim=0;
 async function goView(v){
   if(v===S.view) return; const O={pend:0,apr:1,done:2}, d=O[v]>O[S.view]?1:-1, my=++vAnim;
-  S.view=v; ['pend','apr','done'].forEach(k=>$('#tab-'+k).classList.toggle('on',k===v)); moveInd();
+  S.view=v; store.set('fila_view',v); ['pend','apr','done'].forEach(k=>$('#tab-'+k).classList.toggle('on',k===v)); moveInd();
   const els=[$('#list'),document.querySelector('.daysbar')].filter(Boolean);
   if(matchMedia('(prefers-reduced-motion: reduce)').matches||!els[0].animate){ render(); window.scrollTo({top:0}); return; }
   const out=els.map(e=>e.animate([{transform:'none',opacity:1},{transform:`translateX(${-d*56}px)`,opacity:0}],{duration:170,easing:'cubic-bezier(.5,0,.9,.6)',fill:'forwards'}));
@@ -1096,6 +1099,8 @@ async function goView(v){
   render(); window.scrollTo({top:0});
   els.forEach((e,i)=>{ out[i].cancel(); e.animate([{transform:`translateX(${d*56}px)`,opacity:0},{transform:'none',opacity:1}],{duration:340,easing:'cubic-bezier(.16,.84,.3,1)'}); });
 }
+/* v32: AU do topo = botão que volta pro topo */
+$('#logo').addEventListener('click',()=>window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
 $('#tab-pend').onclick=()=>goView('pend');
 $('#tab-done').onclick=()=>goView('done');
 $('#tab-apr').onclick=()=>goView('apr');
