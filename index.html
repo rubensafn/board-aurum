@@ -581,6 +581,23 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .fchip b i{font-size:13px}
 #days .dtile.on .c,.fgrid .dtile.on .c{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.14),rgba(14,14,20,.88) 75%)!important}
 #days .dtile .c i,.fgrid .dtile .c i,.fchip b i{transform:translateY(.5px)}
+/* v25: botões do card com a mesma estética do APAGAR TODOS — vidro com fundo da cor, contorno vivo e neonzinho */
+.ib.gold{background:linear-gradient(160deg,rgba(243,217,119,.36),rgba(217,184,85,.16))!important;-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
+  box-shadow:0 0 0 1px rgba(248,224,142,.85),0 0 12px rgba(243,217,119,.38),inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 12px rgba(243,217,119,.18)!important;color:#fff6d6!important}
+.ib.gold svg{filter:drop-shadow(0 0 6px rgba(243,217,119,.75))}
+.ib.cyan{background:linear-gradient(160deg,rgba(103,232,249,.36),rgba(34,211,238,.16))!important;-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
+  box-shadow:0 0 0 1px rgba(165,243,252,.85),0 0 12px rgba(103,232,249,.38),inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 12px rgba(103,232,249,.18)!important;color:#ecfeff!important}
+.ib.cyan svg{filter:drop-shadow(0 0 6px rgba(103,232,249,.75))}
+.ib.green{background:linear-gradient(160deg,rgba(74,222,128,.36),rgba(22,163,74,.16))!important;-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
+  box-shadow:0 0 0 1px rgba(134,239,172,.85),0 0 12px rgba(74,222,128,.38),inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 12px rgba(74,222,128,.18)!important;color:#f0fdf4!important}
+.ib.green svg{filter:drop-shadow(0 0 6px rgba(74,222,128,.75))}
+.ib.red{background:linear-gradient(160deg,rgba(248,113,113,.36),rgba(220,38,38,.16))!important;-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
+  box-shadow:0 0 0 1px rgba(252,165,165,.85),0 0 12px rgba(248,113,113,.38),inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 12px rgba(248,113,113,.18)!important;color:#fff1f1!important}
+.ib.red svg{filter:drop-shadow(0 0 6px rgba(248,113,113,.75))}
+.ib.mute{background:linear-gradient(160deg,rgba(200,200,215,.36),rgba(120,120,140,.16))!important;-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
+  box-shadow:0 0 0 1px rgba(230,230,240,.85),0 0 12px rgba(200,200,215,.38),inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 12px rgba(200,200,215,.18)!important;color:#f4f4f8!important}
+.ib.mute svg{filter:drop-shadow(0 0 6px rgba(200,200,215,.75))}
+.ib[disabled]{opacity:.38!important;filter:saturate(.5)}
 </style>
 </head>
 <body>
