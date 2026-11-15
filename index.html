@@ -434,6 +434,9 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .cfm-box p{margin:0;font-size:13px;line-height:1.45;color:var(--ink-2)}
 .cfm-bt{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:6px}
 .cfm-bt .act{height:46px;justify-content:center}
+/* v16: pop-up de apagar (vermelho) */
+.cfm.danger .cfm-ic{color:var(--red);background:rgba(248,113,113,.10);box-shadow:0 0 0 1px rgba(248,113,113,.45),0 0 22px rgba(248,113,113,.25)}
+.cfm.danger #cfmOk{color:#fecaca!important;background:rgba(248,113,113,.14)!important;box-shadow:inset 0 0 0 1px rgba(248,113,113,.5)!important}
 .pill.dest.st.sel{color:var(--rose)!important;background:rgba(251,113,133,.10)!important;border-color:rgba(251,113,133,.45)!important}
 .hpick{grid-template-columns:repeat(5,1fr)}
 .hpick .dtile .x.tst{color:var(--violet)}
@@ -564,7 +567,7 @@ const isMobile=()=>window.matchMedia('(max-width:759px)').matches;
 function readSession(){ try{ const s=JSON.parse(store.get('fila_sess')||'null'); if(s&&s.pin&&s.exp>Date.now()) return s.pin; }catch(_){} store.set('fila_sess',null); store.set('fila_pin',null); return ''; }
 function saveSession(pin){ store.set('fila_sess',JSON.stringify({pin,exp:Date.now()+SESSAO_HORAS*3600e3})); store.set('fila_pin',null); }
 
-const S={posts:[],view:'pend',filtro:store.get('fila_filtro')||'todos',pin:readSession(),ver:{},copied:store.get('fila_copied')||'',loaded:false,sig:'',sheet:null,busy:new Set()};
+const S={posts:[],view:'pend',filtros:{pend:store.get('fila_filtro')||'todos',apr:store.get('fila_filtro_apr')||'todos',done:store.get('fila_filtro_done')||'todos'},pin:readSession(),ver:{},copied:store.get('fila_copied')||'',loaded:false,sig:'',sheet:null,busy:new Set()};
 
 async function rpc(fn,body){
   const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -638,26 +641,30 @@ function rowHTML(p){
 }
 function patchRow(id){ const el=document.querySelector(`[data-row="${CSS.escape(id)}"]`), p=find(id); if(el&&p) el.outerHTML=rowHTML(p); }
 
-/* ---- filtro de dias ---- */
-function renderDays(pend){
-  const nav=$('#days'); if(S.view!=='pend'){nav.style.display='none';$('#fchip').classList.remove('show');return;} nav.style.display='';
-  const cnt=new Map(); pend.forEach(p=>{const k=dayKey(p);cnt.set(k,(cnt.get(k)||0)+1);});
-  const t=today(), tm=tomorrow();
-  const keys=['todos']; if(cnt.has('atrasados')) keys.push('atrasados');
-  keys.push(t,tm); [...cnt.keys()].filter(k=>!['atrasados','sem',t,tm].includes(k)).sort().forEach(k=>keys.push(k)); keys.push('sem');
-  if(!keys.includes(S.filtro)) S.filtro='todos';
-  const n=k=>k==='todos'?pend.length:(cnt.get(k)||0);
-  const cur=S.filtro, tc=cur==='todos'?'TODOS':cur==='sem'?'SEM DIA':cur==='atrasados'?'ATRASO':cur===t?'HOJE':cur===tm?'AMANHÃ':(p=>p.w+' '+p.d)(parts(cur));
+/* ---- filtro de dias (v16: em PENDENTES, APROVADOS e POSTADOS; sem o "SEM DIA" — quem não tem dia aparece em TODOS) ---- */
+const yesterday=()=>{const d=new Date();d.setDate(d.getDate()-1);return iso(d);};
+const doneKey=p=>p.postado_em?iso(new Date(p.postado_em)):'sem';
+const keyOf=(p,v)=>v==='done'?doneKey(p):dayKey(p);
+const FKEY={pend:'fila_filtro',apr:'fila_filtro_apr',done:'fila_filtro_done'};
+const viewList=v=>S.posts.filter(p=>v==='done'?p.postado:v==='apr'?(!p.postado&&p.aprovado):(!p.postado&&!p.aprovado));
+function renderDays(){
+  const nav=$('#days'), v=S.view, arr=viewList(v); nav.style.display='';
+  const cnt=new Map(); arr.forEach(p=>{const k=keyOf(p,v);cnt.set(k,(cnt.get(k)||0)+1);});
+  const t=today(), tm=tomorrow(), on=yesterday(); let keys=['todos'];
+  if(v==='done'){ keys.push(t,on); [...cnt.keys()].filter(k=>![t,on,'sem'].includes(k)).sort().reverse().forEach(k=>keys.push(k)); }
+  else { if(cnt.has('atrasados')) keys.push('atrasados'); keys.push(t,tm); [...cnt.keys()].filter(k=>!['atrasados','sem',t,tm].includes(k)).sort().forEach(k=>keys.push(k)); }
+  if(!keys.includes(S.filtros[v])) S.filtros[v]='todos';
+  const cur=S.filtros[v], n=k=>k==='todos'?arr.length:(cnt.get(k)||0);
+  const lbl=k=>k==='todos'?'TODOS':k==='atrasados'?'ATRASO':k===t?'HOJE':k===tm?'AMANHÃ':k===on?'ONTEM':parts(k).w;
+  const tc=cur==='todos'||cur==='atrasados'||cur===t||cur===tm||cur===on?lbl(cur):(p=>p.w+' '+p.d)(parts(cur));
   $('#fchip').innerHTML=`${I.cal}<span>${tc}</span><b>${n(cur)}</b>`;
   nav.innerHTML=keys.map(k=>{
-    let w,num,cls='dtile glass',tn='';
-    if(k==='todos'){w='TODOS';num='';}
-    else if(k==='sem'){w='SEM DIA';num='';}
-    else if(k==='atrasados'){w='ATRASO';num='';tn='late';}
-    else {const p=parts(k);w=k===t?'HOJE':k===tm?'AMANHÃ':p.w;num=p.d;tn=k===t?'today':k===tm?'tomorrow':'';}
-    return `<button class="${cls}${S.filtro===k?' on':''}" ${tn?`data-tone="${tn}"`:''} data-act="filtro" data-f="${k}" aria-pressed="${S.filtro===k}"><span class="w">${w}</span>${num?`<span class="n">${num}</span>`:''}<span class="c">${n(k)}</span></button>`;
+    const w=lbl(k), num=k==='todos'||k==='atrasados'?'':parts(k).d;
+    const tn=k==='atrasados'?'late':k===t?'today':(k===tm&&v!=='done')?'tomorrow':'';
+    return `<button class="dtile glass${cur===k?' on':''}" ${tn?`data-tone="${tn}"`:''} data-act="filtro" data-f="${k}" aria-pressed="${cur===k}"><span class="w">${w}</span>${num?`<span class="n">${num}</span>`:''}<span class="c">${n(k)}</span></button>`;
   }).join('');
 }
+const filtrar=(arr,v)=>{const f=S.filtros[v]; return f==='todos'?arr:arr.filter(p=>keyOf(p,v)===f);};
 
 /* ---- render geral (só quando os dados ou a aba/filtro mudam) ---- */
 const order=(a,b)=>(b.lote||'').localeCompare(a.lote||'')||(a.num??0)-(b.num??0);
@@ -666,17 +673,18 @@ function render(){
   const pend=S.posts.filter(p=>!p.postado&&!p.aprovado), apr=S.posts.filter(p=>!p.postado&&p.aprovado), done=S.posts.filter(p=>p.postado);
   $('#c-pend').textContent=pend.length; $('#c-apr').textContent=apr.length; $('#c-done').textContent=done.length;
   $('#tab-pend').classList.toggle('on',S.view==='pend'); $('#tab-apr').classList.toggle('on',S.view==='apr'); $('#tab-done').classList.toggle('on',S.view==='done');
-  renderDays(pend);
+  renderDays();
+  const filtrado=S.filtros[S.view]!=='todos';
   const list=$('#list');
   if(!S.loaded){ list.innerHTML='<div class="sk"></div><div class="sk"></div><div class="sk"></div>'; return; }
   let items;
-  if(S.view==='apr'){ items=apr.slice().sort((a,b)=>((a.dia||'')+(a.hora||'')).localeCompare((b.dia||'')+(b.hora||'')));
-    if(!items.length){ list.innerHTML=emptyHTML('NADA APROVADO','O que você aprovar fica aqui esperando o horário de postar.'); }
+  if(S.view==='apr'){ items=filtrar(apr,'apr').slice().sort((a,b)=>((a.dia||'')+(a.hora||'')).localeCompare((b.dia||'')+(b.hora||'')));
+    if(!items.length){ list.innerHTML=filtrado&&apr.length?emptyHTML('NADA NESSE DIA','Nenhum post aprovado pra esse dia.'):emptyHTML('NADA APROVADO','O que você aprovar fica aqui esperando o horário de postar.'); }
     else list.innerHTML=items.map(rowHTML).join(''); return; }
-  if(S.view==='done'){ items=done.slice().sort((a,b)=>(b.postado_em||'').localeCompare(a.postado_em||''));
-    if(!items.length){ list.innerHTML=emptyHTML('NADA POSTADO AINDA','O que você marcar como postado aparece aqui.'); return; }
+  if(S.view==='done'){ items=filtrar(done,'done').slice().sort((a,b)=>(b.postado_em||'').localeCompare(a.postado_em||''));
+    if(!items.length){ list.innerHTML=filtrado&&done.length?emptyHTML('NADA NESSE DIA','Nenhum post marcado como postado nesse dia.'):emptyHTML('NADA POSTADO AINDA','O que você marcar como postado aparece aqui.'); return; }
     list.innerHTML=`<div class="donebar"><span><b>${items.length}</b>${items.length>1?'POSTADOS':'POSTADO'}</span><button class="clearall" data-act="clearall">${I.trash} APAGAR TODOS</button></div>`+items.map(rowHTML).join(''); return; }
-  else { items=S.filtro==='todos'?pend:pend.filter(p=>dayKey(p)===S.filtro);
+  else { items=filtrar(pend,'pend');
     if(!items.length){ list.innerHTML=!S.posts.length?emptyHTML('FILA VAZIA','O próximo lote com selo AU entra aqui.'):!pend.length?emptyHTML('TUDO POSTADO','O próximo lote entra aqui assim que ficar pronto.'):emptyHTML('NADA NESSE DIA','Nenhum post pendente marcado pra esse dia.'); return; } }
   list.innerHTML=items.map(rowHTML).join('');
 }
@@ -691,7 +699,7 @@ async function load(){
 }
 async function setDia(id,dia){
   const p=find(id); if(!p) return; p.dia=dia||null;
-  if(S.view==='pend'&&S.filtro!=='todos'&&dayKey(p)!==S.filtro) render(); else { patchRow(id); renderDays(S.posts.filter(x=>!x.postado&&!x.aprovado)); }
+  if(S.filtros[S.view]!=='todos'&&keyOf(p,S.view)!==S.filtros[S.view]) render(); else { patchRow(id); renderDays(); }
   try{ await rpc('fila_set_dia',{p_pin:S.pin,p_id:id,p_dia:dia||null}); S.sig=''; }catch(_){ toast('Não salvou o dia.'); load(); }
 }
 async function setHora(id,h){
@@ -755,7 +763,7 @@ async function doDownload(id,only,comCopia){
 }
 
 /* ---- apagar post: arquivos saem do storage, a linha fica no banco como histórico (arquivada) — pede confirmação no aviso de baixo ---- */
-function pedeApagar(id){ const p=find(id); if(!p) return; toast('Apagar '+pad(p.num??0)+' '+(p.filme||'')+' do board?','APAGAR',()=>apagar(id),6000); }
+function pedeApagar(id){ const p=find(id); if(!p) return; confirmar('APAGAR ESSE POST?',pad(p.num??0)+' · '+(p.filme||p.nome||'Post')+' sai do board e os arquivos são apagados.','APAGAR',()=>apagar(id),true); }
 async function apagar(id){
   const el=document.querySelector(`[data-row="${CSS.escape(id)}"]`);
   try{
@@ -766,7 +774,7 @@ async function apagar(id){
   }catch(_){ toast('Não apagou. Tenta de novo.'); }
 }
 /* ---- apagar todos os postados: sai do board, mas fica no banco como histórico (o que já foi postado) ---- */
-function pedeLimpar(){ const n=S.posts.filter(p=>p.postado).length; if(!n) return; toast('Tirar '+n+(n>1?' postados':' postado')+' do board?','APAGAR TODOS',limparPostados,6000); }
+function pedeLimpar(){ const n=S.posts.filter(p=>p.postado).length; if(!n) return; confirmar('APAGAR TODOS OS POSTADOS?',(n>1?'Os '+n+' postados saem':'O postado sai')+' do board. O histórico fica salvo.','APAGAR TODOS',limparPostados,true); }
 async function limparPostados(){
   const list=$('#list'), bt=document.querySelector('[data-act="clearall"]'); if(bt) bt.disabled=true;
   try{
@@ -844,7 +852,7 @@ function closeFilterSheet(){
   S.fsheet=false; $('#sheet').classList.remove('open'); $('#sheetBg').classList.remove('open'); document.body.style.overflow='';
   setTimeout(()=>{ if(!S.sheet&&!S.fsheet) $('#sheet').innerHTML=''; },320);
 }
-new IntersectionObserver(([e])=>{ $('#fchip').classList.toggle('show',!e.isIntersecting&&S.view==='pend'&&!!S.pin&&e.boundingClientRect.top<0); },{rootMargin:'-70px 0px 0px 0px'}).observe($('#days'));
+new IntersectionObserver(([e])=>{ $('#fchip').classList.toggle('show',!e.isIntersecting&&!!S.pin&&e.boundingClientRect.top<0); },{rootMargin:'-70px 0px 0px 0px'}).observe($('#days'));
 
 /* ---- painel ---- */
 function openSheet(id,mode){
@@ -886,7 +894,7 @@ function closeSheet(){
 
 /* ---- toast ---- */
 let tt;
-function confirmar(t,msg,ok,fn){ const c=$('#cfm'); $('#cfmIc').innerHTML=I.clock; $('#cfmT').textContent=t; $('#cfmP').textContent=msg; $('#cfmOk').textContent=ok;
+function confirmar(t,msg,ok,fn,danger){ const c=$('#cfm'); c.classList.toggle('danger',!!danger); $('#cfmIc').innerHTML=danger?I.trash:I.clock; $('#cfmT').textContent=t; $('#cfmP').textContent=msg; $('#cfmOk').textContent=ok;
   const fechar=()=>{c.classList.remove('show');document.removeEventListener('keydown',esc_)}, esc_=e=>{if(e.key==='Escape')fechar();};
   $('#cfmOk').onclick=()=>{fechar();fn();}; $('#cfmNo').onclick=fechar; c.onclick=e=>{if(e.target===c)fechar();}; document.addEventListener('keydown',esc_); c.classList.add('show'); setTimeout(()=>$('#cfmOk').focus(),50); }
 function toast(msg,btn='',fn=null,ms){ const t=$('#toast'); $('#toastMsg').textContent=msg; const b=$('#toastBtn'); b.textContent=btn; b.onclick=fn?()=>{t.classList.remove('show');fn();}:null; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),ms||(fn?5000:2200)); }
@@ -906,7 +914,7 @@ function showLogin(msg){
 /* ---- eventos ---- */
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]'); if(!b) return; const id=b.dataset.id, a=b.dataset.act;
-  if(a==='filtro'){ if(S.fsheet) closeFilterSheet(); S.filtro=b.dataset.f; store.set('fila_filtro',S.filtro); render(); window.scrollTo({top:0}); }
+  if(a==='filtro'){ if(S.fsheet) closeFilterSheet(); S.filtros[S.view]=b.dataset.f; store.set(FKEY[S.view],b.dataset.f); render(); window.scrollTo({top:0}); }
   else if(a==='fsheet') openFilterSheet();
   else if(a==='open') openSheet(id,'media');
   else if(a==='fclose') closeFilterSheet();
