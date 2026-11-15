@@ -527,11 +527,26 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .wrap{max-width:1268px!important}
 #days{max-width:1268px!important;padding-left:14px!important;padding-right:14px!important;scroll-padding-inline:14px;scroll-snap-type:none!important}
 #days::after{content:"";flex:none;width:1px}
-/* v18: pílula do filtro em 2 linhas — HOJE/AMANHÃ/ONTEM ou dia da semana em cima, data 15.11 embaixo (apagadinha); TODOS e ATRASO numa linha só */
-#days .dtile,.fgrid .dtile{height:44px!important;padding:0 7px 0 14px!important;gap:8px!important}
-#days .dtile .wn,.fgrid .dtile .wn{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;line-height:1}
+/* v19: filtro de dias — pílula fina (32 px) com "HOJE (15.11)" + bolinha do contador SEPARADA, com um respiro entre elas */
+#days .dtile,.fgrid .dtile,#days .dtile.on,.fgrid .dtile.on,#days .dtile.on[data-tone],.fgrid .dtile.on[data-tone]{background:none!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding:0!important;gap:4px!important;height:32px!important;align-items:center!important;border-radius:999px!important}
+#days .dtile::after,.fgrid .dtile::after{display:none!important}
+#days .dtile .wn,.fgrid .dtile .wn{display:flex;align-items:center;gap:5px;height:32px;padding:0 13px;border-radius:999px;white-space:nowrap}
 #days .dtile .w,.fgrid .dtile .w{line-height:1!important}
-#days .dtile .n,.fgrid .dtile .n{font-size:11px!important;margin:0!important;opacity:.55;font-variant-numeric:tabular-nums;letter-spacing:.02em;font-family:var(--body);font-weight:600}
+#days .dtile .n,.fgrid .dtile .n{font-family:var(--body)!important;font-size:10.5px!important;font-weight:500!important;margin:0!important;color:var(--ink-2);opacity:.6;font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1!important}
+#days .dtile .c,.fgrid .dtile .c{width:28px;min-width:28px!important;height:28px!important;padding:0!important;margin:0!important;border-radius:999px!important;display:grid;place-items:center;font-size:10px!important}
+#days .dtile.on .wn,.fgrid .dtile.on .wn{box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),inset 0 0 14px rgba(167,139,250,.4)!important}
+#days .dtile.on[data-tone="today"] .wn,.fgrid .dtile.on[data-tone="today"] .wn{box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),inset 0 0 14px rgba(251,191,36,.4)!important}
+#days .dtile.on[data-tone="tomorrow"] .wn,.fgrid .dtile.on[data-tone="tomorrow"] .wn{box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),inset 0 0 14px rgba(167,139,250,.5)!important}
+#days .dtile.on[data-tone="late"] .wn,.fgrid .dtile.on[data-tone="late"] .wn{box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),inset 0 0 14px rgba(248,113,113,.4)!important}
+#days .dtile.on .c,.fgrid .dtile.on .c{background:rgba(167,139,250,.22)!important;color:#fff!important}
+#days .dtile.on[data-tone="today"] .c,.fgrid .dtile.on[data-tone="today"] .c{background:rgba(251,191,36,.22)!important}
+#days .dtile.on[data-tone="late"] .c,.fgrid .dtile.on[data-tone="late"] .c{background:rgba(248,113,113,.22)!important}
+.fgrid .dtile{justify-content:flex-start!important}
+.fgrid .dtile .wn{flex:1}
+/* contorno neon do selecionado só na pílula, não em volta da bolinha */
+#days .dtile.on::before,.fgrid .dtile.on::before{display:none!important}
+#days .dtile.on .wn::before,.fgrid .dtile.on .wn::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:3;background:var(--neon);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);animation:spin 4s linear infinite}
 </style>
 </head>
 <body>
@@ -680,7 +695,7 @@ function renderDays(){
   nav.innerHTML=keys.map(k=>{
     const w=lbl(k), num=k==='todos'||k==='atrasados'?'':(q=>q.d+'.'+pad(+q.m))(k.split('-').reduce((o,x,i)=>(i===1?o.m=x:i===2?o.d=x:0,o),{}));
     const tn=k==='atrasados'?'late':k===t?'today':(k===tm&&v!=='done')?'tomorrow':'';
-    return `<button class="dtile glass${cur===k?' on':''}" ${tn?`data-tone="${tn}"`:''} data-act="filtro" data-f="${k}" aria-pressed="${cur===k}"><span class="wn"><span class="w">${w}</span>${num?`<span class="n">${num}</span>`:''}</span><span class="c">${n(k)}</span></button>`;
+    return `<button class="dtile glass${cur===k?' on':''}" ${tn?`data-tone="${tn}"`:''} data-act="filtro" data-f="${k}" aria-pressed="${cur===k}"><span class="wn glass"><span class="w">${w}</span>${num?`<span class="n">(${num})</span>`:''}</span><span class="c glass">${n(k)}</span></button>`;
   }).join('');
   const cb=$('#clrAll'), tem=v==='done'&&arr.length>0; cb.hidden=!tem; cb.disabled=false; nav.classList.toggle('has-clr',tem);
 }
