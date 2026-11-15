@@ -598,6 +598,13 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
   box-shadow:0 0 0 1px rgba(230,230,240,.85),0 0 12px rgba(200,200,215,.38),inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 12px rgba(200,200,215,.18)!important;color:#f4f4f8!important}
 .ib.mute svg{filter:drop-shadow(0 0 6px rgba(200,200,215,.75))}
 .ib[disabled]{opacity:.38!important;filter:saturate(.5)}
+/* v26: comparação pro Rubão aprovar — número BRANCO nas duas.
+   A (linha de dias + painel): bolinha PREENCHIDA com o degradê colorido.  B (mini menu): bolinha escura com contorno colorido. */
+#days .dtile .c i,.fgrid .dtile .c i,.fchip b i{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:#fff!important;-webkit-text-fill-color:#fff!important;transform:none!important}
+#days .dtile .c,.fgrid .dtile .c,#days .dtile.on .c,.fgrid .dtile.on .c{background:linear-gradient(135deg,rgba(243,217,119,.9),rgba(251,113,133,.85) 35%,rgba(167,139,250,.9) 68%,rgba(103,232,249,.9))!important}
+#days .dtile .c i,.fgrid .dtile .c i{text-shadow:0 1px 2px rgba(0,0,0,.45)}
+.fchip b{padding:0!important;margin:0!important;text-align:center}
+.fchip b i{width:100%;text-align:center;transform:translateY(.8px)!important}
 </style>
 </head>
 <body>
