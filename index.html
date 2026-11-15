@@ -636,19 +636,22 @@ html{overscroll-behavior-x:none;-webkit-text-size-adjust:100%;text-size-adjust:1
 #logo{cursor:pointer;background:none;border:0;padding:0;-webkit-tap-highlight-color:transparent;transition:transform .15s,opacity .15s}
 #logo:active{transform:scale(.9);opacity:.8}
 
-/* v34: SELECIONADO acende por dentro (glow), pílula e bolinha juntas, na cor do dia:
-   outros dias/TODOS violeta · HOJE âmbar · AMANHÃ azul elétrico (mais vivo que o violeta) · ATRASO vermelho. Bolinha NÃO é preenchida. */
+/* v35 (aprovado 15/11): SELECIONADO = NEON de uma cor só, no tom claro da cor do dia — na pílula inteira e na bolinha (sem o contorno arco-íris).
+   Bolinha = botão neon (degradê da cor, reflexo em cima, número branco com sombra). TODOS/outros dias violeta · HOJE dourado · AMANHÃ azul elétrico · ATRASO vermelho. */
 #days .dtile[data-tone="tomorrow"] .w,.fgrid .dtile[data-tone="tomorrow"] .w{color:#38bdf8!important}
 .fchip:focus,.fchip:focus-visible{outline:none!important}
-#days .dtile.on,.fgrid .dtile.on{box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),inset 0 0 20px rgba(167,139,250,.62)!important}
-#days .dtile.on .c,.fgrid .dtile.on .c{background:radial-gradient(circle at 50% 50%,#0e0e14 38%,rgba(167,139,250,.38) 100%),#0e0e14!important;box-shadow:inset 0 0 14px rgba(167,139,250,.9),inset 0 0 5px rgba(167,139,250,.6),0 0 12px rgba(167,139,250,.5)!important}
-#days .dtile.on[data-tone="today"],.fgrid .dtile.on[data-tone="today"]{box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),inset 0 0 20px rgba(251,191,36,.62)!important}
-#days .dtile.on[data-tone="today"] .c,.fgrid .dtile.on[data-tone="today"] .c{background:radial-gradient(circle at 50% 50%,#0e0e14 38%,rgba(251,191,36,.38) 100%),#0e0e14!important;box-shadow:inset 0 0 14px rgba(251,191,36,.9),inset 0 0 5px rgba(251,191,36,.6),0 0 12px rgba(251,191,36,.5)!important}
-#days .dtile.on[data-tone="tomorrow"],.fgrid .dtile.on[data-tone="tomorrow"]{box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),inset 0 0 20px rgba(56,189,248,.62)!important}
-#days .dtile.on[data-tone="tomorrow"] .c,.fgrid .dtile.on[data-tone="tomorrow"] .c{background:radial-gradient(circle at 50% 50%,#0e0e14 38%,rgba(56,189,248,.38) 100%),#0e0e14!important;box-shadow:inset 0 0 14px rgba(56,189,248,.9),inset 0 0 5px rgba(56,189,248,.6),0 0 12px rgba(56,189,248,.5)!important}
-#days .dtile.on[data-tone="late"],.fgrid .dtile.on[data-tone="late"]{box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),inset 0 0 20px rgba(248,113,113,.62)!important}
-#days .dtile.on[data-tone="late"] .c,.fgrid .dtile.on[data-tone="late"] .c{background:radial-gradient(circle at 50% 50%,#0e0e14 38%,rgba(248,113,113,.38) 100%),#0e0e14!important;box-shadow:inset 0 0 14px rgba(248,113,113,.9),inset 0 0 5px rgba(248,113,113,.6),0 0 12px rgba(248,113,113,.5)!important}
-#days .dtile.on .c i,.fgrid .dtile.on .c i{text-shadow:0 0 6px rgba(0,0,0,.5)!important}
+#days .dtile.on::before,.fgrid .dtile.on::before{display:none!important}
+#days .dtile.on .c::after,.fgrid .dtile.on .c::after{display:none!important}
+#days .dtile.on .c i,.fgrid .dtile.on .c i{color:#fff!important;-webkit-text-fill-color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.6),0 0 3px rgba(0,0,0,.45)!important}
+#days .dtile.on,.fgrid .dtile.on{box-shadow:0 0 0 1.5px #ddd6fe,0 0 12px rgba(167,139,250,.55),inset 0 0 20px rgba(167,139,250,.55)!important}
+#days .dtile.on .c,.fgrid .dtile.on .c{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 46%),linear-gradient(180deg,#8b5cf6,#5b21b6)!important;box-shadow:0 0 0 1.5px #ddd6fe,0 0 10px rgba(167,139,250,.8),inset 0 1px 0 rgba(255,255,255,.35)!important}
+#days .dtile.on[data-tone="today"],.fgrid .dtile.on[data-tone="today"]{box-shadow:0 0 0 1.5px #fde68a,0 0 12px rgba(251,191,36,.55),inset 0 0 20px rgba(251,191,36,.55)!important}
+#days .dtile.on[data-tone="today"] .c,.fgrid .dtile.on[data-tone="today"] .c{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 46%),linear-gradient(180deg,#d4a017,#7a5a0c)!important;box-shadow:0 0 0 1.5px #fde68a,0 0 10px rgba(251,191,36,.8),inset 0 1px 0 rgba(255,255,255,.35)!important}
+#days .dtile.on[data-tone="tomorrow"],.fgrid .dtile.on[data-tone="tomorrow"]{box-shadow:0 0 0 1.5px #bae6fd,0 0 12px rgba(56,189,248,.55),inset 0 0 20px rgba(56,189,248,.55)!important}
+#days .dtile.on[data-tone="tomorrow"] .c,.fgrid .dtile.on[data-tone="tomorrow"] .c{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 46%),linear-gradient(180deg,#0ea5e9,#075985)!important;box-shadow:0 0 0 1.5px #bae6fd,0 0 10px rgba(56,189,248,.8),inset 0 1px 0 rgba(255,255,255,.35)!important}
+#days .dtile.on[data-tone="late"],.fgrid .dtile.on[data-tone="late"]{box-shadow:0 0 0 1.5px #fecaca,0 0 12px rgba(248,113,113,.55),inset 0 0 20px rgba(248,113,113,.55)!important}
+#days .dtile.on[data-tone="late"] .c,.fgrid .dtile.on[data-tone="late"] .c{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 46%),linear-gradient(180deg,#ef4444,#991b1b)!important;box-shadow:0 0 0 1.5px #fecaca,0 0 10px rgba(248,113,113,.8),inset 0 1px 0 rgba(255,255,255,.35)!important}
+
 </style>
 </head>
 <body>
