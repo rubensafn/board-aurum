@@ -413,6 +413,12 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 #days.has-clr{padding-right:168px!important;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 172px),transparent calc(100% - 154px));mask-image:linear-gradient(90deg,#000 calc(100% - 172px),transparent calc(100% - 154px))}
 #clrAll{position:absolute;right:14px;top:50%;transform:translateY(-50%);height:32px;padding:0 14px;border-radius:999px;color:#fca5a5;background:rgba(248,113,113,.12);box-shadow:0 0 0 1px rgba(248,113,113,.45)}
 #clrAll[hidden]{display:none}
+/* v23: APAGAR TODOS mais evidente — vidro com fundo vermelho mais forte, contorno vivo e neonzinho */
+#clrAll{color:#fff1f1!important;background:linear-gradient(160deg,rgba(248,113,113,.58),rgba(220,38,38,.36))!important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
+  box-shadow:0 0 0 1px rgba(252,165,165,.9),0 0 14px rgba(248,113,113,.55),0 0 28px rgba(239,68,68,.25),inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 12px rgba(248,113,113,.25)!important;
+  text-shadow:0 0 8px rgba(248,113,113,.6)}
+#clrAll svg{color:#fecaca;filter:drop-shadow(0 0 6px rgba(248,113,113,.8))}
 
 #clrAll svg{width:14px;height:14px}
 #clrAll:active{transform:translateY(-50%) scale(.97)}
@@ -542,6 +548,12 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 #days .dtile.on[data-tone="today"] .c,.fgrid .dtile.on[data-tone="today"] .c{background:rgba(251,191,36,.2)!important}
 #days .dtile.on[data-tone="late"] .c,.fgrid .dtile.on[data-tone="late"] .c{background:rgba(248,113,113,.2)!important}
 .fgrid .dtile{justify-content:space-between!important}
+/* v23: bolinhas da linha de dias com o mesmo tratamento do mini menu — contorno colorido, fundo com cor, número maior */
+#days .dtile .c,.fgrid .dtile .c{position:relative;box-shadow:none!important;font-size:13px!important;font-weight:700!important;color:#fff!important;
+  background:radial-gradient(circle at 30% 25%,rgba(167,139,250,.5),rgba(103,232,249,.16) 70%)!important}
+#days .dtile .c::after,.fgrid .dtile .c::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;
+  background:linear-gradient(135deg,#f3d977,#fb7185 35%,#a78bfa 68%,#67e8f9);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 /* v21: painel FILTRAR POR DIA — 2 colunas largas pra pílula + bolinha não encavalarem */
 .fgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
 @media (min-width:760px){.fgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
