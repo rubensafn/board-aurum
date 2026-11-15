@@ -553,6 +553,12 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .fchip::after{background:linear-gradient(100deg,rgba(243,217,119,.8),rgba(251,113,133,.7) 35%,rgba(167,139,250,.75) 68%,rgba(103,232,249,.8))!important;padding:1px!important}
 .fchip b{min-width:44px!important;width:44px;height:44px!important;padding:0!important;border-radius:999px!important;margin-left:2px;font-size:12px!important;
   background:rgba(255,255,255,.08)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+/* v22: bolinha do mini menu — contorno colorido (igual à cápsula), fundo com cor e número maior pra chamar mais atenção */
+.fchip b{position:relative;box-shadow:none!important;font-size:15px!important;font-weight:700!important;color:#fff!important;
+  background:radial-gradient(circle at 30% 25%,rgba(167,139,250,.55),rgba(103,232,249,.18) 70%)!important}
+.fchip b::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;
+  background:linear-gradient(135deg,#f3d977,#fb7185 35%,#a78bfa 68%,#67e8f9);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 </style>
 </head>
 <body>
