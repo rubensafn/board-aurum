@@ -571,6 +571,16 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .fchip b::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;
   background:linear-gradient(135deg,#f3d977,#fb7185 35%,#a78bfa 68%,#67e8f9);
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+/* v24: número das bolinhas — tamanho menor, centralizado de verdade, colorido em degradê; fundo escuro pra cor aparecer */
+#days .dtile .c,.fgrid .dtile .c,.fchip b{display:flex!important;align-items:center!important;justify-content:center!important;line-height:1!important;
+  background:radial-gradient(circle at 35% 30%,rgba(167,139,250,.22),rgba(14,14,20,.9) 75%)!important}
+#days .dtile .c i,.fgrid .dtile .c i,.fchip b i{font-style:normal;font-family:var(--body);font-weight:800;line-height:1;display:block;letter-spacing:-.01em;font-variant-numeric:tabular-nums;
+  background:linear-gradient(135deg,#f3d977,#fb7185 40%,#a78bfa 70%,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+#days .dtile .c i,.fgrid .dtile .c i{font-size:11.5px}
+.fchip b{font-size:13px!important;margin-left:0!important}
+.fchip b i{font-size:13px}
+#days .dtile.on .c,.fgrid .dtile.on .c{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.14),rgba(14,14,20,.88) 75%)!important}
+#days .dtile .c i,.fgrid .dtile .c i,.fchip b i{transform:translateY(.5px)}
 </style>
 </head>
 <body>
@@ -717,11 +727,11 @@ function renderDays(){
   const cur=S.filtros[v], n=k=>k==='todos'?arr.length:(cnt.get(k)||0);
   const lbl=k=>k==='todos'?'TODOS':k==='atrasados'?'ATRASO':k===t?'HOJE':k===tm?'AMANHÃ':k===on?'ONTEM':parts(k).w;
   const tc=cur==='todos'||cur==='atrasados'||cur===t||cur===tm||cur===on?lbl(cur):(p=>p.w+' '+p.d)(parts(cur));
-  $('#fchip').innerHTML=`${I.cal}<span>${tc}</span><b>${n(cur)}</b>`;
+  $('#fchip').innerHTML=`${I.cal}<span>${tc}</span><b><i>${n(cur)}</i></b>`;
   nav.innerHTML=keys.map(k=>{
     const w=lbl(k), num=k==='todos'||k==='atrasados'?'':(q=>q.d+'.'+pad(+q.m))(k.split('-').reduce((o,x,i)=>(i===1?o.m=x:i===2?o.d=x:0,o),{}));
     const tn=k==='atrasados'?'late':k===t?'today':(k===tm&&v!=='done')?'tomorrow':'';
-    return `<button class="dtile glass${cur===k?' on':''}" ${tn?`data-tone="${tn}"`:''} data-act="filtro" data-f="${k}" aria-pressed="${cur===k}"><span class="wn"><span class="w">${w}</span>${num?`<span class="n">(${num})</span>`:''}</span><span class="c">${n(k)}</span></button>`;
+    return `<button class="dtile glass${cur===k?' on':''}" ${tn?`data-tone="${tn}"`:''} data-act="filtro" data-f="${k}" aria-pressed="${cur===k}"><span class="wn"><span class="w">${w}</span>${num?`<span class="n">(${num})</span>`:''}</span><span class="c"><i>${n(k)}</i></span></button>`;
   }).join('');
   const cb=$('#clrAll'), tem=v==='done'&&arr.length>0; cb.hidden=!tem; cb.disabled=false; nav.classList.toggle('has-clr',tem);
 }
