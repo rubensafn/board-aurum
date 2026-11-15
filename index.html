@@ -545,8 +545,6 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 #days .dtile .c,.fgrid .dtile .c{width:32px;min-width:32px!important;height:32px!important;padding:0!important;margin:0!important;border-radius:999px!important;display:grid;place-items:center;font-size:10px!important;
   background:rgba(255,255,255,.07)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
 #days .dtile.on .c,.fgrid .dtile.on .c{background:rgba(167,139,250,.2)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.4);color:#fff!important}
-#days .dtile.on[data-tone="today"] .c,.fgrid .dtile.on[data-tone="today"] .c{background:rgba(251,191,36,.2)!important}
-#days .dtile.on[data-tone="late"] .c,.fgrid .dtile.on[data-tone="late"] .c{background:rgba(248,113,113,.2)!important}
 .fgrid .dtile{justify-content:space-between!important}
 /* v23: bolinhas da linha de dias com o mesmo tratamento do mini menu — contorno colorido, fundo com cor, número maior */
 #days .dtile .c,.fgrid .dtile .c{position:relative;box-shadow:none!important;font-size:13px!important;font-weight:700!important;color:#fff!important;
@@ -601,7 +599,7 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 /* v28: bolinhas — estilo do MINI MENU em todas (aprovado 15/11): fundo escuro, contorno em degradê colorido, número BRANCO;
    mesma bolinha em qualquer dia (não muda de cor no HOJE/AMANHÃ). Número centralizado pela altura real dos algarismos (text-box trim). */
 #days .dtile .c,.fgrid .dtile .c,#days .dtile.on .c,.fgrid .dtile.on .c,.fchip b{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;margin:0!important;
-  background:radial-gradient(circle at 35% 30%,rgba(167,139,250,.24),rgba(14,14,20,.92) 75%)!important;box-shadow:none!important;filter:none!important}
+  background:radial-gradient(circle at 35% 30%,rgba(167,139,250,.24),rgba(14,14,20,0) 75%),#0e0e14!important;box-shadow:none!important;filter:none!important;opacity:1!important;color:#fff!important}
 #days .dtile .c i,.fgrid .dtile .c i,.fchip b i{display:block;font-style:normal;font-family:var(--body)!important;font-weight:700!important;line-height:1!important;letter-spacing:0!important;
   font-variant-numeric:tabular-nums;text-align:center;width:auto!important;background:none!important;color:#fff!important;-webkit-text-fill-color:#fff!important;text-shadow:none!important;
   text-box:trim-both cap alphabetic;transform:none!important}
@@ -619,6 +617,13 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .seg .tab.on{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.35)!important}
 .seg .tab.on b{color:#fff!important}
 @media (max-width:759px){.seg-ind{top:2px;bottom:2px}}
+/* v30: SAIR com a mesma estética do APAGAR TODOS — vidro vermelho forte, contorno vivo e neon */
+#logout{color:#fff1f1!important;background:linear-gradient(160deg,rgba(248,113,113,.58),rgba(220,38,38,.36))!important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);
+  box-shadow:0 0 0 1px rgba(252,165,165,.9),0 0 14px rgba(248,113,113,.55),0 0 28px rgba(239,68,68,.25),inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 12px rgba(248,113,113,.25)!important;
+  text-shadow:0 0 8px rgba(248,113,113,.6)}
+#logout svg{color:#fecaca;filter:drop-shadow(0 0 6px rgba(248,113,113,.8))}
+#logout::after,#logout::before{display:none!important}
 </style>
 </head>
 <body>
