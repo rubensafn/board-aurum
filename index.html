@@ -413,6 +413,7 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 #days.has-clr{padding-right:168px!important;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 172px),transparent calc(100% - 154px));mask-image:linear-gradient(90deg,#000 calc(100% - 172px),transparent calc(100% - 154px))}
 #clrAll{position:absolute;right:14px;top:50%;transform:translateY(-50%);height:32px;padding:0 14px;border-radius:999px;color:#fca5a5;background:rgba(248,113,113,.12);box-shadow:0 0 0 1px rgba(248,113,113,.45)}
 #clrAll[hidden]{display:none}
+
 #clrAll svg{width:14px;height:14px}
 #clrAll:active{transform:translateY(-50%) scale(.97)}
 @media (max-width:759px){
@@ -526,6 +527,11 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .wrap{max-width:1268px!important}
 #days{max-width:1268px!important;padding-left:14px!important;padding-right:14px!important;scroll-padding-inline:14px;scroll-snap-type:none!important}
 #days::after{content:"";flex:none;width:1px}
+/* v18: pílula do filtro em 2 linhas — HOJE/AMANHÃ/ONTEM ou dia da semana em cima, data 15.11 embaixo (apagadinha); TODOS e ATRASO numa linha só */
+#days .dtile,.fgrid .dtile{height:44px!important;padding:0 7px 0 14px!important;gap:8px!important}
+#days .dtile .wn,.fgrid .dtile .wn{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;line-height:1}
+#days .dtile .w,.fgrid .dtile .w{line-height:1!important}
+#days .dtile .n,.fgrid .dtile .n{font-size:11px!important;margin:0!important;opacity:.55;font-variant-numeric:tabular-nums;letter-spacing:.02em;font-family:var(--body);font-weight:600}
 </style>
 </head>
 <body>
@@ -672,9 +678,9 @@ function renderDays(){
   const tc=cur==='todos'||cur==='atrasados'||cur===t||cur===tm||cur===on?lbl(cur):(p=>p.w+' '+p.d)(parts(cur));
   $('#fchip').innerHTML=`${I.cal}<span>${tc}</span><b>${n(cur)}</b>`;
   nav.innerHTML=keys.map(k=>{
-    const w=lbl(k), num=k==='todos'||k==='atrasados'?'':parts(k).d;
+    const w=lbl(k), num=k==='todos'||k==='atrasados'?'':(q=>q.d+'.'+pad(+q.m))(k.split('-').reduce((o,x,i)=>(i===1?o.m=x:i===2?o.d=x:0,o),{}));
     const tn=k==='atrasados'?'late':k===t?'today':(k===tm&&v!=='done')?'tomorrow':'';
-    return `<button class="dtile glass${cur===k?' on':''}" ${tn?`data-tone="${tn}"`:''} data-act="filtro" data-f="${k}" aria-pressed="${cur===k}"><span class="w">${w}</span>${num?`<span class="n">${num}</span>`:''}<span class="c">${n(k)}</span></button>`;
+    return `<button class="dtile glass${cur===k?' on':''}" ${tn?`data-tone="${tn}"`:''} data-act="filtro" data-f="${k}" aria-pressed="${cur===k}"><span class="wn"><span class="w">${w}</span>${num?`<span class="n">${num}</span>`:''}</span><span class="c">${n(k)}</span></button>`;
   }).join('');
   const cb=$('#clrAll'), tem=v==='done'&&arr.length>0; cb.hidden=!tem; cb.disabled=false; nav.classList.toggle('has-clr',tem);
 }
