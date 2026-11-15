@@ -939,15 +939,19 @@ async function doDownload(id,only,comCopia){
 }
 
 /* ---- apagar post: arquivos saem do storage, a linha fica no banco como histórico (arquivada) — pede confirmação no aviso de baixo ---- */
-function pedeApagar(id){ const p=find(id); if(!p) return; confirmar('APAGAR ESSE POST?',pad(p.num??0)+' · '+(p.filme||p.nome||'Post')+' sai do board e os arquivos são apagados.','APAGAR',()=>apagar(id),true); }
+function pedeApagar(id){ const p=find(id); if(!p) return; const nm=pad(p.num??0)+' · '+(p.filme||p.nome||'Post');
+  /* pendente/aprovado apagado sem postar = REJEITADO: só essa peça não volta nas sugestões da varredura (não é padrão de gosto) */
+  if(!p.postado) confirmar('REJEITAR ESSE POST?',nm+' sai do board e essa peça não volta nas sugestões.','REJEITAR',()=>apagar(id),true);
+  else confirmar('APAGAR ESSE POST?',nm+' sai do board e os arquivos são apagados.','APAGAR',()=>apagar(id),true); }
 async function apagar(id){
+  const rej=!(find(id)||{}).postado;
   const el=document.querySelector(`[data-row="${CSS.escape(id)}"]`);
   try{
     const r=await fetch(SB_URL+'/functions/v1/fila-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete',pin:S.pin,id})}).then(r=>r.json());
     if(!r||!r.ok) throw new Error();
     if(el){ el.classList.add('leaving'); await new Promise(r=>setTimeout(r,280)); }
-    S.posts=S.posts.filter(x=>x.id!==id); if(S.copied===id){S.copied='';store.set('fila_copied',null);} S.sig=''; render(); toast('Saiu do board · histórico salvo');
-  }catch(_){ toast('Não apagou. Tenta de novo.'); }
+    S.posts=S.posts.filter(x=>x.id!==id); if(S.copied===id){S.copied='';store.set('fila_copied',null);} S.sig=''; render(); toast(rej?'Rejeitado · não volta nas sugestões':'Saiu do board · histórico salvo');
+  }catch(_){ confirmar('NÃO APAGOU','O servidor recusou. Tenta de novo; se continuar, toca em SAIR e entra de novo com a senha.','OK',()=>{},true); }
 }
 /* ---- apagar todos os postados: sai do board, mas fica no banco como histórico (o que já foi postado) ---- */
 function pedeLimpar(){ const n=S.posts.filter(p=>p.postado).length; if(!n) return; confirmar('APAGAR TODOS OS POSTADOS?',(n>1?'Os '+n+' postados saem':'O postado sai')+' do board. O histórico fica salvo.','APAGAR TODOS',limparPostados,true); }
