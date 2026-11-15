@@ -652,6 +652,34 @@ html{overscroll-behavior-x:none;-webkit-text-size-adjust:100%;text-size-adjust:1
 #days .dtile.on[data-tone="late"],.fgrid .dtile.on[data-tone="late"]{box-shadow:0 0 0 1.5px #fecaca,0 0 12px rgba(248,113,113,.55),inset 0 0 20px rgba(248,113,113,.55)!important}
 #days .dtile.on[data-tone="late"] .c,.fgrid .dtile.on[data-tone="late"] .c{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 46%),linear-gradient(180deg,#ef4444,#991b1b)!important;box-shadow:0 0 0 1.5px #fecaca,0 0 10px rgba(248,113,113,.8),inset 0 1px 0 rgba(255,255,255,.35)!important}
 
+/* v36: CELULAR — painéis (dia, horário, legenda, filtro, post) abrem como POP-UP NO MEIO DA TELA, igual no PC; fundo travado; APAGAR TODOS vira botão no canto inferior direito */
+.sheet{left:50%!important;right:auto!important;bottom:auto!important;top:50%!important;width:min(560px,calc(100vw - 24px))!important;max-height:calc(100dvh - 48px)!important;
+  border-radius:24px!important;padding:14px 14px 16px!important;transform:translate(-50%,-46%) scale(.96)!important;opacity:0;pointer-events:none;
+  transition:transform .28s cubic-bezier(.2,.9,.25,1),opacity .22s!important}
+.sheet.open{transform:translate(-50%,-50%)!important;opacity:1!important;pointer-events:auto!important}
+.sheet .grab{display:none!important}
+.sh-body{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.sheet-bg,.cfm{touch-action:none;overscroll-behavior:contain}
+@media (max-width:759px){
+  #clrAll{position:fixed!important;left:auto!important;right:14px!important;top:auto!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;transform:none!important;
+    width:auto!important;height:44px!important;padding:0 16px!important;gap:8px;z-index:40;justify-content:center}
+  #clrAll span{display:inline!important;font-family:var(--display);font-weight:700;font-size:10.5px;letter-spacing:.12em}
+  #clrAll:active{transform:scale(.96)!important}
+  #days.has-clr{padding-right:14px!important;-webkit-mask-image:none!important;mask-image:none!important}
+  body:has(.sheet.open) #clrAll,body:has(.toast.show) #clrAll,body:has(.cfm.show) #clrAll{opacity:0;pointer-events:none}
+  body:has(#clrAll:not([hidden])) .list{padding-bottom:84px}
+}
+/* pop-up no meio: fundo do painel quase opaco (não dá pra ver os cards de trás) + fundo da tela mais escuro */
+.sheet{background:linear-gradient(180deg,rgba(26,24,34,.97),rgba(14,13,20,.97))!important;-webkit-backdrop-filter:blur(24px) saturate(1.4)!important;backdrop-filter:blur(24px) saturate(1.4)!important;
+  box-shadow:0 24px 70px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08)!important}
+.sheet-bg{background:rgba(4,4,8,.72)!important}
+/* pop-up de confirmação (apagar, postar agora): também quase opaco, fundo da tela escuro, mini menu escondido */
+.cfm{background:rgba(4,4,8,.72)!important;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.cfm-box{background:linear-gradient(180deg,rgba(26,24,34,.97),rgba(14,13,20,.97))!important;box-shadow:0 24px 70px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08)!important}
+body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
+/* seletor de dia: AMANHÃ não quebra em 2 linhas */
+.dpick .dtile .w{white-space:nowrap;font-size:9.5px!important;letter-spacing:.06em!important}
+
 </style>
 </head>
 <body>
@@ -993,10 +1021,10 @@ function horaSheetHTML(p){
 function openFilterSheet(){
   S.fsheet=true;
   $('#sheet').innerHTML=`<div class="grab"></div><div class="sh-head"><span class="film">FILTRAR POR DIA</span><button class="icon-btn glass" data-act="fclose" aria-label="Fechar">${I.x}</button></div><div class="sh-body"><div class="fgrid">${[...$('#days').querySelectorAll('.dtile')].map(e=>e.outerHTML).join('')}</div></div>`;
-  $('#sheet').classList.add('open'); $('#sheetBg').classList.add('open'); document.body.style.overflow='hidden';
+  $('#sheet').classList.add('open'); $('#sheetBg').classList.add('open'); lockScroll(true);
 }
 function closeFilterSheet(){
-  S.fsheet=false; if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); requestAnimationFrame(syncChip); $('#sheet').classList.remove('open'); $('#sheetBg').classList.remove('open'); document.body.style.overflow='';
+  S.fsheet=false; if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); requestAnimationFrame(syncChip); $('#sheet').classList.remove('open'); $('#sheetBg').classList.remove('open'); lockScroll(false);
   setTimeout(()=>{ if(!S.sheet&&!S.fsheet) $('#sheet').innerHTML=''; },320);
 }
 /* v21: mini menu de dias embaixo — aparece SEMPRE que a linha de dias some lá em cima (em qualquer aba/filtro), some quando ela volta */
@@ -1028,7 +1056,7 @@ function openSheet(id,mode){
       <div class="sh-acts"><button class="act primary" data-act="copy" data-id="${esc(p.id)}">${I.copy} COPIAR ${c.cel&&c.pc?(v==='cel'?'· CELULAR':'· PC'):''}</button></div>`;
   }
   $('#sheet').innerHTML=head+`<div class="sh-body">${body}</div>`;
-  $('#sheet').classList.add('open'); $('#sheetBg').classList.add('open'); document.body.style.overflow='hidden';
+  $('#sheet').classList.add('open'); $('#sheetBg').classList.add('open'); lockScroll(true);
   const tr=$('#track'); if(tr) tr.addEventListener('scroll',()=>slideUI(tr),{passive:true});
 }
 function slideUI(tr){ const n=tr.children.length, i=Math.round(tr.scrollLeft/tr.clientWidth);
@@ -1037,15 +1065,22 @@ function slideUI(tr){ const n=tr.children.length, i=Math.round(tr.scrollLeft/tr.
   tr.querySelectorAll('video').forEach((v,k)=>{ if(k!==i) v.pause(); }); }
 function closeSheet(){
   if(!S.sheet) return; const v=$('#sheet video'); if(v) v.pause();
-  $('#sheet').classList.remove('open'); $('#sheetBg').classList.remove('open'); document.body.style.overflow='';
+  $('#sheet').classList.remove('open'); $('#sheetBg').classList.remove('open'); lockScroll(false);
   const id=S.sheet.id; S.sheet=null; setTimeout(()=>{ if(!S.sheet) $('#sheet').innerHTML=''; },320); patchRow(id);
 }
 
 /* ---- toast ---- */
 let tt;
+/* v36: com pop-up aberto o FUNDO FICA TRAVADO (funciona no iPhone: trava o body no lugar e devolve a posição ao fechar) */
+let lockY=null;
+function lockScroll(on){
+  const need=on||$('#sheet').classList.contains('open')||$('#cfm').classList.contains('show'); const b=document.body.style;
+  if(need&&lockY===null){ lockY=window.scrollY; Object.assign(b,{position:'fixed',top:-lockY+'px',left:'0',right:'0',width:'100%',overflow:'hidden'}); }
+  else if(!need&&lockY!==null){ const y=lockY; lockY=null; Object.assign(b,{position:'',top:'',left:'',right:'',width:'',overflow:''}); window.scrollTo({top:y,behavior:'instant'}); }
+}
 function confirmar(t,msg,ok,fn,danger){ const c=$('#cfm'); c.classList.toggle('danger',!!danger); $('#cfmIc').innerHTML=danger?I.trash:I.clock; $('#cfmT').textContent=t; $('#cfmP').textContent=msg; $('#cfmOk').textContent=ok;
-  const fechar=()=>{c.classList.remove('show');document.removeEventListener('keydown',esc_)}, esc_=e=>{if(e.key==='Escape')fechar();};
-  $('#cfmOk').onclick=()=>{fechar();fn();}; $('#cfmNo').onclick=fechar; c.onclick=e=>{if(e.target===c)fechar();}; document.addEventListener('keydown',esc_); c.classList.add('show'); setTimeout(()=>$('#cfmOk').focus(),50); }
+  const fechar=()=>{c.classList.remove('show');document.removeEventListener('keydown',esc_);lockScroll(false);}, esc_=e=>{if(e.key==='Escape')fechar();};
+  $('#cfmOk').onclick=()=>{fechar();fn();}; $('#cfmNo').onclick=fechar; c.onclick=e=>{if(e.target===c)fechar();}; document.addEventListener('keydown',esc_); c.classList.add('show'); lockScroll(true); setTimeout(()=>$('#cfmOk').focus(),50); }
 function toast(msg,btn='',fn=null,ms){ const t=$('#toast'); $('#toastMsg').textContent=msg; const b=$('#toastBtn'); b.textContent=btn; b.onclick=fn?()=>{t.classList.remove('show');fn();}:null; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),ms||(fn?5000:2200)); }
 
 /* ---- login ---- */
