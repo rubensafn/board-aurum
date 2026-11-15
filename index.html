@@ -624,6 +624,14 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
   text-shadow:0 0 8px rgba(248,113,113,.6)}
 #logout svg{color:#fecaca;filter:drop-shadow(0 0 6px rgba(248,113,113,.8))}
 #logout::after,#logout::before{display:none!important}
+/* v31: CELULAR — a página NUNCA anda pro lado nem encolhe. Scroll só pra cima e pra baixo.
+   (1) nada pode passar da largura da tela: html/body cortam o que sobrar na lateral (clip não quebra o sticky);
+   (2) texto comprido sem espaço (aviso, nome de arquivo, legenda) quebra a linha em vez de esticar o card. */
+html,body{max-width:100%;overflow-x:hidden}
+@supports (overflow:clip){html,body{overflow-x:clip}}
+html{overscroll-behavior-x:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.aviso,.aviso span,.capprev,.capprev .clamp,.fname,.film,.cfm-box p,.cfm-box b,#toastMsg,.sheet,.sh-body,.row .info{overflow-wrap:anywhere;word-break:break-word;min-width:0}
+.row,.row .info,.wrap,.list{min-width:0;max-width:100%}
 </style>
 </head>
 <body>
