@@ -681,6 +681,31 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
 /* seletor de dia: AMANHÃ não quebra em 2 linhas */
 .dpick .dtile .w{white-space:nowrap;font-size:9.5px!important;letter-spacing:.06em!important}
 
+/* v37 (aprovado 15/11): CELULAR — um botão só, redondo, no canto inferior direito (calendário + selo com a quantidade do filtro).
+   Abre o pop-up de dias; em POSTADOS o pop-up traz embaixo o APAGAR TODOS OS POSTADOS. Some o mini menu e o APAGAR TODOS soltos. PC não muda. */
+.fab{display:none}
+.popsep{height:1px;margin:4px 0 0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent)}
+.popclear{width:100%;height:46px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:9px;font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.12em;color:#fff1f1;
+  background:linear-gradient(160deg,rgba(248,113,113,.58),rgba(220,38,38,.36));box-shadow:0 0 0 1px rgba(252,165,165,.9),0 0 14px rgba(248,113,113,.55),inset 0 1px 0 rgba(255,255,255,.18);text-shadow:0 0 8px rgba(248,113,113,.6)}
+.popclear svg{width:15px;height:15px;color:#fecaca;filter:drop-shadow(0 0 6px rgba(248,113,113,.8))}
+.popclear:active{transform:scale(.98)}
+@media (max-width:759px){
+  #fchip,#clrAll{display:none!important}
+  #fab:not([hidden]){display:grid;place-items:center;position:fixed;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:45;width:50px;height:50px;border-radius:999px;color:#ddd6fe;
+    background:radial-gradient(circle at 35% 30%,rgba(167,139,250,.28),rgba(14,14,20,.94) 72%),#0e0e14;box-shadow:0 10px 26px rgba(0,0,0,.55),0 0 14px rgba(167,139,250,.35);
+    -webkit-tap-highlight-color:transparent;transition:transform .15s,opacity .2s}
+  #fab::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:1;background:linear-gradient(135deg,#f3d977,#fb7185 35%,#a78bfa 68%,#67e8f9);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+  #fab svg{width:21px;height:21px;position:relative;z-index:2}
+  /* selo da quantidade POR CIMA de tudo (contorno, ícone) */
+  #fab b{position:absolute;z-index:3;top:-6px;right:-6px;min-width:22px;height:22px;padding:0 5px;border-radius:999px;display:grid;place-items:center;font:700 11px/1 var(--body);color:#fff;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 46%),linear-gradient(180deg,#8b5cf6,#5b21b6);box-shadow:0 0 0 1.5px #ddd6fe,0 0 0 3.5px #0e0e14,0 0 8px rgba(167,139,250,.8)}
+  #fab:active{transform:scale(.93)}
+  #fab:focus,#fab:focus-visible{outline:none}
+  body:has(.sheet.open) #fab,body:has(.cfm.show) #fab,body:has(.toast.show) #fab{opacity:0;pointer-events:none}
+  .list{padding-bottom:80px}
+  .envtag{right:auto!important;left:12px}
+}
 </style>
 </head>
 <body>
@@ -700,6 +725,7 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
 </header>
 <div class="daysbar"><nav class="days" id="days" aria-label="Filtrar por dia"></nav><button class="clearall" id="clrAll" data-act="clearall" aria-label="Apagar todos os postados" title="Apagar todos os postados" hidden></button></div>
 <button class="fchip glass" id="fchip" data-act="fsheet" aria-label="Filtrar por dia"></button>
+<button class="fab" id="fab" data-act="fsheet" aria-label="Filtrar por dia" hidden></button>
 <main class="wrap"><div class="list" id="list"></div></main>
 <div class="sheet-bg" id="sheetBg"></div>
 <section class="sheet glass" id="sheet" role="dialog" aria-modal="true" aria-label="Detalhes do post"></section>
@@ -833,6 +859,7 @@ function renderDays(){
     const tn=k==='atrasados'?'late':k===t?'today':(k===tm&&v!=='done')?'tomorrow':'';
     return `<button class="dtile glass${cur===k?' on':''}" ${tn?`data-tone="${tn}"`:''} data-act="filtro" data-f="${k}" aria-pressed="${cur===k}"><span class="wn"><span class="w">${w}</span>${num?`<span class="n">(${num})</span>`:''}</span><span class="c"><i>${n(k)}</i></span></button>`;
   }).join('');
+  const fb=$('#fab'); if(fb){ fb.hidden=!S.pin; fb.innerHTML=I.cal+'<b>'+n(cur)+'</b>'; }
   const cb=$('#clrAll'), tem=v==='done'&&arr.length>0; cb.hidden=!tem; cb.disabled=false; nav.classList.toggle('has-clr',tem);
 }
 const filtrar=(arr,v)=>{const f=S.filtros[v]; return f==='todos'?arr:arr.filter(p=>keyOf(p,v)===f);};
@@ -1025,7 +1052,7 @@ function horaSheetHTML(p){
 /* ---- filtro no painel (quando os dias já saíram da tela) ---- */
 function openFilterSheet(){
   S.fsheet=true;
-  $('#sheet').innerHTML=`<div class="grab"></div><div class="sh-head"><span class="film">FILTRAR POR DIA</span><button class="icon-btn glass" data-act="fclose" aria-label="Fechar">${I.x}</button></div><div class="sh-body"><div class="fgrid">${[...$('#days').querySelectorAll('.dtile')].map(e=>e.outerHTML).join('')}</div></div>`;
+  $('#sheet').innerHTML=`<div class="grab"></div><div class="sh-head"><span class="film">FILTRAR POR DIA</span><button class="icon-btn glass" data-act="fclose" aria-label="Fechar">${I.x}</button></div><div class="sh-body"><div class="fgrid">${[...$('#days').querySelectorAll('.dtile')].map(e=>e.outerHTML).join('')}</div>${S.view==='done'&&S.posts.some(p=>p.postado)?`<div class="popsep"></div><button class="popclear" data-act="clearpop">${I.trash}<span>APAGAR TODOS OS POSTADOS</span></button>`:''}</div>`;
   $('#sheet').classList.add('open'); $('#sheetBg').classList.add('open'); lockScroll(true);
 }
 function closeFilterSheet(){
@@ -1090,7 +1117,7 @@ function toast(msg,btn='',fn=null,ms){ const t=$('#toast'); $('#toastMsg').textC
 
 /* ---- login ---- */
 function logout(msg){ S.pin=''; store.set('fila_sess',null); closeSheet(); showLogin(msg); }
-function showLogin(msg){
+function showLogin(msg){ const _fb=document.getElementById('fab'); if(_fb) _fb.hidden=true;
   $('#top').hidden=true; clearInterval(poll);
   $('#list').innerHTML=`<form class="login glass" id="login"><div class="au">${AU}</div><strong>BOARD</strong>
     <input class="field" id="pin" type="password" autocomplete="current-password" placeholder="SENHA" aria-label="Senha" required>
@@ -1123,6 +1150,7 @@ document.addEventListener('click',e=>{
   else if(a==='posted') setPostado(id,true);
   else if(a==='undo') setPostado(id,false);
   else if(a==='clearall') pedeLimpar();
+  else if(a==='clearpop'){ closeFilterSheet(); setTimeout(pedeLimpar,180); }
   else if(a==='del') pedeApagar(id);
   else if(a==='slide'){ const tr=$('#track'); if(tr) tr.scrollBy({left:tr.clientWidth*(+b.dataset.d),behavior:'smooth'}); }
   else if(a==='hora') openSheet(id,'hora');
