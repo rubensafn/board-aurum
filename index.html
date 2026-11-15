@@ -635,6 +635,11 @@ html{overscroll-behavior-x:none;-webkit-text-size-adjust:100%;text-size-adjust:1
 /* v32: AU clicável (volta pro topo) */
 #logo{cursor:pointer;background:none;border:0;padding:0;-webkit-tap-highlight-color:transparent;transition:transform .15s,opacity .15s}
 #logo:active{transform:scale(.9);opacity:.8}
+/* v33: bolinha da pílula SELECIONADA acende — degradê preenchido (tons fundos pra o número branco não sumir), número com sombra leve, brilho colorido em volta. Igual em qualquer dia. */
+#days .dtile.on .c,.fgrid .dtile.on .c{
+  background:radial-gradient(circle at 50% 50%,rgba(20,10,40,.35),rgba(20,10,40,0) 60%),linear-gradient(135deg,#b07a1e,#c93a5f 38%,#6d45d8 70%,#1f8fa8)!important;
+  box-shadow:0 0 10px rgba(167,139,250,.55),0 0 18px rgba(251,113,133,.25)!important}
+#days .dtile.on .c i,.fgrid .dtile.on .c i{text-shadow:0 1px 2px rgba(0,0,0,.55),0 0 6px rgba(0,0,0,.25)!important}
 </style>
 </head>
 <body>
