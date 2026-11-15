@@ -605,6 +605,17 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 #days .dtile .c i,.fgrid .dtile .c i{text-shadow:0 1px 2px rgba(0,0,0,.45)}
 .fchip b{padding:0!important;margin:0!important;text-align:center}
 .fchip b i{width:100%;text-align:center;transform:translateY(.8px)!important}
+/* v27: abas PENDENTES/APROVADOS/POSTADOS — marcador preenchido na cor da aba que desliza (com elástico suave) até a aba clicada */
+.seg{position:relative!important}
+.seg .tab{z-index:1;background:none!important;box-shadow:none!important;transition:color .3s}
+.seg-ind{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:999px;z-index:0;pointer-events:none;will-change:transform,width}
+.seg-ind.ready{transition:transform .5s cubic-bezier(.6,-.12,.2,1.18),width .5s cubic-bezier(.6,-.12,.2,1.18),background .4s,box-shadow .4s}
+.seg-ind[data-v="pend"]{background:linear-gradient(160deg,rgba(251,191,36,.62),rgba(217,119,6,.34));box-shadow:0 0 0 1px rgba(253,230,138,.85),0 0 16px rgba(251,191,36,.45),inset 0 1px 0 rgba(255,255,255,.25)}
+.seg-ind[data-v="apr"]{background:linear-gradient(160deg,rgba(167,139,250,.66),rgba(124,58,237,.36));box-shadow:0 0 0 1px rgba(221,214,254,.85),0 0 16px rgba(167,139,250,.5),inset 0 1px 0 rgba(255,255,255,.25)}
+.seg-ind[data-v="done"]{background:linear-gradient(160deg,rgba(74,222,128,.58),rgba(22,163,74,.34));box-shadow:0 0 0 1px rgba(187,247,208,.85),0 0 16px rgba(74,222,128,.45),inset 0 1px 0 rgba(255,255,255,.25)}
+.seg .tab.on{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.35)!important}
+.seg .tab.on b{color:#fff!important}
+@media (max-width:759px){.seg-ind{top:2px;bottom:2px}}
 </style>
 </head>
 <body>
@@ -614,7 +625,7 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 <header class="top" id="top" hidden>
   <div class="bar glass">
     <div class="brand"><div class="au" id="logo" role="img" aria-label="Aurum · Board"></div></div>
-    <div class="seg" role="tablist">
+    <div class="seg" role="tablist"><span class="seg-ind" id="segInd" aria-hidden="true"></span>
       <button class="tab t-pend on" id="tab-pend" role="tab">PENDENTES <b id="c-pend">0</b></button>
       <button class="tab t-apr" id="tab-apr" role="tab">APROVADOS <b id="c-apr">0</b></button>
       <button class="tab t-done" id="tab-done" role="tab">POSTADOS <b id="c-done">0</b></button>
@@ -761,13 +772,18 @@ function renderDays(){
 }
 const filtrar=(arr,v)=>{const f=S.filtros[v]; return f==='todos'?arr:arr.filter(p=>keyOf(p,v)===f);};
 
+/* v27: marcador das abas que DESLIZA até a aba clicada, preenchido com a cor dela */
+function moveInd(){ const ind=$('#segInd'), on=document.querySelector('.seg .tab.on'); if(!ind||!on) return;
+  ind.style.width=on.offsetWidth+'px'; ind.style.transform='translateX('+on.offsetLeft+'px)'; ind.dataset.v=S.view;
+  if(!ind.classList.contains('ready')) requestAnimationFrame(()=>requestAnimationFrame(()=>ind.classList.add('ready'))); }
+window.addEventListener('resize',moveInd);
 /* ---- render geral (só quando os dados ou a aba/filtro mudam) ---- */
 const order=(a,b)=>(b.lote||'').localeCompare(a.lote||'')||(a.num??0)-(b.num??0);
 function emptyHTML(t,m){return `<div class="empty glass"><div class="au">${AU}</div><strong>${t}</strong>${m}</div>`;}
 function render(){
   const pend=S.posts.filter(p=>!p.postado&&!p.aprovado), apr=S.posts.filter(p=>!p.postado&&p.aprovado), done=S.posts.filter(p=>p.postado);
   $('#c-pend').textContent=pend.length; $('#c-apr').textContent=apr.length; $('#c-done').textContent=done.length;
-  $('#tab-pend').classList.toggle('on',S.view==='pend'); $('#tab-apr').classList.toggle('on',S.view==='apr'); $('#tab-done').classList.toggle('on',S.view==='done');
+  $('#tab-pend').classList.toggle('on',S.view==='pend'); $('#tab-apr').classList.toggle('on',S.view==='apr'); $('#tab-done').classList.toggle('on',S.view==='done'); moveInd();
   renderDays(); requestAnimationFrame(syncChip);
   const filtrado=S.filtros[S.view]!=='todos';
   const list=$('#list');
