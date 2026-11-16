@@ -22,3 +22,6 @@ Formato do `lote.json` no topo de `tools/fila_push.py`. O dia e o "postado" fica
 - pg_cron `fila-publicar` roda **a cada minuto**. O container do Instagram é criado até 15 min antes; publica no minuto marcado (card mostra PRONTO · SAI HH:MM).
 - Erro do Instagram: tenta de novo sozinho 1x; se falhar, card mostra NÃO POSTOU + motivo + TENTAR DE NOVO / MUDAR HORÁRIO, e chega aviso no celular (app ntfy, tópico em `fila_config.notify_url`). Story com erro: TENTAR O STORY DE NOVO.
 - Lixeira do board usa a RPC `fila_apagar` (mesma senha do `fila_list`); arquivos saem na limpeza (`cleanup`).
+
+## Legenda pelo board
+- Painel da legenda: **EDITAR** (salva na hora, RPC `fila_set_legenda`, sem Claude) e **NOVA LEGENDA** (RPC `fila_pedir_legenda`, com instrução opcional). O pedido fica em `legenda_refazer`/`legenda_pedido` e a varredura agendada (11h22, 15h22, 18h22) reescreve. Trava quando o post já está indo pro Instagram.

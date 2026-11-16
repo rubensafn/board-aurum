@@ -267,6 +267,18 @@ button{cursor:pointer;-webkit-appearance:none;appearance:none;background:none;bo
 
 .sheet:not(.open){visibility:hidden;transition:transform .32s cubic-bezier(.2,.9,.25,1),visibility 0s .32s}
 .captext{max-height:48vh;overflow:auto}
+.capin{display:block;width:100%;min-height:34vh;resize:vertical;font-family:var(--body);color:var(--ink);outline:none}
+.capin:focus{border-color:rgba(243,217,119,.45)}
+.capin.pedido{min-height:120px}
+.capin::placeholder{color:var(--mute)}
+.capnote{font-family:var(--display);font-weight:700;font-size:10.5px;letter-spacing:.12em;color:var(--gold);margin:0 0 10px}
+.capinfo{display:flex;align-items:flex-start;gap:8px;margin:10px 0 0;padding:9px 11px;border-radius:12px;font-size:11.5px;line-height:1.45;font-weight:600;color:#ddd6fe;background:rgba(167,139,250,.08);box-shadow:0 0 0 1px rgba(167,139,250,.35)}
+.capinfo svg{width:15px;height:15px;flex:none;margin-top:1px;color:var(--violet)}
+.capinfo b{color:#fff}
+.capinfo.pedida{margin:0 0 10px;align-items:center}
+.capinfo.pedida span{flex:1;min-width:0}
+.capinfo.pedida button{flex:none;font-family:var(--display);font-weight:700;font-size:9.5px;letter-spacing:.1em;color:var(--ink-2);padding:6px 8px;border-radius:9px;box-shadow:0 0 0 1px var(--hair-2)}
+.capbts{margin-bottom:-4px}
 
 .sheet.glass,.toast.glass{position:fixed}
 
@@ -839,7 +851,7 @@ function rowHTML(p){
     <div class="info">
       <div class="l1"><span class="num">${esc(pad(p.num??0))}</span><span class="film">${esc(p.filme||p.nome||'Post')}</span></div>
       <div class="fname">${esc(p.nome||'')}</div>
-      <div class="meta">${p.manual&&!p.postado?'<span class="pill man">VOCÊ POSTA</span>':''}${dayPill}${horaPill}${destPills}${stPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
+      <div class="meta">${p.manual&&!p.postado?'<span class="pill man">VOCÊ POSTA</span>':''}${dayPill}${horaPill}${destPills}${stPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.legenda_refazer&&!p.postado?'<span class="pill apr">NOVA LEGENDA PEDIDA</span>':''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
       ${p.aviso&&!p.postado?`<div class="aviso">${I.hand}<span>${esc(p.aviso)}</span></div>`:''}
       ${destFixo(p)==='story'&&!c?'':`<button class="capprev" data-act="cap" data-id="${esc(p.id)}"><span class="clamp">${c?esc(c):'<i>Sem legenda</i>'}</span><span class="more">VER LEGENDA ›</span></button>`}
       ${erroBox}${erroActs}${aprov}<div class="acts">${acts}</div>
@@ -991,6 +1003,24 @@ async function apagar(id){
     S.posts=S.posts.filter(x=>x.id!==id); if(S.copied===id){S.copied='';store.set('fila_copied',null);} S.sig=''; render(); toast(rej?'Rejeitado · não volta nas sugestões':'Saiu do board · histórico salvo');
   }catch(e){ if(e.code==='28000'){logout('Senha inválida');return;} confirmar('NÃO APAGOU',/publicado agora/.test(e.message||'')?'Esse post está indo pro Instagram agora. Espera 1 minuto.':'Não deu certo. Tenta de novo.','OK',()=>{},true); }
 }
+/* ---- legenda: editar aqui (sem Claude) ou pedir uma nova (a próxima varredura reescreve) ---- */
+function proxVarredura(){ const n=new Date(); for(let d=0;d<2;d++) for(const h of [[11,22],[15,22],[18,22]]){ const t=new Date(n); t.setDate(t.getDate()+d); t.setHours(h[0],h[1],0,0); if(t>n) return t; } return new Date(n.getTime()+864e5); }
+async function capSalvar(id){
+  const p=find(id); if(!p) return; const txt=($('#capin')||{}).value; if(txt==null) return;
+  const c=caps(p), v=verOf(p); let cel=p.legenda_celular||p.legenda||'', pc=p.legenda_pc||'';
+  if(c.cel&&c.pc){ if(v==='cel') cel=txt; else pc=txt; } else if(c.pc&&!c.cel) pc=txt; else cel=txt;
+  try{ await rpc('fila_set_legenda',{p_pin:S.pin,p_id:id,p_celular:cel,p_pc:pc});
+    p.legenda_celular=cel||null; p.legenda_pc=pc||null; p.legenda_refazer=false; p.legenda_pedido=null; S.sig='';
+    openSheet(id,'cap'); toast('Legenda salva'); }
+  catch(e){ if(e.code==='28000'){logout('Senha inválida');return;} toast(/instagram/i.test(e.message||'')?'Esse post já está indo pro Instagram':'Não salvou. Tenta de novo.'); }
+}
+async function capPedir(id,cancelar){
+  const p=find(id); if(!p) return; const ped=cancelar?null:(($('#capped')||{}).value||'').trim();
+  try{ await rpc('fila_pedir_legenda',{p_pin:S.pin,p_id:id,p_pedido:ped});
+    p.legenda_refazer=!cancelar; p.legenda_pedido=cancelar?null:(ped||null); S.sig='';
+    openSheet(id,'cap'); toast(cancelar?'Pedido cancelado':'Pedido enviado · sai na próxima varredura'); }
+  catch(e){ if(e.code==='28000'){logout('Senha inválida');return;} toast(/instagram/i.test(e.message||'')?'Esse post já está indo pro Instagram':'Não salvou. Tenta de novo.'); }
+}
 /* ---- erro do Instagram em português (o detalhe técnico fica embaixo, pequeno) ---- */
 function motivoErro(m){ m=String(m||'');
   if(/2207026|codec|format/i.test(m)) return 'O Instagram não aceitou o formato do vídeo (quadros por segundo, áudio ou codec).';
@@ -1111,14 +1141,28 @@ function openSheet(id,mode){
         <div class="dots">${fs.map((_,i)=>`<span class="${i?'':'cur'}"></span>`).join('')}</div><span class="cnt" id="cnt">1/${fs.length}</span>`:slides}</div>
       <div class="sh-acts"><button class="act" data-act="dl" data-id="${esc(p.id)}">${I.dl} ${fs.length>1?'BAIXAR '+fs.length+' LÂMINAS':fs[0]&&fs[0].kind==='video'?'BAIXAR VÍDEO':'BAIXAR POST'}</button>
       <button class="act primary" data-act="copy" data-id="${esc(p.id)}">${I.copy} COPIAR LEGENDA</button></div>`;
+  } else if(mode==='capedit'){
+    body=`<div class="capnote">EDITANDO A LEGENDA${c.cel&&c.pc?' · '+(v==='cel'?'CELULAR':'PC'):''}</div>
+      <textarea class="captext capin" id="capin" aria-label="Legenda">${esc(capOf(p))}</textarea>
+      <div class="sh-acts"><button class="act" data-act="cap" data-id="${esc(p.id)}">${I.x} CANCELAR</button><button class="act primary" data-act="capsave" data-id="${esc(p.id)}">${I.check} SALVAR LEGENDA</button></div>`;
+  } else if(mode==='capnova'){
+    const tarde=p.aprovado&&p.dia&&p.hora&&new Date(p.dia+'T'+p.hora+':00-03:00')<proxVarredura();
+    body=`<div class="capnote">PEDIR NOVA LEGENDA</div>
+      <textarea class="captext capin pedido" id="capped" placeholder="O que mudar? (opcional) Ex.: mais curta, sem emoji, chamar pra pré-venda, tom mais engraçado…" aria-label="O que mudar na legenda">${esc(p.legenda_pedido||'')}</textarea>
+      <div class="capinfo">${I.clock}<span>A próxima varredura (11h, 15h ou 18h) reescreve e a legenda nova aparece aqui no card.${tarde?' <b>Esse post sai antes disso:</b> se não der tempo, vai com a legenda atual.':''}</span></div>
+      <div class="sh-acts"><button class="act" data-act="cap" data-id="${esc(p.id)}">${I.x} VOLTAR</button><button class="act primary" data-act="capped" data-id="${esc(p.id)}">${I.send} PEDIR NOVA LEGENDA</button></div>`;
   } else {
+    const podeMexer=!p.postado&&!['criando','publicado'].includes(p.ig_status||'');
     body=`${c.cel&&c.pc?`<div class="vers"><button class="ver${v==='cel'?' on':''}" data-act="ver" data-v="cel" data-id="${esc(p.id)}">CELULAR</button><button class="ver${v==='pc'?' on':''}" data-act="ver" data-v="pc" data-id="${esc(p.id)}">PC</button></div>`:''}
+      ${p.legenda_refazer?`<div class="capinfo pedida">${I.send}<span><b>NOVA LEGENDA PEDIDA.</b> Sai na próxima varredura (11h, 15h ou 18h).${p.legenda_pedido?' Pedido: “'+esc(p.legenda_pedido)+'”':''}</span><button data-act="capcancel" data-id="${esc(p.id)}">CANCELAR</button></div>`:''}
       <div class="captext">${esc(capOf(p))||'<i>Sem legenda</i>'}</div>
+      ${podeMexer?`<div class="sh-acts capbts"><button class="act" data-act="capedit" data-id="${esc(p.id)}">${I.pen} EDITAR</button><button class="act" data-act="capnova" data-id="${esc(p.id)}">${I.send} NOVA LEGENDA</button></div>`:''}
       <div class="sh-acts"><button class="act primary" data-act="copy" data-id="${esc(p.id)}">${I.copy} COPIAR ${c.cel&&c.pc?(v==='cel'?'· CELULAR':'· PC'):''}</button></div>`;
   }
   $('#sheet').innerHTML=head+`<div class="sh-body">${body}</div>`;
   $('#sheet').classList.add('open'); $('#sheetBg').classList.add('open'); lockScroll(true);
   const tr=$('#track'); if(tr) tr.addEventListener('scroll',()=>slideUI(tr),{passive:true});
+  const ta=$('#capin'); if(ta&&mode==='capedit') setTimeout(()=>{ ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length); },60);
 }
 function slideUI(tr){ const n=tr.children.length, i=Math.round(tr.scrollLeft/tr.clientWidth);
   const pl=tr.parentElement; pl.querySelectorAll('.dots span').forEach((d,k)=>d.classList.toggle('cur',k===i));
@@ -1171,6 +1215,11 @@ document.addEventListener('click',e=>{
   else if(a==='setday'){ closeSheet(); setDia(id,b.dataset.d||null); }
   else if(a==='go') doDownload(id,null,true);
   else if(a==='cap') openSheet(id,'cap');
+  else if(a==='capedit') openSheet(id,'capedit');
+  else if(a==='capnova') openSheet(id,'capnova');
+  else if(a==='capsave') capSalvar(id);
+  else if(a==='capped') capPedir(id,false);
+  else if(a==='capcancel') capPedir(id,true);
   else if(a==='close') closeSheet();
   else if(a==='ver'){ S.ver[id]=b.dataset.v; openSheet(id,'cap'); }
   else if(a==='vrow'){ S.ver[id]=b.dataset.v; patchRow(id); }
