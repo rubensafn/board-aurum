@@ -747,6 +747,25 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
 .aprov:not(.ok):not(.man) svg{filter:drop-shadow(0 0 6px rgba(167,139,250,.8))}
 .act.primary{background:linear-gradient(135deg,rgba(248,224,142,.5),rgba(217,184,85,.32) 55%,rgba(169,135,66,.4)),#151008!important}
 .tab.on{background:linear-gradient(160deg,rgba(167,139,250,.45),rgba(103,232,249,.22))!important}
+/* v42: CARDS COM ALTURA FIXA — todos do mesmo tamanho (celular e PC), sem espaço vazio:
+   a legenda ocupa o que sobrar (mostra mais linhas, some em degradê), pílulas numa linha só (arrasta pro lado), botões sempre embaixo */
+.row{height:250px;align-items:stretch!important;overflow:hidden}
+@media (min-width:760px){.row{height:312px}}
+.row .thumb{height:100%!important;min-height:0!important;align-self:stretch}
+.row .info{min-height:0;height:100%;overflow:hidden}
+.row .meta{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent);flex:none}
+.row .meta::-webkit-scrollbar{display:none}
+.row .meta>*{flex:none}
+.row .l1,.row .fname{flex:none}
+.row .capprev{flex:1 1 auto;min-height:44px;overflow:hidden}
+.row .capprev .clamp{display:block!important;-webkit-line-clamp:unset!important;overflow:hidden;height:100%;-webkit-mask-image:linear-gradient(180deg,#000 70%,transparent);mask-image:linear-gradient(180deg,#000 70%,transparent)}
+.row .aviso,.row .erro-bts,.row .aprov,.row .acts{flex:none}
+.row .aviso span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media (min-width:760px){.row{height:336px}}
+.row .capprev.vazio{display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:12px;padding:9px 11px}
+.row .capprev.vazio .clamp{height:auto;-webkit-mask-image:none;mask-image:none}
+@media (max-width:620px){.row .erro-bts{flex-direction:row!important}.row .erro-bts .aprov{flex:1 1 0!important;width:auto!important;padding:0 6px;font-size:9.5px;letter-spacing:.06em}.row .erro-bts .aprov svg{width:13px;height:13px}}
+.row .aviso.erro small{display:none}
 </style>
 </head>
 <body>
@@ -876,7 +895,7 @@ function rowHTML(p){
       <div class="fname">${esc(p.nome||'')}</div>
       <div class="meta">${p.manual&&!p.postado?'<span class="pill man">VOCÊ POSTA</span>':''}${dayPill}${horaPill}${destPills}${stPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.legenda_refazer&&!p.postado?'<span class="pill apr">NOVA LEGENDA PEDIDA</span>':''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
       ${p.aviso&&!p.postado?`<div class="aviso">${I.hand}<span>${esc(p.aviso)}</span></div>`:''}
-      ${destFixo(p)==='story'&&!c?'':`<button class="capprev" data-act="cap" data-id="${esc(p.id)}"><span class="clamp">${c?esc(c):'<i>Sem legenda</i>'}</span><span class="more">VER LEGENDA ›</span></button>`}
+      ${destFixo(p)==='story'&&!c?`<div class="capprev vazio"><span class="clamp"><i>Story · não leva legenda</i></span></div>`:p.ig_status==='erro'&&!p.postado?'':`<button class="capprev" data-act="cap" data-id="${esc(p.id)}"><span class="clamp">${c?esc(c):'<i>Sem legenda</i>'}</span><span class="more">VER LEGENDA ›</span></button>`}
       ${erroBox}${erroActs}${aprov}<div class="acts">${acts}</div>
     </div>
   </article>`;
