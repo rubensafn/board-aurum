@@ -1,5 +1,5 @@
 // FILA DE POSTS — uploads assinados e gravação de posts (token), limpeza de vídeos já postados e apagar post (senha da fila),
-// e PUBLICAÇÃO AUTOMÁTICA no Instagram (@aurum.cinema) dos posts APROVADOS, no dia/horário marcado (chamada pelo pg_cron de 5 em 5 min).
+// e PUBLICAÇÃO AUTOMÁTICA no Instagram (@aurum.cinema) dos posts APROVADOS, no dia/horário marcado (chamada por TOQUES agendados no pg_cron só nos horários de cada post aprovado: 15 min antes, na hora e +2 min — ver fila_posts_agenda).
 // O container é criado até ANTECEDENCIA_MIN minutos antes e só é publicado no minuto marcado (sem atraso).
 // Erro do Instagram: tenta de novo 1x sozinho; se falhar de novo, marca erro e avisa o Rubão no celular (ntfy, fila_config.notify_url).
 // SÓ mexe na tabela fila_posts, na fila_config (chaves meta_*/cron_key/notify_url) e no bucket fila-posts. Nunca tocar no SISTEMA DE CORTESIAS (mesmo projeto).
@@ -103,6 +103,7 @@ async function publicar(sb: any) {
   const tok = await conf(sb, "meta_token"); const ig = await conf(sb, "meta_ig_user");
   if (!tok || !ig) return { erro: "sem token da Meta" };
   const log: unknown[] = [];
+  let pendente = false; // sobrou algo que precisa de outra conferida (Instagram processando na hora de sair, Story) → agenda 1 toque daqui a 2 min
   // 1) containers já criados: publica quando o Instagram terminou E chegou o minuto marcado
   const { data: emAndamento } = await sb.from("fila_posts").select("*").eq("ig_status", "criando");
   for (const p of emAndamento ?? []) {
@@ -115,14 +116,14 @@ async function publicar(sb: any) {
           // 1ª falha: o Instagram às vezes recusa à toa — cria o container de novo uma vez
           const c = await criarContainer(ig, tok, p);
           await sb.from("fila_posts").update({ ig_container: c, ig_refeito: true, ig_tentativas: 0, ig_erro: m.slice(0, 300) }).eq("id", p.id);
-          log.push([p.id, "refazendo", m]); continue;
+          log.push([p.id, "refazendo", m]); pendente = true; continue;
         }
         throw new Error(m);
       }
       if (st.status_code && st.status_code !== "FINISHED") {
         const n = (p.ig_tentativas ?? 0) + 1;
         if (n > 40) throw new Error("Instagram demorou demais pra processar");
-        await sb.from("fila_posts").update({ ig_tentativas: n }).eq("id", p.id); log.push([p.id, "processando"]); continue;
+        await sb.from("fila_posts").update({ ig_tentativas: n }).eq("id", p.id); log.push([p.id, "processando"]); if (chegouHora(p)) pendente = true; continue;
       }
       if (!chegouHora(p)) { log.push([p.id, "pronto, esperando o horário"]); continue; }
       const pub = await g(`${ig}/media_publish`, { creation_id: p.ig_container, access_token: tok }, "POST");
@@ -130,7 +131,7 @@ async function publicar(sb: any) {
       await sb.from("fila_posts").update({ ig_status: "publicado", ig_media_id: pub.id, ig_permalink: link, ig_erro: null, postado: true, postado_em: new Date().toISOString() }).eq("id", p.id);
       log.push([p.id, "publicado"]);
       if (destinoDe(p) === "feed_story" && !p.ig_story_status) {
-        try { const sc = await criarStory(ig, tok, p); await sb.from("fila_posts").update({ ig_story_status: "criando", ig_story_container: sc }).eq("id", p.id); log.push([p.id, "story container"]); }
+        try { const sc = await criarStory(ig, tok, p); await sb.from("fila_posts").update({ ig_story_status: "criando", ig_story_container: sc }).eq("id", p.id); log.push([p.id, "story container"]); pendente = true; }
         catch (e) { const m = String((e as Error).message); await sb.from("fila_posts").update({ ig_story_status: "erro", ig_story_erro: m.slice(0, 300) }).eq("id", p.id); await avisar(sb, "AURUM · Story não saiu", `${quem(p)}: o post saiu no feed, mas o Story deu erro (${m}).`); }
       }
     } catch (e) {
@@ -142,7 +143,7 @@ async function publicar(sb: any) {
   // Story que o Rubão mandou TENTAR DE NOVO no board (ig_story_status = 'refazer'): cria o container de novo
   const { data: refazer } = await sb.from("fila_posts").select("*").eq("ig_story_status", "refazer");
   for (const p of refazer ?? []) {
-    try { const sc = await criarStory(ig, tok, p); await sb.from("fila_posts").update({ ig_story_status: "criando", ig_story_container: sc, ig_story_erro: null }).eq("id", p.id); log.push([p.id, "story refeito"]); }
+    try { const sc = await criarStory(ig, tok, p); await sb.from("fila_posts").update({ ig_story_status: "criando", ig_story_container: sc, ig_story_erro: null }).eq("id", p.id); log.push([p.id, "story refeito"]); pendente = true; }
     catch (e) { const m = String((e as Error).message); await sb.from("fila_posts").update({ ig_story_status: "erro", ig_story_erro: m.slice(0, 300) }).eq("id", p.id); await avisar(sb, "AURUM · Story não saiu", `${quem(p)}: o Story deu erro de novo (${m}).`); }
   }
   // Story do "feed + story": publica quando o Instagram terminar de processar
@@ -151,7 +152,7 @@ async function publicar(sb: any) {
     try {
       const st = await g(p.ig_story_container, { fields: "status_code", access_token: tok });
       if (st.status_code === "ERROR" || st.status_code === "EXPIRED") throw new Error(await motivo(p.ig_story_container, tok, st.status_code));
-      if (st.status_code && st.status_code !== "FINISHED") continue;
+      if (st.status_code && st.status_code !== "FINISHED") { pendente = true; continue; }
       const pub = await g(`${ig}/media_publish`, { creation_id: p.ig_story_container, access_token: tok }, "POST");
       await sb.from("fila_posts").update({ ig_story_status: "publicado", ig_story_id: pub.id, ig_story_erro: null }).eq("id", p.id);
       log.push([p.id, "story publicado"]);
@@ -170,13 +171,14 @@ async function publicar(sb: any) {
     try {
       const c = await criarContainer(ig, tok, p);
       await sb.from("fila_posts").update({ ig_container: c }).eq("id", p.id);
-      log.push([p.id, "container", c]);
+      log.push([p.id, "container", c]); if (chegouHora(p)) pendente = true;
     } catch (e) {
       const m = String((e as Error).message);
       await marcarErro(sb, p, m);
       log.push([p.id, "erro", m]);
     }
   }
+  if (pendente) { await sb.rpc("fila_tocar_em", { p_min: 2 }); log.push(["toque em 2 min"]); }
   return { log };
 }
 
@@ -251,9 +253,6 @@ Deno.serve(async (req) => {
   }
 
   if (body.action === "publicar") {
-    // roda de 5 em 5 min (todos os horários do board são múltiplos de 5 e o container é criado até 15 min antes,
-    // então sai no minuto certo). Protege o banco grátis (pouco disco/CPU): o pg_cron pode chamar a cada minuto, mas só os múltiplos de 5 trabalham.
-    if (new Date().getUTCMinutes() % 5 !== 0) return json({ skip: true });
     const key = await conf(sb, "cron_key");
     if (!key || body.key !== key) return json({ error: "key" }, 401);
     return json(await publicar(sb));

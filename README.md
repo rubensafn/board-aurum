@@ -19,7 +19,7 @@ Formato do `lote.json` no topo de `tools/fila_push.py`. O dia e o "postado" fica
 - Antes de mexer: `git pull` e conferir se o arquivo bate com a versão no ar (Supabase → get_edge_function).
 
 ## Postagem automática
-- pg_cron `fila-publicar` roda **a cada minuto**. O container do Instagram é criado até 15 min antes; publica no minuto marcado (card mostra PRONTO · SAI HH:MM).
+- **Sem consulta periódica** (banco grátis: a consulta a cada minuto travou o banco em 16/11). Ao aprovar/mudar horário/TENTAR DE NOVO, o gatilho `fila_posts_agenda` agenda no pg_cron só 3 toques do post: 15 min antes (prepara), na hora (publica) e +2 min (Story/conferência). Cada toque (`fila_toque_AAAAMMDDHHMI`) chama a fila-admin e se apaga. Se o Instagram ainda estiver processando, a função agenda mais 1 toque em 2 min (`fila_tocar_em`). NUNCA voltar pra cron de minuto em minuto sem falar com o Rubão.
 - Erro do Instagram: tenta de novo sozinho 1x; se falhar, card mostra NÃO POSTOU + motivo + TENTAR DE NOVO / MUDAR HORÁRIO, e chega aviso no celular (app ntfy, tópico em `fila_config.notify_url`). Story com erro: TENTAR O STORY DE NOVO.
 - Lixeira do board usa a RPC `fila_apagar` (mesma senha do `fila_list`); arquivos saem na limpeza (`cleanup`).
 
