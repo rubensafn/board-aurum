@@ -724,6 +724,13 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
   .list{padding-bottom:80px}
   .envtag{right:auto!important;left:12px}
 }
+/* v40: TODOS os botões vermelhos (SAIR, APAGAR, APAGAR TODOS, confirmar apagar) com a MESMA cor do SAIR da barra de cima.
+   Fundo escuro por baixo do vidro vermelho pra a cor não clarear quando o botão fica em cima de painel/pop-up mais claro. */
+#logout,#clrAll,.popclear,.ib.red,.clearall,.cfm.danger #cfmOk{color:#fff1f1!important;
+  background:linear-gradient(160deg,rgba(248,113,113,.58),rgba(220,38,38,.36)),#140c12!important;
+  box-shadow:0 0 0 1px rgba(252,165,165,.9),0 0 14px rgba(248,113,113,.55),0 0 28px rgba(239,68,68,.25),inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 12px rgba(248,113,113,.25)!important;
+  text-shadow:0 0 8px rgba(248,113,113,.6)}
+#logout svg,#clrAll svg,.popclear svg,.ib.red svg,.clearall svg,.cfm.danger #cfmOk svg{color:#fecaca!important;filter:drop-shadow(0 0 6px rgba(248,113,113,.8))!important}
 </style>
 </head>
 <body>
