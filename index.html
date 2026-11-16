@@ -397,6 +397,12 @@ body:has(.sheet.open) .fchip,body:has(.toast.show) .fchip{opacity:0;pointer-even
 .pill.dest[disabled]:not(.sel){display:none}
 .aviso{display:flex;align-items:flex-start;gap:8px;padding:9px 11px;border-radius:12px;font-size:11.5px;line-height:1.4;font-weight:600;color:#fecdd3;
   background:rgba(251,113,133,.10);box-shadow:0 0 0 1px rgba(251,113,133,.45),0 0 14px rgba(251,113,133,.14)}
+.aviso.erro{flex-wrap:nowrap}.aviso.erro b{color:#fff1f2;letter-spacing:.04em}
+.aviso.erro small{display:block;margin-top:4px;font-size:10px;font-weight:500;color:rgba(254,205,211,.6);overflow-wrap:anywhere}
+.erro-bts{display:flex;gap:8px;width:100%}.erro-bts .aprov{flex:1 1 0;width:auto;min-width:0;white-space:nowrap;writing-mode:horizontal-tb}
+.erro-bts .aprov.alt{flex:0 0 auto;padding:0 14px;color:var(--ink-2);background:rgba(255,255,255,.05);box-shadow:0 0 0 1px var(--hair-2)}
+.erro-bts .aprov.alt svg{filter:none}
+@media (max-width:620px){.erro-bts{flex-direction:column}.erro-bts .aprov,.erro-bts .aprov.alt{flex:none;width:100%}}
 .aviso svg{width:15px;height:15px;flex:none;margin-top:1px;color:var(--rose);filter:drop-shadow(0 0 6px rgba(251,113,133,.5))}
 /* ===== v15: POSTADOS · APAGAR TODOS (some do board, histórico fica no banco) ===== */
 .donebar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 2px 0}
@@ -737,6 +743,7 @@ const SB_URL='https://gdtfwmqbvsqtxtccrydv.supabase.co', SB_KEY='sb_publishable_
 const SESSAO_HORAS=8;
 const AU='<svg viewBox="56.18 55.44 252.95 195.8" aria-hidden="true"><path fill="url(#augold)" d="M187.42,205.8c5.1,11.57,9.72,19.4,13.83,23.5,4.11,4.1,7.91,6.15,11.36,6.15v2.41h-71.14v-2.41c1.48,0,3.05-.24,4.69-.72,1.64-.48,3.170-1.28,4.57-2.41,1.4-1.12,2.55-2.61,3.46-4.46.9-1.85,1.36-4.14,1.36-6.87,0-4.01-1.32-9.16-3.95-15.43l-6.18-13.26c-2.96,7.23-6.51,13.86-10.62,19.89-4.12,6.03-8.52,11.17-13.22,15.43-4.69,4.26-9.47,7.59-14.33,10-4.86,2.41-9.6,3.62-14.2,3.62-8.89,0-15.48-2.05-19.76-6.15-4.28-4.1-6.63-10-7.04-17.72-.41-7.71.99-17.11,4.2-28.2,3.21-11.09,7.86-23.62,13.96-37.6l38.29-86.05h2.47l62.25,140.29ZM82.19,185.79c0,8.84,2.47,15.55,7.41,20.13,4.94,4.58,10.78,6.87,17.54,6.87s13.17-2.33,19.76-6.99c6.58-4.66,11.61-11.81,15.07-21.45l-32.11-71.83-18.03,39.05c-3.3,7.55-5.72,14.1-7.29,19.64-1.570,5.54-2.35,10.41-2.35,14.58Z"/><path fill="url(#augold)" d="M299.07,163.84v-83.68c0-16.64-14.91-14.65-14.91-14.65h-16.57v2.4c8.22,1.12,14.26,6.52,18.13,16.2,3.86,9.68,5.79,22.12,5.79,37.33v55.93c0,7.36-1.18,13.88-3.53,19.56-2.35,5.68-5.41,10.36-9.19,14.04-3.78,3.68-8.1,6.48-12.97,8.4-4.87,1.92-9.82,2.88-14.85,2.88-1.38,0-2.76-.08-4.14-.22-3.81-.39-7.59-1.31-11.35-2.78-5.12-2-9.65-5-13.6-9-3.95-4-7.14-9-9.57-15-2.44-6-3.65-13-3.65-21v-86.17c0-6.24.75-10.76,2.27-13.56,1.51-2.8,3.69-5,6.55-6.6v-2.4h-51.61v2.4c3.02,1.6,5.29,3.8,6.8,6.6,1.51,2.8,2.27,7.32,2.27,13.56v67.41l20.7,46.66s0,.01,0,.02c5.76,13.06,9.68,18.49,11.95,20.75,3.37,3.36,5.01,3.53,5.02,3.53,4.97,0,8.99,4.03,8.99,9v.47c5.38,1.28,10.8,1.94,16.27,1.94,3.02,0,6-.2,8.95-.59,4.6-.61,9.13-1.69,13.58-3.25,7.3-2.56,13.8-6.36,19.51-11.4,5.59-4.94,10.13-11.12,13.63-18.52h0c.07-.15.16-.29.22-.44,1.26-3.44,2.62-6.86,3.59-10.4,1.04-3.79,1.44-7.68,1.63-11.59.28-5.920.07-11.9.07-17.83Z"/></svg>';
 const I={
+  warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17.5v.5"/></svg>',
   hand:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>',
   clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   send:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>',
@@ -813,7 +820,11 @@ function rowHTML(p){
   const fixo=destFixo(p);
   const destPills = fixo ? `<span class="pill dest sel fixo${fixo==='story'?' st':''}">${fixo==='story'?'STORY':'FEED'}</span>` : p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest st${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
   const quando = p.dia&&p.hora ? dayText(p.dia)+' '+p.hora : '';
-  const aprov = p.postado||trava ? '' : p.manual
+  const erroBox = !p.postado&&p.ig_status==='erro' ? `<div class="aviso erro" title="${esc(p.ig_erro||'')}">${I.warn}<span><b>NÃO POSTOU · </b>${esc(motivoErro(p.ig_erro))}${p.ig_refeito?' Já tentei de novo sozinho 1x.':''}<small>${esc(p.ig_erro||'')}</small></span></div>`
+    : p.postado&&p.ig_story_status==='erro' ? `<div class="aviso erro" title="${esc(p.ig_story_erro||'')}">${I.warn}<span><b>STORY NÃO SAIU · </b>O feed saiu, o Story não. ${esc(motivoErro(p.ig_story_erro))}<small>${esc(p.ig_story_erro||'')}</small></span></div>` : '';
+  const erroActs = !p.postado&&p.ig_status==='erro' ? `<div class="erro-bts"><button class="aprov" data-act="retry" data-id="${esc(p.id)}">${I.send} TENTAR DE NOVO</button><button class="aprov alt" data-act="editar" data-id="${esc(p.id)}">${I.pen} MUDAR HORÁRIO</button></div>`
+    : p.postado&&p.ig_story_status==='erro' ? `<div class="erro-bts"><button class="aprov" data-act="retrystory" data-id="${esc(p.id)}">${I.send} TENTAR O STORY DE NOVO</button></div>` : '';
+  const aprov = p.postado||trava ? '' : p.ig_status==='erro'&&p.aprovado ? '' : p.manual
     ? `<button class="aprov man" data-act="posted" data-id="${esc(p.id)}">${I.check} JÁ POSTEI</button>`
     : p.aprovado
     ? `<div class="aprov ok"><span>${I.check} <i class="apl">APROVADO · </i>${esc(quando)}${p.destino==='feed_story'?' · FEED+STORY':p.destino==='story'?' · STORY':''}</span><span class="aprov-bts"><button data-act="editar" data-id="${esc(p.id)}" aria-label="Editar dia e horário" title="Editar dia e horário">${I.pen}</button><button data-act="desaprovar" data-id="${esc(p.id)}" aria-label="Desfazer aprovação" title="Desfazer aprovação">${I.undo}</button></span></div>`
@@ -831,7 +842,7 @@ function rowHTML(p){
       <div class="meta">${p.manual&&!p.postado?'<span class="pill man">VOCÊ POSTA</span>':''}${dayPill}${horaPill}${destPills}${stPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
       ${p.aviso&&!p.postado?`<div class="aviso">${I.hand}<span>${esc(p.aviso)}</span></div>`:''}
       ${destFixo(p)==='story'&&!c?'':`<button class="capprev" data-act="cap" data-id="${esc(p.id)}"><span class="clamp">${c?esc(c):'<i>Sem legenda</i>'}</span><span class="more">VER LEGENDA ›</span></button>`}
-      ${aprov}<div class="acts">${acts}</div>
+      ${erroBox}${erroActs}${aprov}<div class="acts">${acts}</div>
     </div>
   </article>`;
 }
@@ -919,7 +930,7 @@ async function toggleDestino(id,which){
 async function setAprovado(id,v,agoraOk){
   const p=find(id); if(!p) return;
   if(v&&p.dia&&p.hora&&!agoraOk){ const quando=new Date(p.dia+'T'+p.hora+':00');
-    if(quando.getTime()<=Date.now()+5*60e3){ confirmar(quando<Date.now()?'ESSE HORÁRIO JÁ PASSOU':'FALTA MENOS DE 5 MIN', (quando<Date.now()?'O horário '+p.hora+' já passou.':'Está marcado pra '+p.hora+'.')+' Se aprovar agora, o post vai pro Instagram em até 5 minutos.','POSTAR AGORA',()=>setAprovado(id,true,true)); return; } }
+    if(quando.getTime()<=Date.now()+5*60e3){ confirmar(quando<Date.now()?'ESSE HORÁRIO JÁ PASSOU':'FALTA MENOS DE 5 MIN', (quando<Date.now()?'O horário '+p.hora+' já passou.':'Está marcado pra '+p.hora+'.')+' Se aprovar agora, o post vai pro Instagram em 1 minuto.','POSTAR AGORA',()=>setAprovado(id,true,true)); return; } }
   if(v&&(!p.dia||!p.hora)){ toast(!p.dia&&!p.hora?'Escolhe o dia e o horário antes de aprovar':!p.dia?'Escolhe o dia antes de aprovar':'Escolhe o horário antes de aprovar'); return; }
   const fx=destFixo(p);
   if(v&&fx&&p.destino!==fx){ try{ await rpc('fila_set_destino',{p_pin:S.pin,p_id:id,p_destino:fx}); p.destino=fx; }catch(_){ toast('Não salvou. Tenta de novo.'); return; } }
@@ -974,11 +985,28 @@ async function apagar(id){
   const rej=!(find(id)||{}).postado;
   const el=document.querySelector(`[data-row="${CSS.escape(id)}"]`);
   try{
-    const r=await fetch(SB_URL+'/functions/v1/fila-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete',pin:S.pin,id})}).then(r=>r.json());
-    if(!r||!r.ok) throw new Error();
+    await rpc('fila_apagar',{p_pin:S.pin,p_id:id});
+    fetch(SB_URL+'/functions/v1/fila-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cleanup',pin:S.pin})}).catch(()=>{});
     if(el){ el.classList.add('leaving'); await new Promise(r=>setTimeout(r,280)); }
     S.posts=S.posts.filter(x=>x.id!==id); if(S.copied===id){S.copied='';store.set('fila_copied',null);} S.sig=''; render(); toast(rej?'Rejeitado · não volta nas sugestões':'Saiu do board · histórico salvo');
-  }catch(_){ confirmar('NÃO APAGOU','O servidor recusou. Tenta de novo; se continuar, toca em SAIR e entra de novo com a senha.','OK',()=>{},true); }
+  }catch(e){ if(e.code==='28000'){logout('Senha inválida');return;} confirmar('NÃO APAGOU',/publicado agora/.test(e.message||'')?'Esse post está indo pro Instagram agora. Espera 1 minuto.':'Não deu certo. Tenta de novo.','OK',()=>{},true); }
+}
+/* ---- erro do Instagram em português (o detalhe técnico fica embaixo, pequeno) ---- */
+function motivoErro(m){ m=String(m||'');
+  if(/2207026|codec|format/i.test(m)) return 'O Instagram não aceitou o formato do vídeo (quadros por segundo, áudio ou codec).';
+  if(/2207004|2207052|download|baix/i.test(m)) return 'O Instagram não conseguiu baixar o arquivo.';
+  if(/2207003|2207020|demorou|timeout|EXPIRED/i.test(m)) return 'O Instagram demorou demais pra processar o arquivo.';
+  if(/2207009|aspect|propor/i.test(m)) return 'Proporção do arquivo fora do que o Instagram aceita.';
+  if(/2207042|limit/i.test(m)) return 'A conta bateu o limite de posts por dia pela API.';
+  if(/2207050|2207051|restri|spam|block/i.test(m)) return 'O Instagram travou a ação na conta. Abre o app do Instagram e vê se tem aviso.';
+  if(/token|OAuth|session|expired|permission/i.test(m)) return 'O acesso à conta do Instagram expirou. Precisa renovar o login da Meta.';
+  if(/sem arquivo/i.test(m)) return 'O post está sem arquivo.';
+  if(/carrossel/i.test(m)) return 'Uma das lâminas do carrossel deu erro no Instagram.';
+  return 'O Instagram recusou sem explicar. Quase sempre é o formato do arquivo.'; }
+async function retryStory(id){
+  const p=find(id); if(!p) return;
+  try{ await rpc('fila_refazer_story',{p_pin:S.pin,p_id:id}); p.ig_story_status='refazer'; p.ig_story_erro=null; patchRow(id); toast('Story vai de novo em até 1 minuto'); S.sig=''; }
+  catch(_){ toast('Não salvou. Tenta de novo.'); }
 }
 /* ---- apagar todos os postados: sai do board, mas fica no banco como histórico (o que já foi postado) ---- */
 function pedeLimpar(){ const n=S.posts.filter(p=>p.postado).length; if(!n) return; confirmar('APAGAR TODOS OS POSTADOS?',(n>1?'Os '+n+' postados saem':'O postado sai')+' do board. O histórico fica salvo.','APAGAR TODOS',limparPostados,true); }
@@ -1021,9 +1049,10 @@ async function edSalvar(id,agoraOk){
   const p=find(id); if(!p) return; const h=($('#ehin')||{}).value||S.ed.hora, d=S.ed.dia;
   if(!d||!/^\d{2}:\d{2}$/.test(h)){ toast('Escolhe o dia e o horário'); return; }
   const quando=new Date(d+'T'+h+':00');
-  if(!agoraOk&&quando.getTime()<=Date.now()+5*60e3){ confirmar(quando<Date.now()?'ESSE HORÁRIO JÁ PASSOU':'FALTA MENOS DE 5 MIN',(quando<Date.now()?'O horário '+h+' já passou.':'Fica marcado pra '+h+'.')+' Salvando, o post vai pro Instagram em até 5 minutos.','POSTAR AGORA',()=>edSalvar(id,true)); return; }
+  if(!agoraOk&&quando.getTime()<=Date.now()+5*60e3){ confirmar(quando<Date.now()?'ESSE HORÁRIO JÁ PASSOU':'FALTA MENOS DE 5 MIN',(quando<Date.now()?'O horário '+h+' já passou.':'Fica marcado pra '+h+'.')+' Salvando, o post vai pro Instagram em 1 minutos.','POSTAR AGORA',()=>edSalvar(id,true)); return; }
   closeSheet();
   try{ if(d!==p.dia) await rpc('fila_set_dia',{p_pin:S.pin,p_id:id,p_dia:d}); if(h!==p.hora) await rpc('fila_set_hora',{p_pin:S.pin,p_id:id,p_hora:h});
+    if(p.ig_status==='erro'){ await rpc('fila_set_aprovado',{p_pin:S.pin,p_id:id,p_aprovado:true}); p.ig_status=null; p.ig_erro=null; p.ig_refeito=false; }
     p.dia=d; p.hora=h; S.sig=''; render(); toast('Alteração salva · posta '+dayText(d)+' às '+h); }
   catch(_){ toast('Não salvou. Tenta de novo.'); load(); }
 }
@@ -1157,6 +1186,8 @@ document.addEventListener('click',e=>{
   else if(a==='hset'){ const v=($('#hin')||{}).value||''; if(!/^\d{2}:\d{2}$/.test(v)){ toast('Digita o horário (ex.: 18:45)'); return; } closeSheet(); setHora(id,v); }
   else if(a==='sethora'){ closeSheet(); setHora(id,b.dataset.h||null); }
   else if(a==='aprovar') setAprovado(id,true);
+  else if(a==='retry') setAprovado(id,true);
+  else if(a==='retrystory') retryStory(id);
   else if(a==='dest') toggleDestino(id,b.dataset.v);
   else if(a==='desaprovar') setAprovado(id,false);
 });

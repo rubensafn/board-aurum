@@ -13,3 +13,12 @@ Board de controle de postagem do AURUM Cinema (board.aurumcinema.com.br). Cada p
 FILA_TOKEN=<token> python3 tools/fila_push.py lote.json
 ```
 Formato do `lote.json` no topo de `tools/fila_push.py`. O dia e o "postado" ficam com o Rubão, direto no board.
+
+## Edge Function `fila-admin` (código fica AQUI)
+- Fonte: `supabase/functions/fila-admin/index.ts`. **Sempre** editar a partir deste arquivo e commitar antes/junto do deploy — nunca publicar uma versão que não está no repo (já se perdeu uma versão assim).
+- Antes de mexer: `git pull` e conferir se o arquivo bate com a versão no ar (Supabase → get_edge_function).
+
+## Postagem automática
+- pg_cron `fila-publicar` roda **a cada minuto**. O container do Instagram é criado até 15 min antes; publica no minuto marcado (card mostra PRONTO · SAI HH:MM).
+- Erro do Instagram: tenta de novo sozinho 1x; se falhar, card mostra NÃO POSTOU + motivo + TENTAR DE NOVO / MUDAR HORÁRIO, e chega aviso no celular (app ntfy, tópico em `fila_config.notify_url`). Story com erro: TENTAR O STORY DE NOVO.
+- Lixeira do board usa a RPC `fila_apagar` (mesma senha do `fila_list`); arquivos saem na limpeza (`cleanup`).
