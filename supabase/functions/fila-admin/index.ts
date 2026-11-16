@@ -1,5 +1,5 @@
 // FILA DE POSTS — uploads assinados e gravação de posts (token), limpeza de vídeos já postados e apagar post (senha da fila),
-// e PUBLICAÇÃO AUTOMÁTICA no Instagram (@aurum.cinema) dos posts APROVADOS, no dia/horário marcado (chamada pelo pg_cron a cada minuto).
+// e PUBLICAÇÃO AUTOMÁTICA no Instagram (@aurum.cinema) dos posts APROVADOS, no dia/horário marcado (chamada pelo pg_cron de 5 em 5 min).
 // O container é criado até ANTECEDENCIA_MIN minutos antes e só é publicado no minuto marcado (sem atraso).
 // Erro do Instagram: tenta de novo 1x sozinho; se falhar de novo, marca erro e avisa o Rubão no celular (ntfy, fila_config.notify_url).
 // SÓ mexe na tabela fila_posts, na fila_config (chaves meta_*/cron_key/notify_url) e no bucket fila-posts. Nunca tocar no SISTEMA DE CORTESIAS (mesmo projeto).
@@ -251,6 +251,9 @@ Deno.serve(async (req) => {
   }
 
   if (body.action === "publicar") {
+    // roda de 5 em 5 min (todos os horários do board são múltiplos de 5 e o container é criado até 15 min antes,
+    // então sai no minuto certo). Protege o banco grátis (pouco disco/CPU): o pg_cron pode chamar a cada minuto, mas só os múltiplos de 5 trabalham.
+    if (new Date().getUTCMinutes() % 5 !== 0) return json({ skip: true });
     const key = await conf(sb, "cron_key");
     if (!key || body.key !== key) return json({ error: "key" }, 401);
     return json(await publicar(sb));
