@@ -1013,6 +1013,21 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 /* v50: horários do EDITAR com a mesma altura do pendente (o "+62% ALCANCE" cortava o nome) e % numa linha só */
 .hpick .dtile .x{white-space:nowrap}
 .edw .hpick .dtile{height:78px!important}
+/* v51: EXCLUIR TODAS na aba RESV (vermelho igual ao APAGAR TODOS) */
+.rsv-top .rt-bts{display:flex;gap:10px;flex:none}
+.rsv-top .rclear{height:40px;padding:0 16px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--display);font-weight:700;font-size:10.5px;letter-spacing:.12em;color:#fff1f2;
+  background:linear-gradient(160deg,rgba(248,113,113,.58),rgba(220,38,38,.36)),#140c12;box-shadow:0 0 0 1px rgba(252,165,165,.9),0 0 14px rgba(248,113,113,.5),inset 0 1px 0 rgba(255,255,255,.18)}
+.rsv-top .rclear svg{width:15px;height:15px;color:#fecaca;filter:drop-shadow(0 0 6px rgba(248,113,113,.8))}
+@media (max-width:759px){.rsv-top .rt-bts{flex-direction:column;align-items:stretch}.rsv-top .rclear{height:40px}}
+/* v51: botão + (novo post) no celular com cor própria (violeta cheio, igual ao NOVO POST do PC) e desce pro lugar do calendário quando ele não existe (aba RESV) */
+@media (max-width:759px){
+  .fabnovo:not([hidden]){color:#fff!important;background:linear-gradient(160deg,rgba(167,139,250,.75),rgba(124,58,237,.55)),#110c1a!important;
+    box-shadow:0 0 0 1.5px #c4b5fd,0 0 16px rgba(167,139,250,.6),0 10px 26px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.25)!important}
+  .fabnovo::after{display:none!important}
+  .fabnovo svg{filter:drop-shadow(0 1px 1px rgba(0,0,0,.4))!important}
+  body.v-resv .fabnovo:not([hidden]),body:has(#fab[hidden]) .fabnovo:not([hidden]){bottom:calc(16px + env(safe-area-inset-bottom))!important}
+  .fabnovo{transition:bottom .25s ease,transform .15s,opacity .2s}
+}
 </style>
 </head>
 <body>
@@ -1700,7 +1715,7 @@ function resvHTML(){
   if(!S.resv) return S.resvErro?emptyHTML('NÃO CARREGOU','Confere a internet e abre a aba de novo.'):'<div class="sk"></div><div class="sk"></div><div class="sk"></div>';
   const q=S.resv.filter(r=>r.quero).length;
   const top=`<div class="rsv-top glass"><div class="rt-txt"><b>RESERVAS DA VARREDURA</b><span>${q?`${q} marcada${q>1?'s':''} · `:''}Marca QUERO ESSA e a varredura ${proxRodada()} baixa e põe em PENDENTES.</span></div>
-    <button class="aprov rodar" data-act="rodar">${I.send} RODAR VARREDURA AGORA</button></div>`;
+    <div class="rt-bts"><button class="aprov rodar" data-act="rodar">${I.send} RODAR VARREDURA AGORA</button>${S.resv.length?`<button class="rclear" data-act="rclear">${I.trash} EXCLUIR TODAS</button>`:''}</div></div>`;
   if(!S.resv.length) return top+emptyHTML('NENHUMA RESERVA','Quando a varredura achar peça boa que não coube no dia, ela fica guardada aqui.');
   return top+S.resv.map(resvRow).join('');
 }
@@ -1708,6 +1723,13 @@ async function setQuero(sc,v){
   const r=findR(sc); if(!r) return; r.quero=v; $('#list').innerHTML=resvHTML();
   toast(v?'Marcada · sai na varredura '+proxRodada():'Desmarcada', v?'DESFAZER':'', v?()=>setQuero(sc,false):null);
   try{ await rpc('fila_reserva_quero',{p_pin:S.pin,p_shortcode:sc,p_quero:v}); }catch(_){ r.quero=!v; if(S.view==='resv') $('#list').innerHTML=resvHTML(); toast('Não salvou. Tenta de novo.'); }
+}
+function excluirTodasResv(){
+  const n=(S.resv||[]).length; if(!n) return;
+  confirmar('EXCLUIR TODAS AS RESERVAS?','Sai'+(n>1?'m as '+n+' reservas':' a reserva')+' da aba e a varredura não sugere essas peças de novo. Filme nenhum é afetado: material novo continua chegando.','EXCLUIR TODAS',async()=>{
+    const bk=S.resv; S.resv=[]; S.resvN=0; render();
+    try{ await rpc('fila_reservas_excluir_todas',{p_pin:S.pin}); toast('Reservas excluídas'); }
+    catch(_){ S.resv=bk; S.resvN=bk.length; render(); toast('Não salvou. Tenta de novo.'); } },true);
 }
 function rejeitarResv(sc){
   const r=findR(sc); if(!r) return;
@@ -1731,6 +1753,7 @@ document.addEventListener('click',e=>{
   else if(a==='rrej') rejeitarResv(b.dataset.sc);
   else if(a==='rver'){ const r=findR(b.dataset.sc); if(r&&r.permalink) window.open(r.permalink,'_blank','noopener'); }
   else if(a==='rodar') rodarVarredura();
+  else if(a==='rclear') excluirTodasResv();
   else if(a==='open') openSheet(id,'media');
   else if(a==='fclose') closeFilterSheet();
   else if(a==='day') openSheet(id,'day');
