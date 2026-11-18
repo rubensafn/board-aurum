@@ -3,7 +3,7 @@
 Este arquivo é a memória do projeto. **Toda conversa nova começa lendo este arquivo e o README.md.**
 **Toda mudança termina atualizando este arquivo** (o que foi feito, o que ficou pendente), junto com o commit.
 
-Atualizado em: 18/11/2026, 12h45 (versão no ar: v47)
+Atualizado em: 18/11/2026, 14h55 (versão no ar: v48)
 
 ---
 
@@ -44,6 +44,12 @@ Atualizado em: 18/11/2026, 12h45 (versão no ar: v47)
 - Tabelas: `fila_posts` (+ colunas `subido`, `selo_pendente`), `fila_filmes` (nova), `fila_config`, `fila_vistos`.
 - RPCs novas: `fila_novo_post`, `fila_filmes_list`, `fila_filme_set`, `fila_filme_add`, `fila_filme_del`.
 
+**Feito em 18/11 (v48 — vídeo +60 s, aprovado pelo Rubão)**
+- Causa do erro 2207082 no story do Rocky (16-11_02): vídeo de 2:28. Story pela API só aceita até 60 s (Reels aceita longo). Não era compressão nem formato.
+- Board: vídeo +60 s fica só FEED (`destFixo` → 'feed'), aviso laranja no card ("Só FEED · story à mão" no celular) e no + NOVO POST. Story desses o Rubão encaminha à mão.
+- Duração: `f.dur` (NOVO POST grava em `arquivos`) ou lida do cabeçalho do vídeo no navegador (`pedirDur`, só posts não postados, sem banco). Lotes da varredura não gravam `dur` ainda (o board mede sozinho).
+- Posts antigos já aprovados como FEED+STORY não foram mexidos (Rubão: o que passou, passou).
+
 **Feito em 18/11 (v47 — cores, aprovado pelo Rubão)**
 - Uma cor quente só (`--hot*`, fim do `<style>`) em: aba PENDENTES, HOJE (filtro e pílula), COPIAR (card e pop-up), número do card, VER LEGENDA, COPIADA, CELULAR/PC selecionado, ENTRAR. Laranja-barro do v46 removido.
 - Avisos de baixo: caixa inteira verde = ok · quente = atenção ("Escolhe…"/"Digita…", classe `warn`) · vermelho = erro.
@@ -59,8 +65,6 @@ Atualizado em: 18/11/2026, 12h45 (versão no ar: v47)
 ---
 
 ## 3. PENDÊNCIAS (em ordem)
-
-**P2 — Story do Rocky**: post Reels feed+story (16-11_02 "Eu Sou o Rocky", arquivo comprimido) saiu só no feed; story deu erro 2207082. Investigar e explicar antes de mexer.
 
 **P3 — Varredura (só o texto da tarefa agendada, depois que uma rodada terminar, com OK do Rubão)**
 - Legenda: sempre linha em branco depois da 1ª frase de impacto (corrigir as pendentes também).
