@@ -1,5 +1,8 @@
 # AURUM · Fila de Posts
 
+> **Antes de qualquer coisa, leia [ESTADO.md](ESTADO.md)** — regras do Rubão, o que está no ar e as pendências.
+
+
 Board de controle de postagem do AURUM Cinema (board.aurumcinema.com.br). Cada post do lote vira um card com prévia, legenda (CELULAR / PC) com botão de copiar, botão de baixar, dia e "marcar como postado". Filtro por dia no topo. Funciona no celular e no PC.
 
 - **Front:** `index.html` (página única, sem build), publicada pela Vercel a partir deste repo.
