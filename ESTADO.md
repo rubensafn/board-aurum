@@ -14,6 +14,7 @@ Atualizado em: 18/11/2026, 15h20 (versão no ar: v49, edge fila-admin v17, texto
 - Se ele está perguntando, **só responde, não mexe**. Se ele mandou parar, para.
 - Antes de mudar como algo funciona (agendamento, frequência, banco, varredura, estrutura): explicar o que muda e o risco, esperar o OK.
 - Antes de afirmar algo sobre o código (cor, tamanho, comportamento): **conferir no código**. Nunca responder de cabeça.
+- **NUNCA inventar regra, número ou horário.** O que não está documentado (aqui, no README ou nos docs do projeto AURUM EDITS, ex. `claude/AUTO-POSTAGEM-AURUM.md`), PERGUNTAR. Antes de mexer na varredura, ler TODOS os docs que ela lê. Toda regra nova do Rubão vai pro doc certo na hora (não só no chat).
 - Antes de mexer: `git pull` e conferir a versão no ar da edge function (outras conversas podem ter mexido).
 
 **Branches**
@@ -73,7 +74,7 @@ Atualizado em: 18/11/2026, 15h20 (versão no ar: v49, edge fila-admin v17, texto
 
 **Regra de ordem: mexer no texto da varredura é SEMPRE a última coisa.** Board primeiro, varredura por último.
 
-**Texto da varredura — FEITO em 18/11 15h20** (tarefa `trig_01TcQLbVPCUExKpeT8kkWntb`, 11h22 · 15h22 · 18h22, valendo a partir da rodada das 15h22): lista da aba FILMES, QUERO ESSA primeiro, legenda com linha em branco depois da 1ª frase (corrige as pendentes não editadas), sem música/Spotify, selo AU nos posts com `selo_pendente`, vídeo +60 s = `destino 'feed'` + `dur` no arquivo, horários 30/30 12h30–22h com 1 h entre posts, limites (5 feed+reels, 8 stories, 1 por filme, 2 se bombando), filme forte 18h–21h30. O texto vale sobre os docs nesses pontos.
+**Texto da varredura — FEITO em 18/11 15h20** (tarefa `trig_01TcQLbVPCUExKpeT8kkWntb`, 11h22 · 15h22 · 18h22, valendo a partir da rodada das 15h22): lista da aba FILMES, QUERO ESSA primeiro, legenda com linha em branco depois da 1ª frase (corrige as pendentes não editadas), sem música/Spotify, selo AU nos posts com `selo_pendente`, vídeo +60 s = `destino 'feed'` + `dur` no arquivo, horários 30/30 12h30–22h com 1 h entre posts, limites (5 feed+reels, 8 stories, 1 por filme, 2 se bombando), pelo menos 1 por dia à noite alternando 20h30/21h30 (o "18h–21h30" foi invenção e foi tirado). **CONFLITO PENDENTE com o doc AUTO-POSTAGEM** (Rubão decide): doc = todo filme todo dia + filme em alta 2–3/dia; texto = máx. 5 feed+reels/dia e 2 por filme. Depois da resposta: passar todas as regras pro doc e o texto da tarefa só mandar ler os docs.
 - Ainda **só quando o Rubão mandar**: 4 rodadas (12h, 15h, 18h, 21h).
 
 **Em espera (não fazer até o Rubão mandar)**: PC (pasta do dia D:\AURUM - DSKP\<MÊS>\DD.MM com BAIXADOS/FINAIS, artes do D:).
