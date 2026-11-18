@@ -3,7 +3,7 @@
 Este arquivo é a memória do projeto. **Toda conversa nova começa lendo este arquivo e o README.md.**
 **Toda mudança termina atualizando este arquivo** (o que foi feito, o que ficou pendente), junto com o commit.
 
-Atualizado em: 18/11/2026, 15h15 (versão no ar: v49, edge fila-admin v17)
+Atualizado em: 18/11/2026, 15h20 (versão no ar: v49, edge fila-admin v17, texto da varredura de 18/11)
 
 ---
 
@@ -73,15 +73,8 @@ Atualizado em: 18/11/2026, 15h15 (versão no ar: v49, edge fila-admin v17)
 
 **Regra de ordem: mexer no texto da varredura é SEMPRE a última coisa.** Board primeiro, varredura por último.
 
-**Último passo — texto da tarefa agendada da varredura** (trocar só entre rodadas, nunca durante uma)
-- Legenda: sempre linha em branco depois da 1ª frase de impacto (corrigir as pendentes também, sem tocar nas que o Rubão editou).
-- Música: posta normal, sem música, legenda manda pro Spotify (conta empresa não usa música com direito autoral).
-- Seguir a lista da aba FILMES (só filmes `ativo`).
-- Aplicar selo AU nos posts com `selo_pendente = true`.
-- Reservas com `quero = true` (QUERO ESSA): baixar primeiro, subir em PENDENTES e marcar `baixado`.
-- Vídeo +60 s: `destino = 'feed'` (story à mão).
-- Horários de 30 em 30 min (12h30–22h), 1 h entre posts, limites (≤5 feed+reels, ≤8 stories/dia, 1 por filme, 2 se bombando), filme forte em horário nobre.
-- 4 rodadas (12h, 15h, 18h, 21h) **só quando o Rubão mandar**.
+**Texto da varredura — FEITO em 18/11 15h20** (tarefa `trig_01TcQLbVPCUExKpeT8kkWntb`, 11h22 · 15h22 · 18h22, valendo a partir da rodada das 15h22): lista da aba FILMES, QUERO ESSA primeiro, legenda com linha em branco depois da 1ª frase (corrige as pendentes não editadas), sem música/Spotify, selo AU nos posts com `selo_pendente`, vídeo +60 s = `destino 'feed'` + `dur` no arquivo, horários 30/30 12h30–22h com 1 h entre posts, limites (5 feed+reels, 8 stories, 1 por filme, 2 se bombando), filme forte 18h–21h30. O texto vale sobre os docs nesses pontos.
+- Ainda **só quando o Rubão mandar**: 4 rodadas (12h, 15h, 18h, 21h).
 
 **Em espera (não fazer até o Rubão mandar)**: PC (pasta do dia D:\AURUM - DSKP\<MÊS>\DD.MM com BAIXADOS/FINAIS, artes do D:).
 
