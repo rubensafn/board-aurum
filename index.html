@@ -933,6 +933,30 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
 .nv-gerar.on{box-shadow:0 0 0 1.5px rgba(196,181,253,.9),0 0 8px rgba(167,139,250,.35)!important}
 .chip.on{box-shadow:0 0 0 1px rgba(165,243,252,.9),0 0 8px rgba(103,232,249,.35)!important}
 .pn-body .chips{flex-wrap:wrap!important;overflow:visible!important;margin:0!important;padding:0!important}
+/* v46: um laranja neon só (o da aba PENDENTES, puxado mais pro laranja) no lugar do dourado apagado: aba PENDENTES, COPIAR, número do card, VER LEGENDA, botão principal do pop-up/ENTRAR.
+   Leitura: texto branco com sombra escura em cima do laranja; texto laranja claro (#fdba74) no fundo escuro */
+.seg-ind[data-v="pend"]{background:linear-gradient(160deg,rgba(251,146,60,.68),rgba(234,88,12,.40))!important;box-shadow:0 0 0 1px rgba(254,215,170,.9),0 0 16px rgba(251,146,60,.55),inset 0 1px 0 rgba(255,255,255,.25)!important}
+.tab.t-pend b{color:#fdba74!important}
+.tab.t-pend.on b{color:#fff!important}
+.num{color:#fdba74!important;text-shadow:0 0 8px rgba(251,146,60,.5)}
+.capprev .more{color:#fdba74!important;text-shadow:0 0 8px rgba(251,146,60,.5)}
+.capnote{color:#fdba74!important}
+.pill.cp{color:#fdba74!important;border-color:rgba(251,146,60,.55)!important;background:rgba(251,146,60,.08)!important}
+.ib.gold,.login .act,.act.primary,.ver.on{color:#fff!important;background:linear-gradient(160deg,rgba(251,146,60,.68),rgba(234,88,12,.40)),#160a04!important;
+  box-shadow:0 0 0 1px rgba(254,215,170,.9),0 0 14px rgba(251,146,60,.5),inset 0 1px 0 rgba(255,255,255,.25)!important;text-shadow:0 1px 2px rgba(0,0,0,.45)!important}
+.ib.gold svg,.act.primary svg{color:#fff!important;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4)) drop-shadow(0 0 6px rgba(251,146,60,.8))!important}
+.login .act::after,.act.primary::after{display:none!important}
+.row.copied{box-shadow:0 8px 24px rgba(0,0,0,.28),0 0 0 1px rgba(251,146,60,.65),0 0 22px rgba(251,146,60,.2)!important}
+.field:focus,.capin:focus{border-color:rgba(251,146,60,.75)!important}
+:focus-visible{outline-color:#fb923c}
+/* botões que são da cor deles (NOVO POST/SUBIR = roxo, ADICIONAR = ciano) continuam como estão */
+.pn-body .act.primary,.nv-go{color:#f5f3ff!important;background:linear-gradient(160deg,rgba(167,139,250,.5),rgba(124,58,237,.3)),#110c1a!important;box-shadow:0 0 0 1px rgba(196,181,253,.9),0 0 12px rgba(167,139,250,.4),inset 0 1px 0 rgba(255,255,255,.16)!important}
+.pn-row2 .act.primary{color:#ecfeff!important;background:linear-gradient(160deg,rgba(103,232,249,.5),rgba(34,211,238,.3)),#07121a!important;box-shadow:0 0 0 1px rgba(165,243,252,.9),0 0 12px rgba(103,232,249,.4),inset 0 1px 0 rgba(255,255,255,.16)!important}
+/* v46b: nada cortado — card com aviso: legenda encolhe e aviso fica em 1 linha no celular; pop-ups com folga embaixo pro contorno do último botão */
+.row .capprev{min-height:0!important}
+@media (max-width:759px){.row .aviso span{-webkit-line-clamp:1!important}}
+.sheet .sh-body{padding-bottom:16px!important}
+.dtile[data-tone="today"] .w{color:#fdba74!important}.pill[data-tone="today"]{color:#fdba74!important;border-color:rgba(251,146,60,.45)!important;background:rgba(251,146,60,.08)!important}
 </style>
 </head>
 <body>
