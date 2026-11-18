@@ -827,7 +827,7 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
 .flt b{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .flrow:not(.on) .flt b{color:var(--mute);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25)}
 .flt small{font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--mute)}
-.flt small.c{color:#86efac}.flt small.b{color:#a5f3fc}.flt small.m{color:var(--gold)}
+.flt small.c{color:#86efac}.flt small.b{color:#a5f3fc}.flt small.m{color:#c4b5fd}
 .sw{flex:none;width:46px;height:28px;border-radius:999px;position:relative;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);transition:background .2s}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:999px;background:#d4d4d8;transition:transform .2s,background .2s}
 .flrow.on .sw{background:linear-gradient(135deg,#4ade80,#16a34a);box-shadow:0 0 10px rgba(74,222,128,.5)}
@@ -890,6 +890,41 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
 .nv-go{height:52px!important;font-size:12px!important}
 .pill.sub{color:#a5f3fc;box-shadow:0 0 0 1px rgba(103,232,249,.45);background:rgba(103,232,249,.08)}
 .pill.selo{color:#fde68a;box-shadow:0 0 0 1px rgba(243,217,119,.55);background:rgba(243,217,119,.1)}
+/* v44 (18/11): SEM DOURADO nos botões novos (dourado só no COPIAR) + nada cortado: contorno e brilho dos botões/caixas não podem ser cortados pela borda */
+/* violeta = mesma receita do APROVAR · ciano = mesma receita do FILMES/BAIXAR */
+.hnovo{color:#f5f3ff!important;background:linear-gradient(160deg,rgba(167,139,250,.5),rgba(124,58,237,.3)),#110c1a!important;
+  box-shadow:0 0 0 1px rgba(196,181,253,.9),0 0 12px rgba(167,139,250,.4),inset 0 1px 0 rgba(255,255,255,.16)!important}
+.hnovo svg{color:#ddd6fe;filter:drop-shadow(0 0 6px rgba(167,139,250,.8))}
+@media (max-width:759px){
+  .fabnovo:not([hidden]){color:#ddd6fe!important;background:radial-gradient(circle at 35% 30%,rgba(167,139,250,.28),rgba(14,14,20,.94) 72%),#0e0e14!important;
+    box-shadow:0 10px 26px rgba(0,0,0,.55),0 0 14px rgba(167,139,250,.35)!important}
+  .fabnovo::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;background:linear-gradient(135deg,#f3d977,#fb7185 35%,#a78bfa 68%,#67e8f9);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+  .fabnovo svg{width:21px!important;height:21px!important;filter:drop-shadow(0 0 6px rgba(167,139,250,.8))}
+}
+.pn-body .act.primary,.nv-go{color:#f5f3ff!important;background:linear-gradient(160deg,rgba(167,139,250,.5),rgba(124,58,237,.3)),#110c1a!important;
+  box-shadow:0 0 0 1px rgba(196,181,253,.9),0 0 12px rgba(167,139,250,.4),inset 0 1px 0 rgba(255,255,255,.16)!important}
+.pn-row2 .act.primary{color:#ecfeff!important;background:linear-gradient(160deg,rgba(103,232,249,.5),rgba(34,211,238,.3)),#07121a!important;
+  box-shadow:0 0 0 1px rgba(165,243,252,.9),0 0 12px rgba(103,232,249,.4),inset 0 1px 0 rgba(255,255,255,.16)!important}
+.pn-row2 .act.primary::before,.pn-row2 .act.primary::after,.nv-go::before,.nv-go::after{display:none!important}
+.nv-drop{border-color:rgba(165,243,252,.6)!important;background:rgba(103,232,249,.06)!important;color:#ecfeff!important}
+.nv-drop svg{color:#a5f3fc!important}
+.chip.on{color:#ecfeff!important;background:linear-gradient(160deg,rgba(103,232,249,.5),rgba(34,211,238,.3)),#07121a!important;box-shadow:0 0 0 1px rgba(165,243,252,.9),0 0 10px rgba(103,232,249,.35)!important}
+.pn-note b{color:#a5f3fc!important}
+.nv-falta{color:#fca5a5!important}
+.nv-selo.falta button{box-shadow:0 0 0 1.5px rgba(252,165,165,.85)!important}
+.pill.selo{color:#ddd6fe!important;box-shadow:0 0 0 1px rgba(196,181,253,.5)!important;background:rgba(167,139,250,.1)!important}
+/* aviso de baixo: sem dourado — contorno violeta (erro continua vermelho), ícone verde de ok */
+.toast:not(.err){box-shadow:0 0 0 1.5px rgba(196,181,253,.9),0 0 24px rgba(167,139,250,.38),0 16px 44px rgba(0,0,0,.75)!important;background:rgba(16,13,24,.97)!important}
+.toast:not(.err) #toastMsg{color:#f5f3ff!important}
+.toast:not(.err) .t-ic{color:#fff!important;background:linear-gradient(160deg,#4ade80,#15803d)!important;box-shadow:0 0 12px rgba(74,222,128,.55)!important}
+.toast button{color:#f5f3ff!important;background:linear-gradient(160deg,rgba(167,139,250,.55),rgba(124,58,237,.35)),#110c1a!important;box-shadow:0 0 0 1px rgba(196,181,253,.9),0 0 12px rgba(167,139,250,.45)!important}
+/* NADA CORTADO: folga dentro de tudo que corta (rolagem/altura fixa) pro contorno + brilho caberem */
+.pn-body{padding:6px 8px 14px!important}
+.chips,.nv-files{padding:7px 8px!important;margin:-5px -8px!important}
+.row .info{padding:3px 6px 6px 3px;box-sizing:border-box}
+.nv-selo .au-m{background:rgba(255,255,255,.08)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+.nv-selo .au-m path{fill:#fff!important}
 </style>
 </head>
 <body>
