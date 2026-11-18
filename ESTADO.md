@@ -3,7 +3,7 @@
 Este arquivo é a memória do projeto. **Toda conversa nova começa lendo este arquivo e o README.md.**
 **Toda mudança termina atualizando este arquivo** (o que foi feito, o que ficou pendente), junto com o commit.
 
-Atualizado em: 18/11/2026, 03h (versão no ar: v46, commit acfc879)
+Atualizado em: 18/11/2026, 12h45 (versão no ar: v47)
 
 ---
 
@@ -31,7 +31,7 @@ Atualizado em: 18/11/2026, 03h (versão no ar: v46, commit acfc879)
 - **NÃO é a identidade do sistema de Cortesias** (outro sistema, outro visual — não copiar nada de lá).
 - Rubão **odeia amarelo clarinho**. Âmbar apagado/dourado sem neon não serve. Ouro (marca AU) pode, mas com critério.
 - Padrão de cor por significado: **verde = ok/certo**, **vermelho = erro**, **amarelo-laranja vivo = pendente/atenção**.
-- Cor quente tem que ser **uma só, igual em tudo** (ver pendência P1). Degradê vivo, nunca escurecendo pra marrom/preto; texto legível por cima.
+- Cor quente é **uma só, igual em tudo** (v47, Rubão aprovou): variáveis `--hot` `#fbbf24` (texto no escuro), `--hot-fill` vidro `#fbbf24 → #f97316` vivo, `--hot-line` contorno `#fde68a`, `--hot-glow`. Usar SEMPRE essas variáveis pra qualquer coisa quente nova. Nunca escurecer pra marrom.
 - Botões novos do mesmo tamanho dos que já existem.
 - Pensar sempre em celular E desktop, usabilidade e praticidade (ele usa muito pelo celular).
 
@@ -44,6 +44,12 @@ Atualizado em: 18/11/2026, 03h (versão no ar: v46, commit acfc879)
 - Tabelas: `fila_posts` (+ colunas `subido`, `selo_pendente`), `fila_filmes` (nova), `fila_config`, `fila_vistos`.
 - RPCs novas: `fila_novo_post`, `fila_filmes_list`, `fila_filme_set`, `fila_filme_add`, `fila_filme_del`.
 
+**Feito em 18/11 (v47 — cores, aprovado pelo Rubão)**
+- Uma cor quente só (`--hot*`, fim do `<style>`) em: aba PENDENTES, HOJE (filtro e pílula), COPIAR (card e pop-up), número do card, VER LEGENDA, COPIADA, CELULAR/PC selecionado, ENTRAR. Laranja-barro do v46 removido.
+- Avisos de baixo: caixa inteira verde = ok · quente = atenção ("Escolhe…"/"Digita…", classe `warn`) · vermelho = erro.
+- Pop-up: rolagem com folga dos lados (contorno do COPIAR não corta mais).
+- Sobrou no código antigo `--gold`/`--amber` em regras sobrescritas; o que aparece na tela é o `--hot`.
+
 **Feito em 18/11 (v43–v46)**
 - + NOVO POST (sobe arquivo próprio, filme, onde posta, legenda ou GERAR LEGENDA, dia/hora, selo AU ✓/✗ obrigatório) → entra em PENDENTES. Rubão testou e funciona.
 - Aba FILMES: puxa em cartaz + lançamentos de `aurumcinema.com.br/api/programacao` e `/api/upcoming` só ao abrir (máx. 1x/10 min); desmarcado continua desmarcado; filme novo chega marcado; dá pra adicionar filme na mão.
@@ -53,12 +59,6 @@ Atualizado em: 18/11/2026, 03h (versão no ar: v46, commit acfc879)
 ---
 
 ## 3. PENDÊNCIAS (em ordem)
-
-**P1 — CORES (Rubão está insatisfeito com o v46, corrigir primeiro, mostrar print ANTES de subir)**
-- O v46 deixou COPIAR, número do card, VER LEGENDA e botão principal (ENTRAR/COPIAR do pop-up) num laranja escuro/barro, e mudou a aba PENDENTES pra pior. **Rubão não gostou.**
-- Fazer: (1) voltar a aba PENDENTES como era antes do v46 (`.seg-ind[data-v="pend"]` original: `linear-gradient(160deg,rgba(251,191,36,.62),rgba(217,119,6,.34))`, contorno `rgba(253,230,138,.85)`); (2) definir UMA cor quente só e usar igual na aba PENDENTES, HOJE (filtro), COPIAR, número do card e VER LEGENDA — degradê vivo amarelo-laranja forte `#fbbf24` → laranja aceso `#f97316`, sem escurecer, texto branco legível; (3) mandar print celular + PC pro Rubão aprovar antes de subir.
-- Aviso de OK (toast): a caixa inteira deve seguir a identidade (verde quando é ok), não só o ícone.
-- Hoje existem 3 amarelos no código: `--gold #f3d977/#d9b855`, `--amber #fbbf24`, e o laranja do v46 `#fb923c/#ea580c`. Unificar.
 
 **P2 — Story do Rocky**: post Reels feed+story (16-11_02 "Eu Sou o Rocky", arquivo comprimido) saiu só no feed; story deu erro 2207082. Investigar e explicar antes de mexer.
 

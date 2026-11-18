@@ -933,22 +933,6 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
 .nv-gerar.on{box-shadow:0 0 0 1.5px rgba(196,181,253,.9),0 0 8px rgba(167,139,250,.35)!important}
 .chip.on{box-shadow:0 0 0 1px rgba(165,243,252,.9),0 0 8px rgba(103,232,249,.35)!important}
 .pn-body .chips{flex-wrap:wrap!important;overflow:visible!important;margin:0!important;padding:0!important}
-/* v46: um laranja neon só (o da aba PENDENTES, puxado mais pro laranja) no lugar do dourado apagado: aba PENDENTES, COPIAR, número do card, VER LEGENDA, botão principal do pop-up/ENTRAR.
-   Leitura: texto branco com sombra escura em cima do laranja; texto laranja claro (#fdba74) no fundo escuro */
-.seg-ind[data-v="pend"]{background:linear-gradient(160deg,rgba(251,146,60,.68),rgba(234,88,12,.40))!important;box-shadow:0 0 0 1px rgba(254,215,170,.9),0 0 16px rgba(251,146,60,.55),inset 0 1px 0 rgba(255,255,255,.25)!important}
-.tab.t-pend b{color:#fdba74!important}
-.tab.t-pend.on b{color:#fff!important}
-.num{color:#fdba74!important;text-shadow:0 0 8px rgba(251,146,60,.5)}
-.capprev .more{color:#fdba74!important;text-shadow:0 0 8px rgba(251,146,60,.5)}
-.capnote{color:#fdba74!important}
-.pill.cp{color:#fdba74!important;border-color:rgba(251,146,60,.55)!important;background:rgba(251,146,60,.08)!important}
-.ib.gold,.login .act,.act.primary,.ver.on{color:#fff!important;background:linear-gradient(160deg,rgba(251,146,60,.68),rgba(234,88,12,.40)),#160a04!important;
-  box-shadow:0 0 0 1px rgba(254,215,170,.9),0 0 14px rgba(251,146,60,.5),inset 0 1px 0 rgba(255,255,255,.25)!important;text-shadow:0 1px 2px rgba(0,0,0,.45)!important}
-.ib.gold svg,.act.primary svg{color:#fff!important;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4)) drop-shadow(0 0 6px rgba(251,146,60,.8))!important}
-.login .act::after,.act.primary::after{display:none!important}
-.row.copied{box-shadow:0 8px 24px rgba(0,0,0,.28),0 0 0 1px rgba(251,146,60,.65),0 0 22px rgba(251,146,60,.2)!important}
-.field:focus,.capin:focus{border-color:rgba(251,146,60,.75)!important}
-:focus-visible{outline-color:#fb923c}
 /* botões que são da cor deles (NOVO POST/SUBIR = roxo, ADICIONAR = ciano) continuam como estão */
 .pn-body .act.primary,.nv-go{color:#f5f3ff!important;background:linear-gradient(160deg,rgba(167,139,250,.5),rgba(124,58,237,.3)),#110c1a!important;box-shadow:0 0 0 1px rgba(196,181,253,.9),0 0 12px rgba(167,139,250,.4),inset 0 1px 0 rgba(255,255,255,.16)!important}
 .pn-row2 .act.primary{color:#ecfeff!important;background:linear-gradient(160deg,rgba(103,232,249,.5),rgba(34,211,238,.3)),#07121a!important;box-shadow:0 0 0 1px rgba(165,243,252,.9),0 0 12px rgba(103,232,249,.4),inset 0 1px 0 rgba(255,255,255,.16)!important}
@@ -956,7 +940,37 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
 .row .capprev{min-height:0!important}
 @media (max-width:759px){.row .aviso span{-webkit-line-clamp:1!important}}
 .sheet .sh-body{padding-bottom:16px!important}
-.dtile[data-tone="today"] .w{color:#fdba74!important}.pill[data-tone="today"]{color:#fdba74!important;border-color:rgba(251,146,60,.45)!important;background:rgba(251,146,60,.08)!important}
+/* v47 (18/11): aba PENDENTES volta a ser como era antes do v46. A cor quente do board é UMA SÓ = a da aba PENDENTES,
+   usada igual em: HOJE (filtro e pílula), COPIAR, número do card, VER LEGENDA, botão principal (ENTRAR/COPIAR do pop-up), aviso de atenção.
+   Vidro dos botões: #fbbf24 → #f97316 vivo (não escurece pra marrom) · contorno #fde68a · texto branco em cima, #fbbf24 no fundo escuro */
+:root{--hot:#fbbf24;--hot-fill:linear-gradient(160deg,rgba(251,191,36,.82),rgba(249,115,22,.62));--hot-line:rgba(253,230,138,.85);--hot-glow:rgba(251,191,36,.45)}
+.num,.capprev .more,.capnote{color:var(--hot)!important;text-shadow:0 0 8px rgba(251,191,36,.45)}
+.pill.cp,.pill[data-tone="today"]{color:var(--hot)!important;border-color:rgba(251,191,36,.5)!important;background:rgba(251,191,36,.08)!important}
+.dtile[data-tone="today"] .w,.dtile[data-tone="today"] .c{color:var(--hot)!important}
+.ib.gold,.login .act,.act.primary,.ver.on{color:#fff!important;background:var(--hot-fill),#140d04!important;
+  box-shadow:0 0 0 1px var(--hot-line),0 0 14px var(--hot-glow),inset 0 1px 0 rgba(255,255,255,.25)!important;text-shadow:0 1px 2px rgba(0,0,0,.45)!important}
+.ib.gold svg,.act.primary svg{color:#fff!important;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4)) drop-shadow(0 0 6px rgba(251,191,36,.8))!important}
+.login .act::after,.act.primary::after{display:none!important}
+#days .dtile.on[data-tone="today"],.fgrid .dtile.on[data-tone="today"]{box-shadow:0 0 0 1.5px var(--hot-line),0 0 12px var(--hot-glow),inset 0 0 20px rgba(251,191,36,.5)!important}
+#days .dtile.on[data-tone="today"] .c,.fgrid .dtile.on[data-tone="today"] .c{background:var(--hot-fill),#140d04!important;box-shadow:0 0 0 1.5px var(--hot-line),0 0 10px var(--hot-glow),inset 0 1px 0 rgba(255,255,255,.25)!important}
+.row.copied{box-shadow:0 8px 24px rgba(0,0,0,.28),0 0 0 1px rgba(251,191,36,.65),0 0 22px rgba(251,191,36,.2)!important}
+.field:focus,.capin:focus{border-color:rgba(251,191,36,.75)!important}
+:focus-visible{outline-color:var(--hot)}
+/* botões que são da cor deles continuam: NOVO POST/SUBIR = roxo, ADICIONAR = ciano */
+.pn-body .act.primary,.nv-go{color:#f5f3ff!important;background:linear-gradient(160deg,rgba(167,139,250,.5),rgba(124,58,237,.3)),#110c1a!important;box-shadow:0 0 0 1px rgba(196,181,253,.9),0 0 12px rgba(167,139,250,.4),inset 0 1px 0 rgba(255,255,255,.16)!important}
+.pn-row2 .act.primary{color:#ecfeff!important;background:linear-gradient(160deg,rgba(103,232,249,.5),rgba(34,211,238,.3)),#07121a!important;box-shadow:0 0 0 1px rgba(165,243,252,.9),0 0 12px rgba(103,232,249,.4),inset 0 1px 0 rgba(255,255,255,.16)!important}
+/* aviso de baixo: a CAIXA INTEIRA na cor do significado — verde = ok · cor quente = atenção (Escolhe…/Digita…) · vermelho = erro */
+.toast:not(.err):not(.warn){background:rgba(7,20,12,.97)!important;box-shadow:0 0 0 1.5px rgba(134,239,172,.9),0 0 24px rgba(74,222,128,.38),0 16px 44px rgba(0,0,0,.75)!important}
+.toast:not(.err):not(.warn) #toastMsg{color:#f0fdf4!important}
+.toast:not(.err):not(.warn) button{color:#f0fdf4!important;background:linear-gradient(160deg,rgba(74,222,128,.58),rgba(22,163,74,.36)),#07140c!important;box-shadow:0 0 0 1px rgba(134,239,172,.9),0 0 12px rgba(74,222,128,.45)!important}
+.toast.warn{background:rgba(22,14,4,.97)!important;box-shadow:0 0 0 1.5px var(--hot-line),0 0 24px var(--hot-glow),0 16px 44px rgba(0,0,0,.75)!important}
+.toast.warn #toastMsg{color:#fff7e0!important}
+.toast.warn .t-ic{color:#fff!important;background:var(--hot-fill),#140d04!important;box-shadow:0 0 0 1px var(--hot-line),0 0 12px var(--hot-glow)!important}
+/* v47: nada cortado no pop-up — a rolagem do pop-up ganha folga dos lados (contorno + brilho do COPIAR cabiam cortados); largura dos botões não muda */
+.sheet .sh-body{padding:6px 14px 16px!important;margin:-6px -14px 0!important}
+/* v47: aba PENDENTES no mesmo vidro vivo dos botões quentes (antes ficava apagada) */
+.seg-ind[data-v="pend"]{background:var(--hot-fill),#140d04!important;box-shadow:0 0 0 1px var(--hot-line),0 0 16px var(--hot-glow),inset 0 1px 0 rgba(255,255,255,.25)!important}
+.seg .tab.t-pend.on{text-shadow:0 1px 2px rgba(0,0,0,.45)!important}
 </style>
 </head>
 <body>
@@ -1426,7 +1440,7 @@ function lockScroll(on){
 function confirmar(t,msg,ok,fn,danger){ const c=$('#cfm'); c.classList.toggle('danger',!!danger); $('#cfmIc').innerHTML=danger?I.trash:I.clock; $('#cfmT').textContent=t; $('#cfmP').textContent=msg; $('#cfmOk').textContent=ok;
   const fechar=()=>{c.classList.remove('show');document.removeEventListener('keydown',esc_);lockScroll(false);}, esc_=e=>{if(e.key==='Escape')fechar();};
   $('#cfmOk').onclick=()=>{fechar();fn();}; $('#cfmNo').onclick=fechar; c.onclick=e=>{if(e.target===c)fechar();}; document.addEventListener('keydown',esc_); c.classList.add('show'); lockScroll(true); setTimeout(()=>$('#cfmOk').focus(),50); }
-function toast(msg,btn='',fn=null,ms){ const t=$('#toast'), err=/^(Não |Sem conexão|Senha|Falta|Tem arquivo)/.test(msg); t.classList.toggle('err',err); $('#toastIc').innerHTML=err?I.warn:fn?I.undo:I.check; $('#toastMsg').textContent=msg; const b=$('#toastBtn'); b.textContent=btn; b.onclick=fn?()=>{t.classList.remove('show');fn();}:null;
+function toast(msg,btn='',fn=null,ms){ const t=$('#toast'), err=/^(Não |Sem conexão|Senha|Falta|Tem arquivo)/.test(msg); t.classList.toggle('err',err); t.classList.toggle('warn',!err&&/^(Escolhe|Digita)/.test(msg)); /* v47 */ $('#toastIc').innerHTML=err||t.classList.contains('warn')?I.warn:fn?I.undo:I.check; $('#toastMsg').textContent=msg; const b=$('#toastBtn'); b.textContent=btn; b.onclick=fn?()=>{t.classList.remove('show');fn();}:null;
   t.classList.remove('show'); void t.offsetWidth; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),ms||(fn?8000:err?5000:4000)); } /* v43: mais tempo na tela (4 s; com botão 8 s; erro 5 s) */
 
 /* ---- v43: painéis FILMES e + NOVO POST (usam o mesmo pop-up; não mexem na lista nem consultam o banco sozinhos) ---- */
