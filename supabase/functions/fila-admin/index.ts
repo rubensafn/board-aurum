@@ -2,7 +2,8 @@
 // e PUBLICAÇÃO AUTOMÁTICA no Instagram (@aurum.cinema) dos posts APROVADOS, no dia/horário marcado (chamada por TOQUES agendados no pg_cron só nos horários de cada post aprovado: 15 min antes, na hora e +2 min — ver fila_posts_agenda).
 // O container é criado até ANTECEDENCIA_MIN minutos antes e só é publicado no minuto marcado (sem atraso).
 // Erro do Instagram: tenta de novo 1x sozinho; se falhar de novo, marca erro e avisa o Rubão no celular (ntfy, fila_config.notify_url).
-// SÓ mexe na tabela fila_posts, na fila_config (chaves meta_*/cron_key/notify_url) e no bucket fila-posts. Nunca tocar no SISTEMA DE CORTESIAS (mesmo projeto).
+// + NOVO POST (upload_sign, senha da fila) e aba FILMES (filmes: puxa do aurumcinema.com.br só quando o Rubão abre a aba).
+// SÓ mexe nas tabelas fila_posts e fila_filmes, na fila_config (chaves meta_*/cron_key/notify_url) e no bucket fila-posts. Nunca tocar no SISTEMA DE CORTESIAS (mesmo projeto).
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
@@ -274,6 +275,58 @@ Deno.serve(async (req) => {
     }
     const { error: e3 } = await sb.from("fila_posts").delete().eq("id", body.id);
     return e3 ? json({ error: e3.message }, 500) : json({ ok: true, apagados: paths.size });
+  }
+
+  if (body.action === "upload_sign") {
+    // + NOVO POST do board: o Rubão sobe o arquivo dele (senha da fila). Só na pasta manual/, nomes limpos, até 11 arquivos (10 lâminas + capa).
+    const { data: ok } = await sb.rpc("fila_ok", { p_pin: body.pin });
+    if (!ok) return json({ error: "pin" }, 401);
+    const nomes: string[] = (Array.isArray(body.nomes) ? body.nomes : []).slice(0, 11);
+    const pasta = `manual/${Date.now().toString(36)}`;
+    const out: unknown[] = [];
+    for (const n of nomes) {
+      const limpo = String(n || "arquivo").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9._-]+/g, "_").slice(-90) || "arquivo";
+      const path = `${pasta}/${Math.random().toString(36).slice(2, 8)}_${limpo}`;
+      const { data, error } = await sb.storage.from(BUCKET).createSignedUploadUrl(path, { upsert: true });
+      out.push(error ? { error: error.message } : { path, signedUrl: data.signedUrl, url: sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl });
+    }
+    return json({ urls: out });
+  }
+
+  if (body.action === "filmes") {
+    // aba FILMES: só roda quando o Rubão abre a aba. Puxa em cartaz + lançamentos do site e devolve a lista.
+    // Filme novo entra marcado; o que ele já marcou/desmarcou (mexido) NUNCA muda por causa do site.
+    const { data: ok } = await sb.rpc("fila_ok", { p_pin: body.pin });
+    if (!ok) return json({ error: "pin" }, 401);
+    const chave = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    const site = new Map<string, any>();
+    let erroSite = "";
+    try {
+      const [pr, up] = await Promise.all([
+        fetch("https://www.aurumcinema.com.br/api/programacao", { signal: AbortSignal.timeout(15000) }).then((r) => r.json()),
+        fetch("https://www.aurumcinema.com.br/api/upcoming", { signal: AbortSignal.timeout(15000) }).then((r) => r.json()),
+      ]);
+      for (const f of Array.isArray(pr) ? pr : []) {
+        const t = String(f.filme_site || f.nome_filme || "").replace(/^\((dub|leg|nac)\)\s*/i, "").trim(); if (!t) continue;
+        const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(f.data_estreia || ""));
+        const k = chave(t); if (!site.has(k)) site.set(k, { chave: k, titulo: t, poster: f.cartaz || null, estreia: m ? `${m[3]}-${m[2]}-${m[1]}` : null });
+      }
+      for (const f of (up?.items ?? []) as any[]) {
+        const t = String(f.title || "").trim(); if (!t) continue;
+        const k = chave(t); if (!site.has(k)) site.set(k, { chave: k, titulo: t, poster: f.poster || null, estreia: /^\d{4}-\d{2}-\d{2}$/.test(f.releaseDate) ? f.releaseDate : null });
+      }
+    } catch (e) { erroSite = String((e as Error).message); }
+    if (site.size) {
+      const agora = new Date().toISOString();
+      const { data: ja } = await sb.from("fila_filmes").select("chave");
+      const tem = new Set((ja ?? []).map((r: any) => r.chave));
+      const novos = [...site.values()].filter((f) => !tem.has(f.chave)).map((f) => ({ ...f, origem: "site", no_site: true, ativo: true, visto_em: agora }));
+      if (novos.length) await sb.from("fila_filmes").insert(novos);
+      for (const f of site.values()) if (tem.has(f.chave)) await sb.from("fila_filmes").update({ titulo: f.titulo, poster: f.poster, estreia: f.estreia, no_site: true, visto_em: agora }).eq("chave", f.chave).eq("origem", "site");
+      await sb.from("fila_filmes").update({ no_site: false }).eq("origem", "site").lt("visto_em", agora);
+    }
+    const { data: lista } = await sb.rpc("fila_filmes_list", { p_pin: body.pin });
+    return json({ filmes: lista ?? [], erro_site: erroSite || undefined });
   }
 
   if (body.action === "cleanup") {

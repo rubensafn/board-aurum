@@ -25,3 +25,11 @@ Formato do `lote.json` no topo de `tools/fila_push.py`. O dia e o "postado" fica
 
 ## Legenda pelo board
 - Painel da legenda: **EDITAR** (salva na hora, RPC `fila_set_legenda`, sem Claude) e **NOVA LEGENDA** (RPC `fila_pedir_legenda`, com instrução opcional). O pedido fica em `legenda_refazer`/`legenda_pedido` e a varredura agendada (11h22, 15h22, 18h22) reescreve. Trava quando o post já está indo pro Instagram.
+
+## v43 (18/11/2026)
+- **Avisos de baixo** maiores, borda dourada (vermelha quando é erro), 4 s na tela (com botão DESFAZER 8 s).
+- **+ NOVO POST** (botão dourado no topo no PC; botão redondo dourado no celular): sobe arquivo próprio (até 50 MB cada, vários = carrossel), filme, onde posta, legenda ou GERAR LEGENDA (a varredura escreve), dia/horário opcional e **selo AU ✓/✗ obrigatório**. Entra em PENDENTES (`subido=true`). Com ✓ fica `selo_pendente=true`: **a varredura precisa aplicar o selo** (fase 3, ainda não está no texto da varredura).
+  Upload: edge `fila-admin` ação `upload_sign` (senha da fila) → pasta `manual/` do bucket → RPC `fila_novo_post`.
+- **FILMES** (botão ciano no topo): tabela `fila_filmes`. Só puxa do site (`aurumcinema.com.br/api/programacao` e `/api/upcoming`) quando o Rubão abre a aba (máx. 1x a cada 10 min). Filme novo entra marcado; marcado/desmarcado pelo Rubão NUNCA muda por causa do site. A varredura vai seguir `ativo` (fase 3).
+- Abas no celular abreviadas: PEND · APROV · POST.
+- **Regra dev/main:** toda mudança vai pra dev E main juntas. Só fica só na dev quando o Rubão avisar que é mudança grande pra ver antes.

@@ -766,6 +766,130 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
 .row .capprev.vazio .clamp{height:auto;-webkit-mask-image:none;mask-image:none}
 @media (max-width:620px){.row .erro-bts{flex-direction:row!important}.row .erro-bts .aprov{flex:1 1 0!important;width:auto!important;padding:0 6px;font-size:9.5px;letter-spacing:.06em}.row .erro-bts .aprov svg{width:13px;height:13px}}
 .row .aviso.erro small{display:none}
+/* v43 (18/11): AVISOS mais fortes · + NOVO POST · aba FILMES · abas abreviadas no celular */
+.tab .sm{display:none}
+@media (max-width:480px){.tab .lg{display:none}.tab .sm{display:inline}}
+/* avisos de baixo: maiores, fundo sólido, borda dourada acesa (vermelha quando é erro), botão dourado cheio */
+.toast{min-height:56px;width:max-content;max-width:min(560px,calc(100vw - 24px));padding:10px 10px 10px 14px!important;gap:12px!important;border-radius:18px!important;font-size:14px!important;font-weight:600!important;line-height:1.3;
+  bottom:calc(env(safe-area-inset-bottom) + 22px)!important;background:rgba(20,17,10,.97)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  box-shadow:0 0 0 1.5px rgba(243,217,119,.9),0 0 24px rgba(243,217,119,.38),0 16px 44px rgba(0,0,0,.75)!important;z-index:70!important;transform:translate(-50%,24px) scale(.96)!important}
+.toast.show{transform:translate(-50%,0) scale(1)!important}
+.toast::after{display:none!important}
+.toast #toastMsg{flex:1;min-width:0;color:#fff8e4}
+.toast .t-ic{flex:none;width:30px;height:30px;border-radius:999px;display:grid;place-items:center;color:#1a1208;background:linear-gradient(135deg,#f8e08e,#d9b855 55%,#a98742);box-shadow:0 0 12px rgba(243,217,119,.6)}
+.toast .t-ic svg{width:16px;height:16px}
+.toast.err{background:rgba(26,10,12,.97)!important;box-shadow:0 0 0 1.5px rgba(252,165,165,.95),0 0 24px rgba(248,113,113,.45),0 16px 44px rgba(0,0,0,.75)!important}
+.toast.err .t-ic{color:#fff;background:linear-gradient(160deg,#f87171,#b91c1c);box-shadow:0 0 12px rgba(248,113,113,.7)}
+.toast.err #toastMsg{color:#ffe4e4}
+.toast button{flex:none;height:40px;padding:0 16px!important;border-radius:12px!important;font-size:11px!important;letter-spacing:.12em!important;color:#1a1208!important;
+  background:linear-gradient(150deg,rgba(255,255,255,.4),rgba(255,255,255,0) 45%),linear-gradient(135deg,#f8e08e,#d9b855 55%,#a98742)!important;box-shadow:0 0 14px rgba(243,217,119,.45)!important}
+.toast button:active{transform:scale(.95)}
+@media (max-width:759px){.toast{bottom:calc(env(safe-area-inset-bottom) + 18px)!important;font-size:13.5px!important}}
+
+/* botões do topo: FILMES (ciano) e + NOVO POST (dourado) */
+.hbtn{flex:none;height:38px;padding:0 13px;border-radius:999px;display:flex;align-items:center;gap:7px;font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.12em;white-space:nowrap}
+.hbtn svg{width:16px;height:16px;flex:none}
+.hfilmes{color:#e6fbff;background:linear-gradient(160deg,rgba(103,232,249,.38),rgba(8,145,178,.22));box-shadow:0 0 0 1px rgba(165,243,252,.75),0 0 12px rgba(103,232,249,.35),inset 0 1px 0 rgba(255,255,255,.16)}
+.hfilmes svg{color:#a5f3fc;filter:drop-shadow(0 0 6px rgba(103,232,249,.8))}
+.hnovo{color:#1a1208;background:linear-gradient(150deg,rgba(255,255,255,.4),rgba(255,255,255,0) 45%),linear-gradient(135deg,#f8e08e,#d9b855 55%,#a98742);box-shadow:0 0 0 1px rgba(255,240,190,.8),0 0 14px rgba(243,217,119,.45)}
+.hbtn:active{transform:scale(.95)}
+.fabnovo{display:none}
+@media (max-width:759px){
+  .hnovo{display:none}
+  .hfilmes{width:36px;height:36px;padding:0;justify-content:center}.hfilmes span{display:none}
+  .fabnovo:not([hidden]){display:grid;place-items:center;position:fixed;right:14px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:45;width:50px;height:50px;border-radius:999px;color:#1a1208;
+    background:linear-gradient(150deg,rgba(255,255,255,.42),rgba(255,255,255,0) 45%),linear-gradient(135deg,#f8e08e,#d9b855 55%,#a98742);box-shadow:0 0 0 1.5px rgba(255,240,190,.85),0 0 16px rgba(243,217,119,.5),0 10px 26px rgba(0,0,0,.55);transition:transform .15s,opacity .2s}
+  .fabnovo svg{width:24px;height:24px}
+  .fabnovo:active{transform:scale(.93)}
+  body:has(.sheet.open) .fabnovo,body:has(.cfm.show) .fabnovo,body:has(.toast.show) .fabnovo{opacity:0;pointer-events:none}
+  .list{padding-bottom:144px}
+}
+
+/* painéis FILMES e NOVO POST (mesmo pop-up do board) */
+.pn-body>*{flex:none!important;align-self:stretch}
+.pn-body .on{position:relative}
+.pn-body .on::before{display:none!important}
+.pn-row2 .field::placeholder{letter-spacing:.02em;text-transform:none}
+.pn-note{font-size:12.5px;line-height:1.45;color:var(--ink-2);margin:0}
+.pn-note b{color:var(--gold)}
+.pn-sec{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.16em;color:var(--mute);margin:6px 2px -4px;display:flex;align-items:center;gap:8px}
+.pn-sec i{font-style:normal;font-family:var(--body);font-weight:600;color:var(--ink-2);letter-spacing:.02em}
+.pn-row2{display:flex;gap:8px;align-items:stretch}
+.pn-row2 .field{margin:0;height:46px;text-align:left;font-size:15px;letter-spacing:.02em;flex:1;min-width:0}
+.pn-row2 .act{height:46px;flex:none;padding:0 16px}
+.fl-list{display:flex;flex-direction:column;gap:8px}
+.flrow{display:flex;align-items:center;gap:8px;border-radius:16px;background:rgba(255,255,255,.04);box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+.flrow.on{background:rgba(74,222,128,.07);box-shadow:0 0 0 1px rgba(74,222,128,.45)}
+.fltog{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:8px 10px;text-align:left;min-height:64px}
+.fltog img,.fltog .ph{width:36px;height:52px;border-radius:7px;object-fit:cover;flex:none;background:rgba(255,255,255,.06)}
+.flrow:not(.on) .fltog img,.flrow:not(.on) .fltog .ph{filter:grayscale(1);opacity:.45}
+.flt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.flt b{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.flrow:not(.on) .flt b{color:var(--mute);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25)}
+.flt small{font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--mute)}
+.flt small.c{color:#86efac}.flt small.b{color:#a5f3fc}.flt small.m{color:var(--gold)}
+.sw{flex:none;width:46px;height:28px;border-radius:999px;position:relative;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:999px;background:#d4d4d8;transition:transform .2s,background .2s}
+.flrow.on .sw{background:linear-gradient(135deg,#4ade80,#16a34a);box-shadow:0 0 10px rgba(74,222,128,.5)}
+.flrow.on .sw::after{transform:translateX(18px);background:#fff}
+.flx{flex:none;width:40px;height:40px;margin-right:8px;border-radius:12px;display:grid;place-items:center;color:#fecaca;background:rgba(248,113,113,.14);box-shadow:0 0 0 1px rgba(252,165,165,.5)}
+.flx svg{width:16px;height:16px}
+.fl-empty{font-size:12.5px;color:var(--mute);padding:6px 4px}
+.fl-load{height:64px;border-radius:16px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.09),rgba(255,255,255,.04));background-size:200% 100%;animation:shim 1.2s linear infinite}
+@keyframes shim{to{background-position:-200% 0}}
+
+.nv-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:110px;border-radius:18px;cursor:pointer;text-align:center;padding:14px;
+  border:1.5px dashed rgba(243,217,119,.6);background:rgba(243,217,119,.06);color:#fff3cf;font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.12em}
+.nv-drop svg{width:26px;height:26px;color:var(--gold)}
+.nv-drop small{font-family:var(--body);font-weight:500;font-size:11.5px;letter-spacing:0;color:var(--mute)}
+.nv-files{display:flex;gap:8px;overflow-x:auto;padding:2px;scrollbar-width:none}
+.nv-files::-webkit-scrollbar{display:none}
+.nv-f{position:relative;flex:none;width:84px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.05);box-shadow:0 0 0 1px rgba(255,255,255,.12)}
+.nv-f img{display:block;width:100%;height:112px;object-fit:cover}
+.nv-f span{display:block;font-size:10px;font-weight:600;padding:4px 6px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nv-f.bad{box-shadow:0 0 0 1.5px #f87171}.nv-f.bad span{color:#fca5a5}
+.nv-f .rm{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:999px;display:grid;place-items:center;background:rgba(0,0,0,.7);color:#fff}
+.nv-f .rm svg{width:13px;height:13px}
+.nv-f .vd{position:absolute;left:5px;top:5px;font-size:9px;font-weight:800;letter-spacing:.1em;padding:2px 5px;border-radius:5px;background:rgba(0,0,0,.65);color:#fff}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px}
+.chips::-webkit-scrollbar{display:none}
+.chips.cwrap{flex-wrap:wrap;overflow:visible;align-items:center}
+.chips{justify-content:flex-start}
+.chip{flex:none;height:40px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--ink-2);background:rgba(255,255,255,.05);box-shadow:0 0 0 1px rgba(255,255,255,.14);white-space:nowrap}
+.chip.on{color:#1a1208;background:linear-gradient(135deg,#f8e08e,#d9b855 55%,#a98742);box-shadow:0 0 0 1px rgba(255,240,190,.8),0 0 12px rgba(243,217,119,.4)}
+.chip.d{font-family:var(--display);font-weight:700;font-size:10.5px;letter-spacing:.1em}
+.chip.st.on{color:#fff;background:linear-gradient(135deg,#fb7185,#be123c);box-shadow:0 0 0 1px rgba(253,164,175,.8),0 0 12px rgba(251,113,133,.45)}
+.chip.fs.on{color:#fff;background:linear-gradient(135deg,#67e8f9,#0891b2 50%,#fb7185);box-shadow:0 0 0 1px rgba(165,243,252,.8),0 0 12px rgba(103,232,249,.4)}
+.chip[disabled]{opacity:.35}
+.nv-in{width:100%;height:46px;border-radius:14px;padding:0 14px;font-size:15px;color:#fff;border:0;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.nv-in::placeholder,.nv-ta::placeholder{color:var(--mute)}
+.nv-ta{width:100%;min-height:130px;resize:vertical;border-radius:14px;padding:12px 14px;font:15px/1.45 var(--body);color:#fff;border:0;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.nv-ta.ped{min-height:80px}
+.nv-in:focus,.nv-ta:focus{outline:none;box-shadow:inset 0 0 0 1.5px rgba(243,217,119,.7)}
+.nv-gerar{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border-radius:14px;text-align:left;background:rgba(167,139,250,.08);box-shadow:0 0 0 1px rgba(196,181,253,.35)}
+.nv-gerar.on{background:rgba(167,139,250,.2);box-shadow:0 0 0 1.5px rgba(196,181,253,.9),0 0 12px rgba(167,139,250,.35)}
+.nv-gerar b{display:block;font-family:var(--display);font-size:11px;letter-spacing:.12em;color:#ddd6fe}
+.nv-gerar small{display:block;font-size:11.5px;color:var(--ink-2);margin-top:2px}
+.nv-gerar .ck{flex:none;width:24px;height:24px;border-radius:8px;display:grid;place-items:center;box-shadow:inset 0 0 0 1.5px rgba(196,181,253,.7)}
+.nv-gerar.on .ck{background:#8b5cf6;box-shadow:none;color:#fff}
+.nv-gerar .ck svg{width:15px;height:15px}
+.nv-selo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nv-selo button{height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.12em;color:var(--ink-2);background:rgba(255,255,255,.05);box-shadow:0 0 0 1px rgba(255,255,255,.16)}
+.nv-selo .au-m{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(135deg,#f3d977,#d9b855 55%,#a98742)}
+.nv-selo .au-m svg{width:18px;height:14px}
+.nv-selo .au-m path{fill:#1a1208}
+.nv-selo b{font-size:20px;line-height:1}
+.nv-selo .sim.on{color:#fff;background:rgba(74,222,128,.16);box-shadow:0 0 0 1.5px #4ade80,0 0 14px rgba(74,222,128,.4)}
+.nv-selo .sim b{color:#4ade80}
+.nv-selo .nao.on{color:#fff;background:rgba(248,113,113,.16);box-shadow:0 0 0 1.5px #f87171,0 0 14px rgba(248,113,113,.4)}
+.nv-selo .nao b{color:#f87171}
+.nv-selo.falta button{box-shadow:0 0 0 1.5px rgba(251,191,36,.7)}
+.nv-falta{font-size:12px;color:#fcd34d;text-align:center;margin:-2px 0 0}
+.nv-prog{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.nv-prog i{display:block;height:100%;background:linear-gradient(90deg,#f3d977,#fb7185,#a78bfa);border-radius:inherit;transition:width .2s}
+.nv-go{height:52px!important;font-size:12px!important}
+.pill.sub{color:#a5f3fc;box-shadow:0 0 0 1px rgba(103,232,249,.45);background:rgba(103,232,249,.08)}
+.pill.selo{color:#fde68a;box-shadow:0 0 0 1px rgba(243,217,119,.55);background:rgba(243,217,119,.1)}
 </style>
 </head>
 <body>
@@ -776,21 +900,24 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
   <div class="bar glass">
     <div class="brand"><button type="button" class="au" id="logo" aria-label="Voltar pro topo" title="Voltar pro topo"></button></div>
     <div class="seg" role="tablist"><span class="seg-ind" id="segInd" aria-hidden="true"></span>
-      <button class="tab t-pend on" id="tab-pend" role="tab">PENDENTES <b id="c-pend">0</b></button>
-      <button class="tab t-apr" id="tab-apr" role="tab">APROVADOS <b id="c-apr">0</b></button>
-      <button class="tab t-done" id="tab-done" role="tab">POSTADOS <b id="c-done">0</b></button>
+      <button class="tab t-pend on" id="tab-pend" role="tab"><span class="lg">PENDENTES</span><span class="sm">PEND</span> <b id="c-pend">0</b></button>
+      <button class="tab t-apr" id="tab-apr" role="tab"><span class="lg">APROVADOS</span><span class="sm">APROV</span> <b id="c-apr">0</b></button>
+      <button class="tab t-done" id="tab-done" role="tab"><span class="lg">POSTADOS</span><span class="sm">POST</span> <b id="c-done">0</b></button>
     </div>
+    <button class="hbtn hfilmes" id="btnFilmes" data-act="filmes" aria-label="Filmes" title="Filmes da varredura"></button>
+    <button class="hbtn hnovo" id="btnNovo" data-act="novo" aria-label="Novo post" title="Subir um post seu"></button>
     <button class="icon-btn" id="logout" aria-label="Sair" title="Sair"></button>
   </div>
 </header>
 <div class="daysbar"><nav class="days" id="days" aria-label="Filtrar por dia"></nav><button class="clearall" id="clrAll" data-act="clearall" aria-label="Apagar todos os postados" title="Apagar todos os postados" hidden></button></div>
 <button class="fchip glass" id="fchip" data-act="fsheet" aria-label="Filtrar por dia"></button>
 <button class="fab" id="fab" data-act="fsheet" aria-label="Filtrar por dia" hidden></button>
+<button class="fabnovo" id="fabNovo" data-act="novo" aria-label="Novo post" hidden></button>
 <main class="wrap"><div class="list" id="list"></div></main>
 <div class="sheet-bg" id="sheetBg"></div>
 <section class="sheet glass" id="sheet" role="dialog" aria-modal="true" aria-label="Detalhes do post"></section>
 <div class="cfm" id="cfm" role="alertdialog" aria-modal="true" aria-labelledby="cfmT"><div class="cfm-box glass"><span class="cfm-ic" id="cfmIc"></span><b id="cfmT"></b><p id="cfmP"></p><div class="cfm-bt"><button class="act" id="cfmNo">CANCELAR</button><button class="act primary" id="cfmOk"></button></div></div></div>
-<div class="toast glass" id="toast" role="status" aria-live="polite"><span id="toastMsg"></span><button id="toastBtn"></button></div>
+<div class="toast glass" id="toast" role="status" aria-live="polite"><span class="t-ic" id="toastIc"></span><span id="toastMsg"></span><button id="toastBtn"></button></div>
 
 <script>
 const SB_URL='https://gdtfwmqbvsqtxtccrydv.supabase.co', SB_KEY='sb_publishable_siBXDugL8v3hXhCEfZHW9g_WBln-WFt';
@@ -811,7 +938,11 @@ const I={
   undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>',
   out:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h3a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg>',
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>',
-  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>'
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>',
+  film:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>',
+  info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 11v6M12 7.5v.5"/></svg>'
 };
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -893,8 +1024,8 @@ function rowHTML(p){
     <div class="info">
       <div class="l1"><span class="num">${esc(pad(p.num??0))}</span><span class="film">${esc(p.filme||p.nome||'Post')}</span></div>
       <div class="fname">${esc(p.nome||'')}</div>
-      <div class="meta">${p.manual&&!p.postado?'<span class="pill man">VOCÊ POSTA</span>':''}${dayPill}${horaPill}${destPills}${stPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.legenda_refazer&&!p.postado?'<span class="pill apr">NOVA LEGENDA PEDIDA</span>':''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
-      ${p.aviso&&!p.postado?`<div class="aviso">${I.hand}<span>${esc(p.aviso)}</span></div>`:''}
+      <div class="meta">${p.manual&&!p.postado?'<span class="pill man">VOCÊ POSTA</span>':''}${p.subido&&!p.postado?'<span class="pill sub">SEU POST</span>':''}${p.selo_pendente&&!p.postado?'<span class="pill selo">SELO AU PEDIDO</span>':''}${dayPill}${horaPill}${destPills}${stPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.legenda_refazer&&!p.postado?'<span class="pill apr">NOVA LEGENDA PEDIDA</span>':''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
+      ${p.aviso&&!p.postado?`<div class="aviso">${I.hand}<span>${esc(p.aviso)}</span></div>`:p.selo_pendente&&!p.postado?`<div class="aviso">${I.hand}<span>Selo AU pedido: entra na próxima varredura (11h, 15h ou 18h). Se o post sair antes, vai sem selo.</span></div>`:''}
       ${destFixo(p)==='story'&&!c?`<div class="capprev vazio"><span class="clamp"><i>Story · não leva legenda</i></span></div>`:p.ig_status==='erro'&&!p.postado?'':`<button class="capprev" data-act="cap" data-id="${esc(p.id)}"><span class="clamp">${c?esc(c):'<i>Sem legenda</i>'}</span><span class="more">VER LEGENDA ›</span></button>`}
       ${erroBox}${erroActs}${aprov}<div class="acts">${acts}</div>
     </div>
@@ -1228,11 +1359,141 @@ function lockScroll(on){
 function confirmar(t,msg,ok,fn,danger){ const c=$('#cfm'); c.classList.toggle('danger',!!danger); $('#cfmIc').innerHTML=danger?I.trash:I.clock; $('#cfmT').textContent=t; $('#cfmP').textContent=msg; $('#cfmOk').textContent=ok;
   const fechar=()=>{c.classList.remove('show');document.removeEventListener('keydown',esc_);lockScroll(false);}, esc_=e=>{if(e.key==='Escape')fechar();};
   $('#cfmOk').onclick=()=>{fechar();fn();}; $('#cfmNo').onclick=fechar; c.onclick=e=>{if(e.target===c)fechar();}; document.addEventListener('keydown',esc_); c.classList.add('show'); lockScroll(true); setTimeout(()=>$('#cfmOk').focus(),50); }
-function toast(msg,btn='',fn=null,ms){ const t=$('#toast'); $('#toastMsg').textContent=msg; const b=$('#toastBtn'); b.textContent=btn; b.onclick=fn?()=>{t.classList.remove('show');fn();}:null; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),ms||(fn?5000:2200)); }
+function toast(msg,btn='',fn=null,ms){ const t=$('#toast'), err=/^(Não |Sem conexão|Senha|Falta|Tem arquivo)/.test(msg); t.classList.toggle('err',err); $('#toastIc').innerHTML=err?I.warn:fn?I.undo:I.check; $('#toastMsg').textContent=msg; const b=$('#toastBtn'); b.textContent=btn; b.onclick=fn?()=>{t.classList.remove('show');fn();}:null;
+  t.classList.remove('show'); void t.offsetWidth; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),ms||(fn?8000:err?5000:4000)); } /* v43: mais tempo na tela (4 s; com botão 8 s; erro 5 s) */
+
+/* ---- v43: painéis FILMES e + NOVO POST (usam o mesmo pop-up; não mexem na lista nem consultam o banco sozinhos) ---- */
+const EDGE=SB_URL+'/functions/v1/fila-admin';
+async function edge(body){ const r=await fetch(EDGE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); const j=await r.json().catch(()=>({})); if(r.status===401){const e=new Error('pin');e.code='28000';throw e;} if(!r.ok||j.error) throw new Error(j.error||r.status); return j; }
+const chaveFilme=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+function openPanel(kind,html){ S.panel=kind; $('#sheet').innerHTML=html; $('#sheet').classList.add('open'); $('#sheetBg').classList.add('open'); lockScroll(true); }
+function panelBody(html){ const b=$('#sheet .sh-body'); if(b&&S.panel) b.innerHTML=html; }
+function closePanel(){ if(!S.panel) return; if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); S.panel=null; $('#sheet').classList.remove('open'); $('#sheetBg').classList.remove('open'); lockScroll(false);
+  setTimeout(()=>{ if(!S.sheet&&!S.fsheet&&!S.panel) $('#sheet').innerHTML=''; },320); }
+const panelHead=(t,sub)=>`<div class="grab"></div><div class="sh-head"><span class="film">${t}${sub?`<small class="fname sh">${sub}</small>`:''}</span><button class="icon-btn glass" data-act="pclose" aria-label="Fechar">${I.x}</button></div>`;
+
+/* FILMES: puxa do site só quando abre (no máx. 1x a cada 10 min); marcar/desmarcar salva na hora e o site nunca muda a sua escolha */
+async function carregarFilmes(forcar){
+  if(!forcar&&S.filmes&&Date.now()-(S.filmesAt||0)<600e3) return S.filmes;
+  const r=await edge({action:'filmes',pin:S.pin}); S.filmes=r.filmes||[]; S.filmesAt=Date.now(); S.filmesErro=r.erro_site||''; return S.filmes;
+}
+function filmesHTML(){
+  const add=`<p class="pn-note">A varredura só puxa post dos filmes <b>marcados</b>. O que você desmarcar fica desmarcado, mesmo quando o site atualizar. Filme novo do site chega marcado.</p>
+    <div class="pn-row2"><input class="field" id="flin" placeholder="Adicionar filme (cultural, evento…)" maxlength="120" enterkeyhint="done" aria-label="Nome do filme"><button class="act primary" data-act="fladd">${I.plus} ADICIONAR</button></div>`;
+  if(!S.filmes) return add+'<div class="fl-list"><div class="fl-load"></div><div class="fl-load"></div><div class="fl-load"></div></div>';
+  const t=today(), fs=S.filmes, dt=d=>d?d.slice(8,10)+'.'+d.slice(5,7):'';
+  const cart=fs.filter(f=>f.origem!=='manual'&&(!f.estreia||f.estreia<=t)), lanc=fs.filter(f=>f.origem!=='manual'&&f.estreia&&f.estreia>t).sort((a,b)=>a.estreia.localeCompare(b.estreia)), man=fs.filter(f=>f.origem==='manual');
+  const row=f=>`<div class="flrow${f.ativo?' on':''}"><button class="fltog" data-act="fltog" data-k="${esc(f.chave)}" aria-pressed="${!!f.ativo}">${f.poster?`<img src="${esc(f.poster)}" alt="" loading="lazy" onerror="this.outerHTML='<span class=ph></span>'">`:'<span class="ph"></span>'}
+      <span class="flt"><b>${esc(f.titulo)}</b>${f.origem==='manual'?'<small class="m">ADICIONADO POR VOCÊ</small>':f.estreia&&f.estreia>t?`<small class="b">ESTREIA ${dt(f.estreia)}</small>`:`<small class="c">EM CARTAZ${f.estreia?' · DESDE '+dt(f.estreia):''}</small>`}</span><span class="sw" aria-hidden="true"></span></button>
+      ${f.origem==='manual'?`<button class="flx" data-act="fldel" data-k="${esc(f.chave)}" aria-label="Tirar ${esc(f.titulo)} da lista">${I.x}</button>`:''}</div>`;
+  const sec=(n,arr)=>arr.length?`<div class="pn-sec">${n} <i>${arr.filter(f=>f.ativo).length}/${arr.length}</i></div><div class="fl-list">${arr.map(row).join('')}</div>`:'';
+  return add+(S.filmesErro?`<div class="fl-empty">Não consegui ler o site agora. Mostrando a última lista salva.</div>`:'')+(fs.length?sec('EM CARTAZ',cart)+sec('LANÇAMENTOS',lanc)+sec('SEUS FILMES',man):'<div class="fl-empty">Nenhum filme ainda.</div>');
+}
+async function abrirFilmes(){
+  openPanel('filmes',panelHead('FILMES','O que a varredura pode postar')+`<div class="sh-body pn-body">${filmesHTML()}</div>`);
+  try{ await carregarFilmes(); if(S.panel==='filmes') panelBody(filmesHTML()); }
+  catch(e){ if(e.code==='28000'){closePanel();logout('Senha inválida');return;} if(S.panel==='filmes'){ S.filmes=S.filmes||[]; S.filmesErro='x'; panelBody(filmesHTML()); } toast('Não carregou os filmes. Tenta de novo.'); }
+}
+async function filmeToggle(k){
+  const f=(S.filmes||[]).find(x=>x.chave===k); if(!f) return; f.ativo=!f.ativo; f.mexido=true; panelBody(filmesHTML());
+  try{ await rpc('fila_filme_set',{p_pin:S.pin,p_chave:k,p_ativo:f.ativo}); toast(f.ativo?f.titulo+' marcado · a varredura pode postar':f.titulo+' desmarcado · a varredura não posta'); }
+  catch(_){ f.ativo=!f.ativo; panelBody(filmesHTML()); toast('Não salvou. Tenta de novo.'); }
+}
+async function filmeAdd(){
+  const i=$('#flin'), t=(i&&i.value||'').trim(), k=chaveFilme(t); if(!k){ toast('Digita o nome do filme'); if(i) i.focus(); return; }
+  try{ await rpc('fila_filme_add',{p_pin:S.pin,p_chave:k,p_titulo:t});
+    const ja=(S.filmes||[]).find(x=>x.chave===k); if(ja){ ja.ativo=true; } else (S.filmes=S.filmes||[]).push({chave:k,titulo:t,origem:'manual',ativo:true,mexido:true,no_site:false});
+    panelBody(filmesHTML()); toast(t+' adicionado'); }
+  catch(_){ toast('Não salvou. Tenta de novo.'); }
+}
+async function filmeDel(k){
+  const f=(S.filmes||[]).find(x=>x.chave===k); if(!f) return;
+  confirmar('TIRAR DA LISTA?',f.titulo+' sai da lista de filmes. A varredura para de puxar post dele.','TIRAR',async()=>{
+    try{ await rpc('fila_filme_del',{p_pin:S.pin,p_chave:k}); S.filmes=S.filmes.filter(x=>x.chave!==k); panelBody(filmesHTML()); toast(f.titulo+' saiu da lista'); }
+    catch(_){ toast('Não apagou. Tenta de novo.'); } },true);
+}
+
+/* + NOVO POST: você sobe o seu arquivo; entra em PENDENTES e segue o fluxo normal (aprovar → posta sozinho) */
+const NV_MAX=50*1024*1024;
+const nvNovo=()=>({files:[],filme:'',outro:false,destino:'',dia:'',hora:'',leg:'',gerar:false,pedido:'',selo:null,busy:false,prog:0,tentou:false});
+const mb=b=>(b/1048576).toFixed(b<10485760?1:0).replace('.',',')+' MB';
+function nvFixo(){ const fs=S.nv.files; if(!fs.length) return null; return destFixo({arquivos:fs.map(f=>({kind:f.kind,w:f.w,h:f.h,nome:f.nome}))}); }
+function nvFalta(){ const n=S.nv, f=[]; if(!n.files.length) f.push('arquivo'); else if(n.files.some(x=>x.bad)) f.push('tirar o arquivo acima de 50 MB');
+  if(!n.filme.trim()) f.push('filme'); if(!(nvFixo()||n.destino)) f.push('destino');
+  if((nvFixo()||n.destino)!=='story'&&!n.leg.trim()&&!n.gerar) f.push('legenda (ou GERAR LEGENDA)');
+  if(n.selo===null) f.push('selo AU'); return f; }
+function novoHTML(){
+  const n=S.nv, fx=nvFixo(), dest=fx||n.destino, falta=nvFalta();
+  if(fx&&n.destino!==fx) n.destino=fx;
+  const ativos=(S.filmes||[]).filter(f=>f.ativo).map(f=>f.titulo);
+  const nomes=[...new Set(ativos)];
+  const days=[]; for(let i=0;i<5;i++){ const d=new Date(); d.setDate(d.getDate()+i); const k=iso(d), pp=parts(k); days.push({k,w:i===0?'HOJE':i===1?'AMANHÃ':pp.w+' '+pp.d}); }
+  const filmeOn=n.filme&&nomes.includes(n.filme);
+  return `${n.files.length?`<div class="nv-files">${n.files.map((f,i)=>`<div class="nv-f${f.bad?' bad':''}">${f.thumb?`<img src="${esc(f.thumb)}" alt="">`:'<img alt="">'}${f.kind==='video'?'<span class="vd">VÍDEO</span>':''}<button class="rm" data-act="nvrm" data-i="${i}" aria-label="Tirar arquivo">${I.x}</button><span>${f.bad?'ACIMA DE 50 MB':esc(mb(f.file.size))}</span></div>`).join('')}</div>`:''}
+    <label class="nv-drop">${I.up}<span>${n.files.length?'TROCAR / ADICIONAR ARQUIVOS':'ESCOLHER ARQUIVO'}</span><small>Imagem ou vídeo · até 50 MB cada · vários = carrossel</small><input type="file" id="nvfile" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" multiple hidden></label>
+    <div class="pn-sec">FILME</div>
+    <div class="chips">${nomes.map(t=>`<button class="chip${n.filme===t&&!n.outro?' on':''}" data-act="nvfilme" data-t="${esc(t)}">${esc(t)}</button>`).join('')}<button class="chip${n.outro||(n.filme&&!filmeOn)?' on':''}" data-act="nvoutro">OUTRO</button></div>
+    ${n.outro||(n.filme&&!filmeOn)?`<input class="nv-in" id="nvfilmein" placeholder="Nome do filme" value="${esc(n.filme)}" maxlength="120" aria-label="Nome do filme">`:''}
+    <div class="pn-sec">ONDE POSTA</div>
+    <div class="chips cwrap">${fx?`<button class="chip d on${fx==='story'?' st':''}" disabled style="opacity:1">${fx==='story'?'SÓ STORY':'SÓ FEED'}</button><span class="fl-empty">${fx==='story'?'Imagem 9:16 vai só no Story.':'Esse formato vai só no feed.'}</span>`
+      :`<button class="chip d${dest==='feed'?' on':''}" data-act="nvdest" data-v="feed">FEED</button><button class="chip d st${dest==='story'?' on':''}" data-act="nvdest" data-v="story">STORY</button><button class="chip d fs${dest==='feed_story'?' on':''}" data-act="nvdest" data-v="feed_story">FEED + STORY</button>`}</div>
+    ${dest==='story'?'':`<div class="pn-sec">LEGENDA</div>
+    <button class="nv-gerar${n.gerar?' on':''}" data-act="nvgerar"><span class="ck">${n.gerar?I.check:''}</span><span><b>GERAR LEGENDA</b><small>A próxima varredura (11h, 15h ou 18h) escreve pra você</small></span></button>
+    ${n.gerar?`<textarea class="nv-ta ped" id="nvped" placeholder="O que a legenda precisa dizer? (opcional)" aria-label="Pedido da legenda">${esc(n.pedido)}</textarea>`:`<textarea class="nv-ta" id="nvleg" placeholder="Escreve a legenda aqui" aria-label="Legenda">${esc(n.leg)}</textarea>`}`}
+    <div class="pn-sec">DIA E HORÁRIO <i>(pode escolher depois no card)</i></div>
+    <div class="chips">${days.map(d=>`<button class="chip d${n.dia===d.k?' on':''}" data-act="nvdia" data-d="${d.k}">${d.w}</button>`).join('')}</div>
+    <div class="chips">${HORAS.map(h=>`<button class="chip d${n.hora===h?' on':''}" data-act="nvhora" data-h="${h}">${h}</button>`).join('')}<input class="nv-in" type="time" id="nvhorain" value="${esc(HORAS.includes(n.hora)?'':n.hora)}" style="width:120px;flex:none;color-scheme:dark" aria-label="Outro horário"></div>
+    <div class="pn-sec">SELO AU <i>(obrigatório escolher)</i></div>
+    <div class="nv-selo${n.tentou&&n.selo===null?' falta':''}"><button class="sim${n.selo===true?' on':''}" data-act="nvselo" data-v="1"><span class="au-m">${AU}</span><b>✓</b></button><button class="nao${n.selo===false?' on':''}" data-act="nvselo" data-v="0"><span class="au-m">${AU}</span><b>✗</b></button></div>
+    ${n.selo===true?'<p class="pn-note">Com selo: a próxima varredura coloca o AU no arquivo. Aprova depois que o selo entrar.</p>':''}
+    ${n.busy?`<div class="nv-prog"><i style="width:${Math.round(n.prog*100)}%"></i></div><p class="pn-note" style="text-align:center">Subindo… ${Math.round(n.prog*100)}% · não fecha o board</p>`:''}
+    <button class="act primary nv-go" data-act="nvgo" ${n.busy?'disabled':''}>${I.up} ${n.busy?'SUBINDO…':'SUBIR POST'}</button>
+    ${falta.length&&n.tentou?`<p class="nv-falta">Falta: ${falta.join(' · ')}</p>`:''}`;
+}
+async function abrirNovo(){
+  if(!S.nv) S.nv=nvNovo();
+  openPanel('novo',panelHead('NOVO POST','Entra em PENDENTES · você aprova e ele posta sozinho')+`<div class="sh-body pn-body">${novoHTML()}</div>`);
+  if(!S.filmes){ try{ await carregarFilmes(); if(S.panel==='novo') nvRender(); }catch(_){ } }
+}
+function nvRender(){ const b=$('#sheet .sh-body'); const y=b?b.scrollTop:0; panelBody(novoHTML()); const b2=$('#sheet .sh-body'); if(b2) b2.scrollTop=y; }
+function lerMidia(file){ return new Promise(res=>{
+  const url=URL.createObjectURL(file), kind=/^video\//.test(file.type)||/\.(mp4|mov)$/i.test(file.name)?'video':'image';
+  const out={file,kind,nome:file.name,url,bad:file.size>NV_MAX};
+  if(kind==='image'){ const im=new Image(); im.onload=()=>{ out.w=im.naturalWidth; out.h=im.naturalHeight; out.thumb=url; res(out); }; im.onerror=()=>{ out.thumb=url; res(out); }; im.src=url; return; }
+  const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; let feito=false;
+  const fim=()=>{ if(feito) return; feito=true; res(out); }; setTimeout(fim,8000);
+  v.onloadedmetadata=()=>{ out.w=v.videoWidth; out.h=v.videoHeight; v.currentTime=Math.min(.5,(v.duration||1)/2); };
+  v.onseeked=()=>{ try{ const c=document.createElement('canvas'), k=Math.min(1,720/(v.videoWidth||720)); c.width=Math.round((v.videoWidth||720)*k); c.height=Math.round((v.videoHeight||1280)*k);
+      c.getContext('2d').drawImage(v,0,0,c.width,c.height); out.thumb=c.toDataURL('image/jpeg',.82); c.toBlob(b=>{ out.posterBlob=b; fim(); },'image/jpeg',.85); }catch(_){ fim(); } };
+  v.onerror=fim; v.src=url; }); }
+async function nvArquivos(list){
+  const novos=await Promise.all([...list].slice(0,10).map(lerMidia));
+  S.nv.files=S.nv.files.concat(novos).slice(0,10); if(nvFixo()) S.nv.destino=nvFixo(); nvRender();
+  if(novos.some(f=>f.bad)) toast('Tem arquivo acima de 50 MB. Esse não sobe.');
+}
+function putArquivo(url,blob,type,onp){ return new Promise((ok,ko)=>{ const x=new XMLHttpRequest(); x.open('PUT',url); x.setRequestHeader('Content-Type',type||'application/octet-stream'); x.setRequestHeader('x-upsert','true');
+  x.upload.onprogress=e=>{ if(e.lengthComputable) onp(e.loaded); }; x.onload=()=>x.status<300?ok():ko(new Error('upload '+x.status)); x.onerror=()=>ko(new Error('rede')); x.send(blob); }); }
+async function nvSubir(){
+  const n=S.nv; n.tentou=true; const falta=nvFalta(); if(falta.length){ nvRender(); toast('Falta: '+falta.join(', ')); return; }
+  n.busy=true; n.prog=0; nvRender();
+  try{
+    const ups=[]; n.files.forEach((f,i)=>{ ups.push({i,tipo:'f',blob:f.file,type:f.file.type||(f.kind==='video'?'video/mp4':'image/jpeg'),nome:f.nome}); if(f.kind==='video'&&f.posterBlob) ups.push({i,tipo:'p',blob:f.posterBlob,type:'image/jpeg',nome:f.nome.replace(/\.[^.]+$/,'')+'_THUMB.jpg'}); });
+    const sg=await edge({action:'upload_sign',pin:S.pin,nomes:ups.map(u=>u.nome)});
+    const total=ups.reduce((a,u)=>a+u.blob.size,0)||1, feito=new Array(ups.length).fill(0);
+    for(let k=0;k<ups.length;k++){ const s=sg.urls[k]; if(!s||s.error) throw new Error('assinatura'); ups[k].path=s.path; ups[k].pub=s.url;
+      await putArquivo(s.signedUrl,ups[k].blob,ups[k].type,l=>{ feito[k]=l; n.prog=feito.reduce((a,b)=>a+b,0)/total; const pi=$('.nv-prog i'); if(pi) pi.style.width=Math.round(n.prog*100)+'%'; }); feito[k]=ups[k].blob.size; }
+    const arquivos=n.files.map((f,i)=>{ const a=ups.find(u=>u.i===i&&u.tipo==='f'), p=ups.find(u=>u.i===i&&u.tipo==='p');
+      const o={kind:f.kind,url:a.pub,path:a.path,nome:a.path.split('/').pop()}; if(f.w&&f.h){o.w=f.w;o.h=f.h;} o.poster=f.kind==='video'?(p?p.pub:''):a.pub; if(p) o.poster_path=p.path; return o; });
+    const dest=nvFixo()||n.destino;
+    await rpc('fila_novo_post',{p_pin:S.pin,p_filme:n.filme.trim(),p_arquivos:arquivos,p_legenda:dest==='story'||n.gerar?null:n.leg,p_pedir_legenda:dest!=='story'&&n.gerar,p_pedido:n.gerar?n.pedido:null,p_destino:dest,p_dia:n.dia||null,p_hora:n.hora||null,p_selo:n.selo});
+    n.files.forEach(f=>{ try{URL.revokeObjectURL(f.url);}catch(_){} }); S.nv=null; closePanel();
+    toast('Post subido · está em PENDENTES'); S.sig=''; if(S.view!=='pend') goView('pend'); setTimeout(load,350);
+  }catch(e){ n.busy=false; if(e.code==='28000'){closePanel();logout('Senha inválida');return;} nvRender(); toast('Não subiu. Confere a internet e tenta de novo.'); }
+}
 
 /* ---- login ---- */
 function logout(msg){ S.pin=''; store.set('fila_sess',null); closeSheet(); showLogin(msg); }
-function showLogin(msg){ const _fb=document.getElementById('fab'); if(_fb) _fb.hidden=true;
+function showLogin(msg){ const _fb=document.getElementById('fab'); if(_fb) _fb.hidden=true; const _fn=document.getElementById('fabNovo'); if(_fn) _fn.hidden=true; closePanel();
   $('#top').hidden=true; clearInterval(poll);
   $('#list').innerHTML=`<form class="login glass" id="login"><div class="au">${AU}</div><strong>BOARD</strong>
     <input class="field" id="pin" type="password" autocomplete="current-password" placeholder="SENHA" aria-label="Senha" required>
@@ -1281,7 +1542,29 @@ document.addEventListener('click',e=>{
   else if(a==='retrystory') retryStory(id);
   else if(a==='dest') toggleDestino(id,b.dataset.v);
   else if(a==='desaprovar') setAprovado(id,false);
+  else if(a==='filmes') abrirFilmes();
+  else if(a==='novo') abrirNovo();
+  else if(a==='pclose') closePanel();
+  else if(a==='fltog') filmeToggle(b.dataset.k);
+  else if(a==='fladd') filmeAdd();
+  else if(a==='fldel') filmeDel(b.dataset.k);
+  else if(a==='nvrm'){ S.nv.files.splice(+b.dataset.i,1); if(!nvFixo()&&['story','feed'].includes(S.nv.destino)&&!S.nv.files.length) S.nv.destino=''; nvRender(); }
+  else if(a==='nvfilme'){ S.nv.filme=b.dataset.t; S.nv.outro=false; nvRender(); }
+  else if(a==='nvoutro'){ S.nv.outro=true; S.nv.filme=''; nvRender(); setTimeout(()=>{const i=$('#nvfilmein'); if(i) i.focus();},40); }
+  else if(a==='nvdest'){ S.nv.destino=b.dataset.v; nvRender(); }
+  else if(a==='nvgerar'){ S.nv.gerar=!S.nv.gerar; nvRender(); }
+  else if(a==='nvdia'){ S.nv.dia=S.nv.dia===b.dataset.d?'':b.dataset.d; nvRender(); }
+  else if(a==='nvhora'){ S.nv.hora=S.nv.hora===b.dataset.h?'':b.dataset.h; nvRender(); }
+  else if(a==='nvselo'){ S.nv.selo=b.dataset.v==='1'; nvRender(); }
+  else if(a==='nvgo') nvSubir();
 });
+/* v43: campos do NOVO POST e dos FILMES guardam o que você digita sem redesenhar (não perde o foco) */
+document.addEventListener('input',e=>{ const t=e.target; if(!S.nv) return;
+  if(t.id==='nvleg') S.nv.leg=t.value; else if(t.id==='nvped') S.nv.pedido=t.value; else if(t.id==='nvfilmein') S.nv.filme=t.value; });
+document.addEventListener('change',e=>{ const t=e.target;
+  if(t.id==='nvfile'&&t.files&&t.files.length){ nvArquivos(t.files); t.value=''; }
+  else if(t.id==='nvhorain'&&S.nv){ S.nv.hora=t.value||''; nvRender(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.id==='flin'){ e.preventDefault(); filmeAdd(); } });
 /* calendário do iPhone: só salva quando ele FECHA (o ✓ ou o Reset), não no primeiro toque */
 document.addEventListener('focusin',e=>{ const i=e.target.closest('[data-act="date"]'); if(i) i.dataset.orig=i.value; });
 document.addEventListener('focusout',e=>{ const i=e.target.closest('[data-act="date"]'); if(!i) return; const v=i.value||'';
@@ -1292,8 +1575,8 @@ document.addEventListener('focusout',e=>{ const i=e.target.closest('[data-act="t
 document.addEventListener('change',e=>{ const i=e.target.closest('[data-act="time"]'); if(!i||isMobile()) return; i.dataset.orig=i.value; if(S.sheet) closeSheet(); setHora(i.dataset.id,i.value||null); });
 document.addEventListener('change',e=>{ if(e.target.id==='edate'&&e.target.value){ S.ed.dia=e.target.value; edRefresh(); return; } if(e.target.id==='ehin'&&e.target.value){ S.ed.hora=e.target.value; const r=$('#edres'); if(r) r.textContent='POSTA '+dayText(S.ed.dia)+' ÀS '+S.ed.hora; return; } });
 document.addEventListener('change',e=>{ const i=e.target.closest('[data-act="date"]'); if(!i||isMobile()) return; i.dataset.orig=i.value; if(S.sheet) closeSheet(); setDia(i.dataset.id,i.value||null); });
-$('#sheetBg').addEventListener('click',()=>{ if(S.fsheet) closeFilterSheet(); else closeSheet(); });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(S.fsheet) closeFilterSheet(); else closeSheet(); } });
+$('#sheetBg').addEventListener('click',()=>{ if(S.panel){ if(!(S.nv&&S.nv.busy)) closePanel(); } else if(S.fsheet) closeFilterSheet(); else closeSheet(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(S.panel){ if(!(S.nv&&S.nv.busy)) closePanel(); } else if(S.fsheet) closeFilterSheet(); else closeSheet(); } });
 /* v29: troca de aba com cara de troca de página — os posts (e a linha de dias) saem deslizando pro lado e a aba nova entra do outro lado */
 let vAnim=0;
 async function goView(v){
@@ -1311,14 +1594,14 @@ $('#logo').addEventListener('click',()=>window.scrollTo({top:0,behavior:matchMed
 $('#tab-pend').onclick=()=>goView('pend');
 $('#tab-done').onclick=()=>goView('done');
 $('#tab-apr').onclick=()=>goView('apr');
-$('#logout').innerHTML=I.out+'<span>SAIR</span>'; $('#clrAll').innerHTML=I.trash+'<span>APAGAR TODOS</span>'; $('#logout').onclick=()=>logout('');
+$('#logout').innerHTML=I.out+'<span>SAIR</span>'; $('#btnFilmes').innerHTML=I.film+'<span>FILMES</span>'; $('#btnNovo').innerHTML=I.plus+'<span>NOVO POST</span>'; $('#fabNovo').innerHTML=I.plus; $('#clrAll').innerHTML=I.trash+'<span>APAGAR TODOS</span>'; $('#logout').onclick=()=>logout('');
 $('#logo').innerHTML=AU;
 if(!/^board\.aurumcinema\.com\.br$/.test(location.hostname)) $('#envtag').hidden=false; // selo DEV fora do link oficial
 
 let poll;
 function start(){
   if(!S.pin){ showLogin(); return; }
-  $('#top').hidden=false; S.loaded=false; render(); load();
+  $('#top').hidden=false; $('#fabNovo').hidden=false; S.loaded=false; render(); load();
   fetch(SB_URL+'/functions/v1/fila-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cleanup',pin:S.pin})}).then(r=>r.json()).then(r=>{ if(r&&r.apagados){S.sig='';load();} }).catch(()=>{});
   clearInterval(poll); poll=setInterval(()=>{ if(!readSession()){logout('Sessão expirada, entra de novo');return;} if(!document.hidden) load(); },30000);
 }
