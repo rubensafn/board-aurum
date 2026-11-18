@@ -3,7 +3,8 @@
 // O container é criado até ANTECEDENCIA_MIN minutos antes e só é publicado no minuto marcado (sem atraso).
 // Erro do Instagram: tenta de novo 1x sozinho; se falhar de novo, marca erro e avisa o Rubão no celular (ntfy, fila_config.notify_url).
 // + NOVO POST (upload_sign, senha da fila) e aba FILMES (filmes: puxa do aurumcinema.com.br só quando o Rubão abre a aba).
-// SÓ mexe nas tabelas fila_posts e fila_filmes, na fila_config (chaves meta_*/cron_key/notify_url) e no bucket fila-posts. Nunca tocar no SISTEMA DE CORTESIAS (mesmo projeto).
+// aba RESV (reservas: miniaturas só quando o Rubão abre a aba; não grava nada).
+// SÓ mexe nas tabelas fila_posts e fila_filmes (+ fila_vistos pelas RPCs da aba RESV), na fila_config (chaves meta_*/cron_key/notify_url) e no bucket fila-posts. Nunca tocar no SISTEMA DE CORTESIAS (mesmo projeto).
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
@@ -327,6 +328,30 @@ Deno.serve(async (req) => {
     }
     const { data: lista } = await sb.rpc("fila_filmes_list", { p_pin: body.pin });
     return json({ filmes: lista ?? [], erro_site: erroSite || undefined });
+  }
+
+  if (body.action === "reservas") {
+    // aba RESV do board: lista as reservas da varredura e busca a miniatura de cada uma no Instagram da distribuidora.
+    // Só roda quando o Rubão abre a aba (o board segura 1x a cada 10 min). Não grava nada.
+    const { data: lista, error } = await sb.rpc("fila_reservas_list", { p_pin: body.pin });
+    if (error) return json({ error: error.code === "28000" ? "pin" : error.message }, error.code === "28000" ? 401 : 500);
+    const tok = await conf(sb, "meta_token"); const ig = await conf(sb, "meta_ig_user");
+    const thumbs: Record<string, string> = {};
+    if (tok && ig) {
+      const contas = [...new Set((lista ?? []).map((r: any) => r.conta).filter((u: any) => typeof u === "string" && /^[A-Za-z0-9._]{1,30}$/.test(u)))].slice(0, 15) as string[];
+      await Promise.all(contas.map(async (u) => {
+        try {
+          const d = await g(ig, { fields: `business_discovery.username(${u}){media.limit(40){permalink,media_type,media_url,thumbnail_url,children{media_url,thumbnail_url}}}`, access_token: tok });
+          for (const m of (d.business_discovery?.media?.data ?? []) as any[]) {
+            const sc = /\/(?:p|reel|tv)\/([^/?#]+)/.exec(String(m.permalink || ""))?.[1]; if (!sc) continue;
+            const k0 = m.children?.data?.[0];
+            const t = m.thumbnail_url || (m.media_type === "IMAGE" ? m.media_url : null) || k0?.thumbnail_url || k0?.media_url || null;
+            if (t) thumbs[sc] = t;
+          }
+        } catch { /* sem miniatura dessa conta */ }
+      }));
+    }
+    return json({ reservas: (lista ?? []).map((r: any) => ({ ...r, thumb: thumbs[r.shortcode] || null })) });
   }
 
   if (body.action === "cleanup") {

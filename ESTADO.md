@@ -3,7 +3,7 @@
 Este arquivo é a memória do projeto. **Toda conversa nova começa lendo este arquivo e o README.md.**
 **Toda mudança termina atualizando este arquivo** (o que foi feito, o que ficou pendente), junto com o commit.
 
-Atualizado em: 18/11/2026, 14h55 (versão no ar: v48)
+Atualizado em: 18/11/2026, 15h15 (versão no ar: v49, edge fila-admin v17)
 
 ---
 
@@ -44,6 +44,11 @@ Atualizado em: 18/11/2026, 14h55 (versão no ar: v48)
 - Tabelas: `fila_posts` (+ colunas `subido`, `selo_pendente`), `fila_filmes` (nova), `fila_config`, `fila_vistos`.
 - RPCs novas: `fila_novo_post`, `fila_filmes_list`, `fila_filme_set`, `fila_filme_add`, `fila_filme_del`.
 
+**Feito em 18/11 (v49 — aba RESV)**
+- Aba RESV (celular PEND · RESV · APROV · POST): lista `fila_vistos` com status `reserva` (RPC `fila_reservas_list`), miniatura buscada no Instagram da distribuidora pela edge `reservas` só ao abrir a aba (máx. 1x/10 min). Contagem da aba: 1 consulta ao abrir o board.
+- QUERO ESSA → `fila_vistos.quero = true` (RPC `fila_reserva_quero`); lixeira → `rejeitado` (RPC `fila_reserva_rejeitar`). Colunas novas: `quero`, `quero_em`.
+- RODAR VARREDURA (topo da aba RESV): a tarefa agendada NÃO aceita token de API (só tem agendamento). O botão abre a página da tarefa (claude.ai/scheduled-task/trig_01TcQLbVPCUExKpeT8kkWntb), onde tem EXECUTAR AGORA.
+
 **Feito em 18/11 (v48 — vídeo +60 s, aprovado pelo Rubão)**
 - Causa do erro 2207082 no story do Rocky (16-11_02): vídeo de 2:28. Story pela API só aceita até 60 s (Reels aceita longo). Não era compressão nem formato.
 - Board: vídeo +60 s fica só FEED (`destFixo` → 'feed'), aviso laranja no card ("Só FEED · story à mão" no celular) e no + NOVO POST. Story desses o Rubão encaminha à mão.
@@ -64,18 +69,21 @@ Atualizado em: 18/11/2026, 14h55 (versão no ar: v48)
 
 ---
 
-## 3. PENDÊNCIAS (em ordem)
+## 3. PENDÊNCIAS (ORDEM DO RUBÃO)
 
-**P3 — Varredura (só o texto da tarefa agendada, depois que uma rodada terminar, com OK do Rubão)**
-- Legenda: sempre linha em branco depois da 1ª frase de impacto (corrigir as pendentes também).
+**Regra de ordem: mexer no texto da varredura é SEMPRE a última coisa.** Board primeiro, varredura por último.
+
+**Último passo — texto da tarefa agendada da varredura** (trocar só entre rodadas, nunca durante uma)
+- Legenda: sempre linha em branco depois da 1ª frase de impacto (corrigir as pendentes também, sem tocar nas que o Rubão editou).
 - Música: posta normal, sem música, legenda manda pro Spotify (conta empresa não usa música com direito autoral).
 - Seguir a lista da aba FILMES (só filmes `ativo`).
-- Aplicar selo AU nos posts com `selo_pendente = true` e escrever legenda dos `legenda_refazer = true`.
-- RESV + QUERO ESSA; menu celular PEND · RESV · APROV · POST.
+- Aplicar selo AU nos posts com `selo_pendente = true`.
+- Reservas com `quero = true` (QUERO ESSA): baixar primeiro, subir em PENDENTES e marcar `baixado`.
+- Vídeo +60 s: `destino = 'feed'` (story à mão).
 - Horários de 30 em 30 min (12h30–22h), 1 h entre posts, limites (≤5 feed+reels, ≤8 stories/dia, 1 por filme, 2 se bombando), filme forte em horário nobre.
 - 4 rodadas (12h, 15h, 18h, 21h) **só quando o Rubão mandar**.
 
-**Stand-by**: PC (pasta do dia D:\AURUM - DSKP\<MÊS>\DD.MM com BAIXADOS/FINAIS, artes do D:) e botão RODAR VARREDURA.
+**Em espera (não fazer até o Rubão mandar)**: PC (pasta do dia D:\AURUM - DSKP\<MÊS>\DD.MM com BAIXADOS/FINAIS, artes do D:).
 
 ---
 

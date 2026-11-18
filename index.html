@@ -976,6 +976,29 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
 .aviso.hot i{font-style:normal}.aviso.hot .sm{display:none}
 @media (max-width:759px){.aviso.hot .lg{display:none}.aviso.hot .sm{display:inline}}
 .aviso.hot svg{color:var(--hot);filter:drop-shadow(0 0 6px rgba(251,191,36,.55))}
+/* v49: aba RESV — ciano (reserva = guardado), QUERO ESSA ciano, marcada = verde (ok), RODAR VARREDURA roxo como APROVAR */
+.seg-ind[data-v="resv"]{background:linear-gradient(160deg,rgba(103,232,249,.62),rgba(8,145,178,.40)),#07121a!important;box-shadow:0 0 0 1px rgba(165,243,252,.85),0 0 16px rgba(103,232,249,.45),inset 0 1px 0 rgba(255,255,255,.25)!important}
+.tab.t-resv b{color:var(--cyan)}
+.seg .tab.t-resv.on{text-shadow:0 1px 2px rgba(0,0,0,.45)!important}
+body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
+.rsv-top{grid-column:1/-1;height:auto!important;border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:2px}
+.rsv-top .rt-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.rsv-top .rt-txt b{font-family:var(--display);font-size:11px;letter-spacing:.14em;color:#a5f3fc}
+.rsv-top .rt-txt span{font-size:12px;line-height:1.35;color:var(--ink-2)}
+.rsv-top .aprov.rodar{width:auto;flex:none;padding:0 18px}
+@media (max-width:759px){.rsv-top{flex-direction:column;align-items:stretch}.rsv-top .aprov.rodar{width:100%}}
+.rsv .thumb{display:block}
+.rsv .thumb .th-ig{position:absolute;inset:0;display:grid;place-items:center;color:rgba(165,243,252,.55);z-index:0}
+.rsv .thumb .th-ig svg{width:26px;height:26px}
+.rsv .thumb img{position:relative;z-index:1}
+.rsv .thumb .play{z-index:2}
+.pill.rtipo{color:#a5f3fc!important;border-color:rgba(103,232,249,.45)!important;background:rgba(103,232,249,.08)!important}
+.pill.rok{color:#bbf7d0!important;border-color:rgba(74,222,128,.55)!important;background:rgba(74,222,128,.1)!important}
+.aprov.rq{color:#ecfeff!important;background:linear-gradient(160deg,rgba(103,232,249,.5),rgba(34,211,238,.3)),#07121a!important;box-shadow:0 0 0 1px rgba(165,243,252,.9),0 0 12px rgba(103,232,249,.4),inset 0 1px 0 rgba(255,255,255,.16)!important}
+.aprov.rq svg{filter:drop-shadow(0 0 6px rgba(103,232,249,.8))}
+.aprov.ok.rqok{color:#bbf7d0!important;background:rgba(74,222,128,.08)!important;box-shadow:0 0 0 1px rgba(74,222,128,.5),0 0 12px rgba(74,222,128,.2)!important}
+.row.rsv.quero{box-shadow:0 8px 24px rgba(0,0,0,.28),0 0 0 1px rgba(74,222,128,.5),0 0 22px rgba(74,222,128,.15)!important}
+.rsv .acts .ib{flex:1 1 0}
 </style>
 </head>
 <body>
@@ -987,6 +1010,7 @@ body:has(.cfm.show) .fchip{opacity:0;pointer-events:none}
     <div class="brand"><button type="button" class="au" id="logo" aria-label="Voltar pro topo" title="Voltar pro topo"></button></div>
     <div class="seg" role="tablist"><span class="seg-ind" id="segInd" aria-hidden="true"></span>
       <button class="tab t-pend on" id="tab-pend" role="tab"><span class="lg">PENDENTES</span><span class="sm">PEND</span> <b id="c-pend">0</b></button>
+      <button class="tab t-resv" id="tab-resv" role="tab"><span class="lg">RESERVAS</span><span class="sm">RESV</span> <b id="c-resv">·</b></button>
       <button class="tab t-apr" id="tab-apr" role="tab"><span class="lg">APROVADOS</span><span class="sm">APROV</span> <b id="c-apr">0</b></button>
       <button class="tab t-done" id="tab-done" role="tab"><span class="lg">POSTADOS</span><span class="sm">POST</span> <b id="c-done">0</b></button>
     </div>
@@ -1039,7 +1063,7 @@ const isMobile=()=>window.matchMedia('(max-width:759px)').matches;
 function readSession(){ try{ const s=JSON.parse(store.get('fila_sess')||'null'); if(s&&s.pin&&s.exp>Date.now()) return s.pin; }catch(_){} store.set('fila_sess',null); store.set('fila_pin',null); return ''; }
 function saveSession(pin){ store.set('fila_sess',JSON.stringify({pin,exp:Date.now()+SESSAO_HORAS*3600e3})); store.set('fila_pin',null); }
 
-const S={posts:[],view:(v=>['pend','apr','done'].includes(v)?v:'pend')(store.get('fila_view')),filtros:{pend:store.get('fila_filtro')||'todos',apr:store.get('fila_filtro_apr')||'todos',done:store.get('fila_filtro_done')||'todos'},pin:readSession(),ver:{},copied:store.get('fila_copied')||'',loaded:false,sig:'',sheet:null,busy:new Set()};
+const S={posts:[],view:(v=>['pend','resv','apr','done'].includes(v)?v:'pend')(store.get('fila_view')),filtros:{pend:store.get('fila_filtro')||'todos',apr:store.get('fila_filtro_apr')||'todos',done:store.get('fila_filtro_done')||'todos'},pin:readSession(),ver:{},copied:store.get('fila_copied')||'',loaded:false,sig:'',sheet:null,busy:new Set()};
 
 async function rpc(fn,body){
   const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -1168,7 +1192,9 @@ function emptyHTML(t,m){return `<div class="empty glass"><div class="au">${AU}</
 function render(){
   const pend=S.posts.filter(p=>!p.postado&&!p.aprovado), apr=S.posts.filter(p=>!p.postado&&p.aprovado), done=S.posts.filter(p=>p.postado);
   $('#c-pend').textContent=pend.length; $('#c-apr').textContent=apr.length; $('#c-done').textContent=done.length;
-  $('#tab-pend').classList.toggle('on',S.view==='pend'); $('#tab-apr').classList.toggle('on',S.view==='apr'); $('#tab-done').classList.toggle('on',S.view==='done'); moveInd();
+  ['pend','resv','apr','done'].forEach(k=>$('#tab-'+k).classList.toggle('on',S.view===k)); moveInd();
+  $('#c-resv').textContent=S.resv?S.resv.length:(S.resvN??'·'); document.body.classList.toggle('v-resv',S.view==='resv');
+  if(S.view==='resv'){ $('#list').innerHTML=resvHTML(); return; } /* v49: aba RESV não tem filtro de dia */
   renderDays(); requestAnimationFrame(syncChip);
   const filtrado=S.filtros[S.view]!=='todos';
   const list=$('#list');
@@ -1601,11 +1627,75 @@ function showLogin(msg){ const _fb=document.getElementById('fab'); if(_fb) _fb.h
   setTimeout(()=>$('#pin')&&$('#pin').focus(),50);
 }
 
+/* ---- v49: aba RESV (reservas da varredura) + QUERO ESSA + RODAR VARREDURA ----
+   Lista e miniaturas só quando o Rubão abre a aba (no máx. 1x a cada 10 min). QUERO ESSA só marca: a próxima varredura baixa e põe em PENDENTES. */
+const RODADAS=['11:22','15:22','18:22'];
+function proxRodada(){ const n=new Date(), hm=n.toTimeString().slice(0,5); const h=RODADAS.find(x=>x>hm); return h?('às '+h.replace(':','h')):'amanhã às 11h22'; }
+async function carregarResv(forcar){
+  if(!forcar&&S.resv&&Date.now()-(S.resvAt||0)<600e3) return;
+  const r=await edge({action:'reservas',pin:S.pin}); S.resv=r.reservas||[]; S.resvAt=Date.now(); S.resvN=S.resv.length;
+}
+async function abrirResv(){
+  const tinha=!!S.resv; S.resvErro='';
+  try{ await carregarResv(); }catch(e){ if(e.code==='28000'){logout('Senha inválida');return;} S.resvErro='x'; if(!tinha) S.resv=null; toast('Não carregou as reservas. Tenta de novo.'); }
+  if(S.view==='resv'&&!S.sheet&&!S.panel){ $('#c-resv').textContent=S.resv?S.resv.length:(S.resvN??'·'); $('#list').innerHTML=resvHTML(); }
+}
+const dm=t=>{ if(!t) return ''; const d=new Date(t); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); };
+const findR=sc=>(S.resv||[]).find(r=>r.shortcode===sc);
+function resvRow(r){
+  const reel=/\/reel\//.test(r.permalink||''), sc=esc(r.shortcode);
+  return `<article class="row glass rsv${r.quero?' quero':''}" data-rsv="${sc}">
+    <button class="thumb" data-act="rver" data-sc="${sc}" aria-label="Ver no Instagram">
+      ${r.thumb?`<img src="${esc(r.thumb)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<span class="th-ig" aria-hidden="true">${I.ig}</span>
+      ${reel?`<span class="play">${I.play}</span>`:''}</button>
+    <div class="info">
+      <div class="l1"><span class="film">${esc(r.filme||'Sem filme')}</span></div>
+      <div class="fname">@${esc(r.conta||'')}${r.postado_distribuidora?' · postou '+dm(r.postado_distribuidora):''}</div>
+      <div class="meta"><span class="pill rtipo">${reel?'REELS':'POST'}</span>${r.quero?`<span class="pill rok">${I.check} QUERO</span>`:''}</div>
+      <button class="capprev" data-act="rver" data-sc="${sc}"><span class="clamp">${r.caption?esc(r.caption):'<i>Sem legenda</i>'}</span><span class="more">VER NO INSTAGRAM ›</span></button>
+      ${r.quero
+        ?`<div class="aprov ok rqok"><span>${I.check} QUERO<i class="apl"> · SAI NA PRÓXIMA VARREDURA</i></span><span class="aprov-bts"><button data-act="rdesq" data-sc="${sc}" aria-label="Desfazer QUERO ESSA" title="Desfazer">${I.undo}</button></span></div>`
+        :`<button class="aprov rq" data-act="rquero" data-sc="${sc}">${I.plus} QUERO ESSA</button>`}
+      <div class="acts"><button class="ib cyan" data-act="rver" data-sc="${sc}" aria-label="Ver no Instagram" title="Ver no Instagram">${I.ig}</button>
+        <button class="ib red" data-act="rrej" data-sc="${sc}" aria-label="Rejeitar essa peça" title="Rejeitar (a varredura não sugere de novo)">${I.trash}</button></div>
+    </div>
+  </article>`;
+}
+function resvHTML(){
+  if(!S.resv) return S.resvErro?emptyHTML('NÃO CARREGOU','Confere a internet e abre a aba de novo.'):'<div class="sk"></div><div class="sk"></div><div class="sk"></div>';
+  const q=S.resv.filter(r=>r.quero).length;
+  const top=`<div class="rsv-top glass"><div class="rt-txt"><b>RESERVAS DA VARREDURA</b><span>${q?`${q} marcada${q>1?'s':''} · `:''}Marca QUERO ESSA e a varredura ${proxRodada()} baixa e põe em PENDENTES.</span></div>
+    <button class="aprov rodar" data-act="rodar">${I.send} RODAR VARREDURA AGORA</button></div>`;
+  if(!S.resv.length) return top+emptyHTML('NENHUMA RESERVA','Quando a varredura achar peça boa que não coube no dia, ela fica guardada aqui.');
+  return top+S.resv.map(resvRow).join('');
+}
+async function setQuero(sc,v){
+  const r=findR(sc); if(!r) return; r.quero=v; $('#list').innerHTML=resvHTML();
+  toast(v?'Marcada · sai na varredura '+proxRodada():'Desmarcada', v?'DESFAZER':'', v?()=>setQuero(sc,false):null);
+  try{ await rpc('fila_reserva_quero',{p_pin:S.pin,p_shortcode:sc,p_quero:v}); }catch(_){ r.quero=!v; if(S.view==='resv') $('#list').innerHTML=resvHTML(); toast('Não salvou. Tenta de novo.'); }
+}
+function rejeitarResv(sc){
+  const r=findR(sc); if(!r) return;
+  confirmar('REJEITAR ESSA PEÇA?','A varredura não sugere essa peça de novo. O filme continua na lista normal.','REJEITAR',async()=>{
+    S.resv=S.resv.filter(x=>x.shortcode!==sc); S.resvN=S.resv.length; render();
+    try{ await rpc('fila_reserva_rejeitar',{p_pin:S.pin,p_shortcode:sc}); toast('Rejeitada · não volta nas sugestões'); }
+    catch(_){ S.resv.push(r); render(); toast('Não salvou. Tenta de novo.'); } },true);
+}
+/* RODAR VARREDURA: a tarefa agendada não aceita disparo por API — o botão abre a página dela no Claude, onde tem EXECUTAR AGORA */
+const TAREFA_URL='https://claude.ai/scheduled-task/trig_01TcQLbVPCUExKpeT8kkWntb';
+function rodarVarredura(){
+  confirmar('RODAR A VARREDURA AGORA?','Abre a tarefa da varredura no Claude. Lá é só tocar em EXECUTAR AGORA: ela procura material novo, baixa as reservas marcadas e sobe em PENDENTES.','ABRIR',()=>{ window.open(TAREFA_URL,'_blank','noopener'); });
+}
 /* ---- eventos ---- */
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]'); if(!b) return; const id=b.dataset.id, a=b.dataset.act;
   if(a==='filtro'){ if(S.fsheet) closeFilterSheet(); S.filtros[S.view]=b.dataset.f; store.set(FKEY[S.view],b.dataset.f); render(); window.scrollTo({top:0}); }
   else if(a==='fsheet') openFilterSheet();
+  else if(a==='rquero') setQuero(b.dataset.sc,true);
+  else if(a==='rdesq') setQuero(b.dataset.sc,false);
+  else if(a==='rrej') rejeitarResv(b.dataset.sc);
+  else if(a==='rver'){ const r=findR(b.dataset.sc); if(r&&r.permalink) window.open(r.permalink,'_blank','noopener'); }
+  else if(a==='rodar') rodarVarredura();
   else if(a==='open') openSheet(id,'media');
   else if(a==='fclose') closeFilterSheet();
   else if(a==='day') openSheet(id,'day');
@@ -1678,8 +1768,8 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(S.panel){ if(!
 /* v29: troca de aba com cara de troca de página — os posts (e a linha de dias) saem deslizando pro lado e a aba nova entra do outro lado */
 let vAnim=0;
 async function goView(v){
-  if(v===S.view) return; const O={pend:0,apr:1,done:2}, d=O[v]>O[S.view]?1:-1, my=++vAnim;
-  S.view=v; store.set('fila_view',v); ['pend','apr','done'].forEach(k=>$('#tab-'+k).classList.toggle('on',k===v)); moveInd();
+  if(v===S.view) return; const O={pend:0,resv:1,apr:2,done:3}, d=O[v]>O[S.view]?1:-1, my=++vAnim;
+  S.view=v; store.set('fila_view',v); ['pend','resv','apr','done'].forEach(k=>$('#tab-'+k).classList.toggle('on',k===v)); moveInd(); if(v==='resv') abrirResv();
   const els=[$('#list'),document.querySelector('.daysbar')].filter(Boolean);
   if(matchMedia('(prefers-reduced-motion: reduce)').matches||!els[0].animate){ render(); window.scrollTo({top:0}); return; }
   const out=els.map(e=>e.animate([{transform:'none',opacity:1},{transform:`translateX(${-d*56}px)`,opacity:0}],{duration:170,easing:'cubic-bezier(.5,0,.9,.6)',fill:'forwards'}));
@@ -1692,6 +1782,7 @@ $('#logo').addEventListener('click',()=>window.scrollTo({top:0,behavior:matchMed
 $('#tab-pend').onclick=()=>goView('pend');
 $('#tab-done').onclick=()=>goView('done');
 $('#tab-apr').onclick=()=>goView('apr');
+$('#tab-resv').onclick=()=>goView('resv');
 $('#logout').innerHTML=I.out+'<span>SAIR</span>'; $('#btnFilmes').innerHTML=I.film+'<span>FILMES</span>'; $('#btnNovo').innerHTML=I.plus+'<span>NOVO POST</span>'; $('#fabNovo').innerHTML=I.plus; $('#clrAll').innerHTML=I.trash+'<span>APAGAR TODOS</span>'; $('#logout').onclick=()=>logout('');
 $('#logo').innerHTML=AU;
 if(!/^board\.aurumcinema\.com\.br$/.test(location.hostname)) $('#envtag').hidden=false; // selo DEV fora do link oficial
@@ -1700,6 +1791,8 @@ let poll;
 function start(){
   if(!S.pin){ showLogin(); return; }
   $('#top').hidden=false; $('#fabNovo').hidden=false; S.loaded=false; render(); load();
+  rpc('fila_reservas_list',{p_pin:S.pin}).then(r=>{ S.resvN=(r||[]).length; if(!S.resv) $('#c-resv').textContent=S.resvN; }).catch(()=>{}); /* v49: só a contagem da aba RESV, 1x ao abrir o board */
+  if(S.view==='resv') abrirResv();
   fetch(SB_URL+'/functions/v1/fila-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cleanup',pin:S.pin})}).then(r=>r.json()).then(r=>{ if(r&&r.apagados){S.sig='';load();} }).catch(()=>{});
   clearInterval(poll); poll=setInterval(()=>{ if(!readSession()){logout('Sessão expirada, entra de novo');return;} if(!document.hidden) load(); },30000);
 }
