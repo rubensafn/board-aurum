@@ -999,6 +999,20 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 .aprov.ok.rqok{color:#bbf7d0!important;background:rgba(74,222,128,.08)!important;box-shadow:0 0 0 1px rgba(74,222,128,.5),0 0 12px rgba(74,222,128,.2)!important}
 .row.rsv.quero{box-shadow:0 8px 24px rgba(0,0,0,.28),0 0 0 1px rgba(74,222,128,.5),0 0 22px rgba(74,222,128,.15)!important}
 .rsv .acts .ib{flex:1 1 0}
+/* v50: valor de alcance do horário digitado (pendente e editar aprovado) */
+.hval{font-size:12px;line-height:1.4;color:var(--ink-2);padding:2px 2px 0}
+.hval b{color:#fff;font-weight:700}.hval .up{color:#4ade80;font-weight:700}.hval .dn{color:#f87171;font-weight:700}.hval i{color:#c4b5fd;font-style:normal}
+.edw .hdata{margin:2px 0}
+/* v50: aviso de baixo menor e todo redondo (pílula) */
+.toast{min-height:40px!important;padding:5px 6px 5px 6px!important;gap:9px!important;border-radius:999px!important;font-size:12.5px!important;max-width:min(460px,calc(100vw - 32px))!important}
+.toast #toastMsg{padding-right:8px}
+.toast .t-ic{width:28px!important;height:28px!important}.toast .t-ic svg{width:14px!important;height:14px!important}
+.toast button{height:30px!important;padding:0 13px!important;border-radius:999px!important;font-size:10px!important}
+.toast button:not(:empty)+*{margin:0}
+@media (max-width:759px){.toast{font-size:12px!important}}
+/* v50: horários do EDITAR com a mesma altura do pendente (o "+62% ALCANCE" cortava o nome) e % numa linha só */
+.hpick .dtile .x{white-space:nowrap}
+.edw .hpick .dtile{height:78px!important}
 </style>
 </head>
 <body>
@@ -1214,6 +1228,7 @@ function render(){
 /* ---- dados ---- */
 async function load(){
   if(S.sheet) return; // não mexe na tela com o painel aberto
+  if(S.destN>0) return; // v50: tem FEED/STORY gravando — não sobrescreve com dado velho
   try{
     const rows=await rpc('fila_list',{p_pin:S.pin}); const sig=JSON.stringify(rows);
     if(S.loaded&&sig===S.sig) return; S.sig=sig; S.posts=(rows||[]).sort(order); S.loaded=true; render();
@@ -1233,14 +1248,20 @@ async function toggleDestino(id,which){
   let f=p.destino==='feed'||p.destino==='feed_story', st=p.destino==='story'||p.destino==='feed_story';
   if(which==='feed') f=!f; else st=!st;
   p.destino=f&&st?'feed_story':f?'feed':st?'story':null; patchRow(id);
-  try{ await rpc('fila_set_destino',{p_pin:S.pin,p_id:id,p_destino:p.destino}); S.sig=''; }catch(_){ toast('Não salvou. Tenta de novo.'); load(); }
+  /* v50: toque rápido FEED→STORY mandava 2 gravações ao mesmo tempo e a mais velha chegava por último (ficava só STORY).
+     Agora grava em fila, sempre o valor ATUAL, e o load() não sobrescreve enquanto tem gravação pendente. */
+  S.destN=(S.destN||0)+1; S.destQ=S.destQ||{};
+  S.destQ[id]=(S.destQ[id]||Promise.resolve()).then(()=>rpc('fila_set_destino',{p_pin:S.pin,p_id:id,p_destino:p.destino}))
+    .then(()=>{ S.sig=''; },()=>{ toast('Não salvou. Tenta de novo.'); }).finally(()=>{ S.destN--; if(!S.destN) load(); });
 }
 async function setAprovado(id,v,agoraOk){
   const p=find(id); if(!p) return;
   if(v&&p.dia&&p.hora&&!agoraOk){ const quando=new Date(p.dia+'T'+p.hora+':00');
     if(quando.getTime()<=Date.now()+5*60e3){ confirmar(quando<Date.now()?'ESSE HORÁRIO JÁ PASSOU':'FALTA MENOS DE 5 MIN', (quando<Date.now()?'O horário '+p.hora+' já passou.':'Está marcado pra '+p.hora+'.')+' Se aprovar agora, o post vai pro Instagram em 1 minuto.','POSTAR AGORA',()=>setAprovado(id,true,true)); return; } }
   if(v&&(!p.dia||!p.hora)){ toast(!p.dia&&!p.hora?'Escolhe o dia e o horário antes de aprovar':!p.dia?'Escolhe o dia antes de aprovar':'Escolhe o horário antes de aprovar'); return; }
+  if(v&&S.destQ&&S.destQ[id]) await S.destQ[id]; /* v50: espera o FEED/STORY gravar antes de aprovar */
   const fx=destFixo(p);
+  if(v&&!fx&&p.destino){ try{ await rpc('fila_set_destino',{p_pin:S.pin,p_id:id,p_destino:p.destino}); }catch(_){ toast('Não salvou. Tenta de novo.'); return; } }
   if(v&&fx&&p.destino!==fx){ try{ await rpc('fila_set_destino',{p_pin:S.pin,p_id:id,p_destino:fx}); p.destino=fx; }catch(_){ toast('Não salvou. Tenta de novo.'); return; } }
   if(v&&!p.destino){ toast('Escolhe FEED, STORY ou os dois antes de aprovar'); return; }
   const el=document.querySelector(`[data-row="${CSS.escape(id)}"]`);
@@ -1359,21 +1380,23 @@ function daySheetHTML(p){
 
 /* ---- editar agendamento de um aprovado (sem voltar pra pendente) ---- */
 function editSheetHTML(p){
-  const e=S.ed, opts=[]; for(let i=0;i<5;i++){ const d=new Date(); d.setDate(d.getDate()+i); const k=iso(d), pp=parts(k);
+  const e=S.ed, opts=[], hd=hdOf(p), tags=HORAS.map(h=>hTag(hd,h)), best=Math.max(...tags.map(t=>t.v??-99)); for(let i=0;i<5;i++){ const d=new Date(); d.setDate(d.getDate()+i); const k=iso(d), pp=parts(k);
     opts.push({k,w:i===0?'HOJE':i===1?'AMANHÃ':pp.w,n:pp.d,tn:i===0?'today':i===1?'tomorrow':''}); }
   return `<div class="edw"><span class="ed-sec">DIA</span>
     <div class="dpick">${opts.map(o=>`<button class="dtile glass${e.dia===o.k?' on':''}" ${o.tn?`data-tone="${o.tn}"`:''} data-act="eday" data-d="${o.k}"><span class="w">${o.w}</span><span class="n">${o.n}</span></button>`).join('')}</div>
     <label class="act dother">${I.cal} OUTRA DATA<input type="date" id="edate" value="${esc(e.dia||'')}" aria-label="Outra data"></label>
     <span class="ed-sec">HORÁRIO</span>
-    <div class="dpick hpick">${HORAS.map(h=>`<button class="dtile glass${e.hora===h?' on':''}" data-act="ehora" data-h="${h}"><span class="w">${h==='12:30'?'ALMOÇO':h==='15:00'?'TARDE':h==='17:30'?'FIM TARDE':h==='20:30'?'NOITE':'P/ AMANHÃ'}</span><span class="n">${h}</span></button>`).join('')}</div>
-    <div class="hother"><span>${I.clock} OUTRO HORÁRIO</span><input class="field" type="time" id="ehin" value="${esc(e.hora||'')}" step="60" aria-label="Outro horário"></div>
+    <div class="dpick hpick">${HORAS.map((h,i)=>`<button class="dtile glass${e.hora===h?' on':''}${tags[i].v===best&&best>0?' best':''}" data-act="ehora" data-h="${h}"><span class="w">${h==='12:30'?'ALMOÇO':h==='15:00'?'TARDE':h==='17:30'?'FIM TARDE':h==='20:30'?'NOITE':'P/ AMANHÃ'}</span><span class="n">${h}</span><span class="x ${tags[i].c}">${tags[i].t}</span></button>`).join('')}</div>
+    <div class="hother"><span>${I.clock} OUTRO HORÁRIO</span><input class="field" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" autocomplete="off" data-h24="1" id="ehin" data-hd="${esc(p.id)}" value="${esc(e.hora||'')}" aria-label="Outro horário"></div>
+    <div class="hval" id="ehinv">${HORAS.includes(e.hora)||!e.hora?'Digita um horário pra ver o alcance dele.':hInfo(hd,e.hora)}</div>
     <div class="ed-res" id="edres">POSTA ${esc(dayText(e.dia))} ÀS ${esc(e.hora)}</div>
-    <button class="act primary ed-save" data-act="esave" data-id="${esc(p.id)}">${I.check} SALVAR ALTERAÇÕES</button></div>`;
+    <button class="act primary ed-save" data-act="esave" data-id="${esc(p.id)}">${I.check} SALVAR ALTERAÇÕES</button>
+    ${hdataHTML(hd)}</div>`;
 }
 function edRefresh(){ const p=find(S.sheet&&S.sheet.id); if(!p) return; $('#sheet .sh-body').innerHTML=editSheetHTML(p); }
 async function edSalvar(id,agoraOk){
   const p=find(id); if(!p) return; const h=($('#ehin')||{}).value||S.ed.hora, d=S.ed.dia;
-  if(!d||!/^\d{2}:\d{2}$/.test(h)){ toast('Escolhe o dia e o horário'); return; }
+  if(!d||!h24ok(h)){ toast('Escolhe o dia e o horário (24 h, ex.: 18:45)'); return; }
   const quando=new Date(d+'T'+h+':00');
   if(!agoraOk&&quando.getTime()<=Date.now()+5*60e3){ confirmar(quando<Date.now()?'ESSE HORÁRIO JÁ PASSOU':'FALTA MENOS DE 5 MIN',(quando<Date.now()?'O horário '+h+' já passou.':'Fica marcado pra '+h+'.')+' Salvando, o post vai pro Instagram em 1 minutos.','POSTAR AGORA',()=>edSalvar(id,true)); return; }
   closeSheet();
@@ -1393,6 +1416,17 @@ const HDADOS={
 function hdOf(p){ const f=(p.arquivos||[])[0]; return f&&f.kind==='video'?HDADOS.reels:HDADOS.est; }
 const HMERC='Estudos 2026: no Brasil o pico de uso do Instagram é 18h–22h (Metricool: 19h–21h; Sociality: 20h–0h). No @aurum.cinema tem poucos posts à noite: 20:30 e 21:30 são TESTE (21:30 = quem está em casa decidindo o cinema de amanhã).';
 function hTag(d,h){ if(h==='21:30') return {t:'TESTE',c:'tst'}; const r=d.fx.find(x=>x[2].split(' ').includes(h)); if(!r) return {t:'SEM DADO',c:''}; const v=Math.round((r[1]-1)*100); return {t:v>0?'+'+v+'%<i class="xl"> ALCANCE</i>':v<0?v+'%<i class="xl"> ALCANCE</i>':'NA MÉDIA',c:v>0?'up':'',v}; }
+/* v50: alcance de QUALQUER horário (digitado ou botão): acha a faixa da tabela pela hora cheia */
+function faixa(x){ const m=x.match(/(\d+)h(?:[–-](\d+)h)?/); return m?[+m[1],+(m[2]||m[1])]:null; }
+function hInfo(d,h){ if(!/^\d{2}:\d{2}$/.test(h||'')) return '';
+  const hh=+h.slice(0,2), r=d.fx.find(x=>{ const f=faixa(x[0]); return f&&hh>=f[0]&&hh<=f[1]; });
+  if(!r) return `<b>${h}</b> · SEM DADO nesse horário (${d.t.toLowerCase()})`;
+  const v=Math.round((r[1]-1)*100), t=v>0?'+'+v+'% de alcance':v<0?v+'% de alcance':'na média de alcance';
+  return `<b>${h}</b> · <span class="${v>0?'up':v<0?'dn':''}">${t}</span> · faixa ${r[0]} · ${d.t.toLowerCase()}${hh>=20?' · <i>noite em teste</i>':''}`; }
+function hdataHTML(d){ const mx=Math.max(...d.fx.map(x=>x[1]));
+  return `<div class="hdata glass"><span class="ht">ALCANCE x MÉDIA · ${d.t} · ÚLTIMOS 300 POSTS</span>
+      ${d.fx.map(x=>{const v=Math.round((x[1]-1)*100);return `<div class="hr ${v>0?'up':v<0?'dn':''}"><span>${x[0]}</span><b style="width:${Math.round(x[1]/mx*100)}%"></b><span>${v>0?'+':''}${v}%</span></div>`}).join('')}
+      <span class="hn">${d.n}</span><span class="hn">${HMERC}</span></div>`; }
 function horaSheetHTML(p){
   const d=hdOf(p), tags=HORAS.map(h=>hTag(d,h)), best=Math.max(...tags.map(t=>t.v??-99));
   const mx=Math.max(...d.fx.map(x=>x[1]));
@@ -1400,7 +1434,8 @@ function horaSheetHTML(p){
     <div class="hdata glass"><span class="ht">ALCANCE x MÉDIA · ${d.t} · ÚLTIMOS 300 POSTS</span>
       ${d.fx.map(x=>{const v=Math.round((x[1]-1)*100);return `<div class="hr ${v>0?'up':v<0?'dn':''}"><span>${x[0]}</span><b style="width:${Math.round(x[1]/mx*100)}%"></b><span>${v>0?'+':''}${v}%</span></div>`}).join('')}
       <span class="hn">${d.n}</span><span class="hn">${HMERC}</span></div>
-    <div class="hother"><span>${I.clock} OUTRO HORÁRIO</span><input class="field" type="time" id="hin" value="${esc(p.hora||'')}" step="60" aria-label="Outro horário"><button class="act primary" data-act="hset" data-id="${esc(p.id)}">USAR</button></div>
+    <div class="hother"><span>${I.clock} OUTRO HORÁRIO</span><input class="field" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" autocomplete="off" data-h24="1" id="hin" data-hd="${esc(p.id)}" value="${esc(p.hora||'')}" aria-label="Outro horário"><button class="act primary" data-act="hset" data-id="${esc(p.id)}">USAR</button></div>
+    <div class="hval" id="hinv">${HORAS.includes(p.hora)||!p.hora?'Digita um horário pra ver o alcance dele.':hInfo(hdOf(p),p.hora)}</div>
     ${p.hora?`<button class="act dclear" data-act="sethora" data-h="" data-id="${esc(p.id)}">${I.x} TIRAR O HORÁRIO</button>`:''}`;
 }
 
@@ -1483,7 +1518,7 @@ function confirmar(t,msg,ok,fn,danger){ const c=$('#cfm'); c.classList.toggle('d
   const fechar=()=>{c.classList.remove('show');document.removeEventListener('keydown',esc_);lockScroll(false);}, esc_=e=>{if(e.key==='Escape')fechar();};
   $('#cfmOk').onclick=()=>{fechar();fn();}; $('#cfmNo').onclick=fechar; c.onclick=e=>{if(e.target===c)fechar();}; document.addEventListener('keydown',esc_); c.classList.add('show'); lockScroll(true); setTimeout(()=>$('#cfmOk').focus(),50); }
 function toast(msg,btn='',fn=null,ms){ const t=$('#toast'), err=/^(Não |Sem conexão|Senha|Falta|Tem arquivo)/.test(msg); t.classList.toggle('err',err); t.classList.toggle('warn',!err&&/^(Escolhe|Digita)/.test(msg)); /* v47 */ $('#toastIc').innerHTML=err||t.classList.contains('warn')?I.warn:fn?I.undo:I.check; $('#toastMsg').textContent=msg; const b=$('#toastBtn'); b.textContent=btn; b.onclick=fn?()=>{t.classList.remove('show');fn();}:null;
-  t.classList.remove('show'); void t.offsetWidth; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),ms||(fn?8000:err?5000:4000)); } /* v43: mais tempo na tela (4 s; com botão 8 s; erro 5 s) */
+  t.classList.remove('show'); void t.offsetWidth; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),ms||(fn?5000:err?4000:2500)); } /* v50: menos tempo na tela (2,5 s; com DESFAZER 5 s; erro 4 s) */
 
 /* ---- v43: painéis FILMES e + NOVO POST (usam o mesmo pop-up; não mexem na lista nem consultam o banco sozinhos) ---- */
 const EDGE=SB_URL+'/functions/v1/fila-admin';
@@ -1566,7 +1601,7 @@ function novoHTML(){
     ${n.gerar?`<textarea class="nv-ta ped" id="nvped" placeholder="O que a legenda precisa dizer? (opcional)" aria-label="Pedido da legenda">${esc(n.pedido)}</textarea>`:`<textarea class="nv-ta" id="nvleg" placeholder="Escreve a legenda aqui" aria-label="Legenda">${esc(n.leg)}</textarea>`}`}
     <div class="pn-sec">DIA E HORÁRIO <i>(pode escolher depois no card)</i></div>
     <div class="chips">${days.map(d=>`<button class="chip d${n.dia===d.k?' on':''}" data-act="nvdia" data-d="${d.k}">${d.w}</button>`).join('')}</div>
-    <div class="chips">${HORAS.map(h=>`<button class="chip d${n.hora===h?' on':''}" data-act="nvhora" data-h="${h}">${h}</button>`).join('')}<input class="nv-in" type="time" id="nvhorain" value="${esc(HORAS.includes(n.hora)?'':n.hora)}" style="width:120px;flex:none;color-scheme:dark" aria-label="Outro horário"></div>
+    <div class="chips">${HORAS.map(h=>`<button class="chip d${n.hora===h?' on':''}" data-act="nvhora" data-h="${h}">${h}</button>`).join('')}<input class="nv-in" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" autocomplete="off" data-h24="1" id="nvhorain" value="${esc(HORAS.includes(n.hora)?'':n.hora)}" style="width:120px;flex:none;color-scheme:dark" aria-label="Outro horário"></div>
     <div class="pn-sec">SELO AU <i>(obrigatório escolher)</i></div>
     <div class="nv-selo${n.tentou&&n.selo===null?' falta':''}"><button class="sim${n.selo===true?' on':''}" data-act="nvselo" data-v="1"><span class="au-m">${AU}</span><b>✓</b></button><button class="nao${n.selo===false?' on':''}" data-act="nvselo" data-v="0"><span class="au-m">${AU}</span><b>✗</b></button></div>
     ${n.selo===true?'<p class="pn-note">Com selo: a próxima varredura coloca o AU no arquivo. Aprova depois que o selo entrar.</p>':''}
@@ -1723,7 +1758,7 @@ document.addEventListener('click',e=>{
   else if(a==='del') pedeApagar(id);
   else if(a==='slide'){ const tr=$('#track'); if(tr) tr.scrollBy({left:tr.clientWidth*(+b.dataset.d),behavior:'smooth'}); }
   else if(a==='hora') openSheet(id,'hora');
-  else if(a==='hset'){ const v=($('#hin')||{}).value||''; if(!/^\d{2}:\d{2}$/.test(v)){ toast('Digita o horário (ex.: 18:45)'); return; } closeSheet(); setHora(id,v); }
+  else if(a==='hset'){ const v=($('#hin')||{}).value||''; if(!h24ok(v)){ toast('Digita o horário em 24 h (ex.: 18:45)'); return; } const p=find(id); closeSheet(); setHora(id,v); if(p) toast('Horário '+hInfo(hdOf(p),v).replace(/<[^>]+>/g,'')); }
   else if(a==='sethora'){ closeSheet(); setHora(id,b.dataset.h||null); }
   else if(a==='aprovar') setAprovado(id,true);
   else if(a==='retry') setAprovado(id,true);
@@ -1747,11 +1782,16 @@ document.addEventListener('click',e=>{
   else if(a==='nvgo') nvSubir();
 });
 /* v43: campos do NOVO POST e dos FILMES guardam o que você digita sem redesenhar (não perde o foco) */
-document.addEventListener('input',e=>{ const t=e.target; if(!S.nv) return;
+/* v50: horário SEMPRE 24 h (Brasil) — campo de texto com máscara HH:MM, não o relógio AM/PM do navegador */
+function h24(v){ const d=String(v||'').replace(/\D/g,'').slice(0,4); if(d.length<3) return d; return d.slice(0,2)+':'+d.slice(2); }
+function h24ok(v){ return /^([01]\d|2[0-3]):[0-5]\d$/.test(v); }
+document.addEventListener('input',e=>{ const t=e.target; if(t.dataset&&t.dataset.h24){ const v=h24(t.value); if(v!==t.value) t.value=v; } },true);
+document.addEventListener('input',e=>{ const t=e.target; if(t.id==='hin'||t.id==='ehin'){ if(t.value&&!h24ok(t.value)){ const o=$('#'+t.id+'v'); if(o) o.innerHTML=t.value.length<5?'Digita no formato 24 h, ex.: 13:45':'Horário inválido (00:00 a 23:59)'; return; } const p=find(t.dataset.hd), o=$('#'+t.id+'v'); if(p&&o) o.innerHTML=t.value?hInfo(hdOf(p),t.value):'Digita um horário pra ver o alcance dele.'; if(t.id==='ehin'&&S.ed&&/^\d{2}:\d{2}$/.test(t.value)){ S.ed.hora=t.value; const r=$('#edres'); if(r) r.textContent='POSTA '+dayText(S.ed.dia)+' ÀS '+t.value; } return; } /* v50 */
+  if(!S.nv) return;
   if(t.id==='nvleg') S.nv.leg=t.value; else if(t.id==='nvped') S.nv.pedido=t.value; else if(t.id==='nvfilmein') S.nv.filme=t.value; });
 document.addEventListener('change',e=>{ const t=e.target;
   if(t.id==='nvfile'&&t.files&&t.files.length){ nvArquivos(t.files); t.value=''; }
-  else if(t.id==='nvhorain'&&S.nv){ S.nv.hora=t.value||''; nvRender(); } });
+  else if(t.id==='nvhorain'&&S.nv){ S.nv.hora=h24ok(t.value)?t.value:''; if(t.value&&!h24ok(t.value)) toast('Digita o horário em 24 h (ex.: 18:45)'); nvRender(); } });
 document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.id==='flin'){ e.preventDefault(); filmeAdd(); } });
 /* calendário do iPhone: só salva quando ele FECHA (o ✓ ou o Reset), não no primeiro toque */
 document.addEventListener('focusin',e=>{ const i=e.target.closest('[data-act="date"]'); if(i) i.dataset.orig=i.value; });
