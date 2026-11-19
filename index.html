@@ -1036,6 +1036,52 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 .ib:disabled{opacity:.4}
 .aviso.aj{color:#ddd6fe;background:rgba(167,139,250,.08);box-shadow:0 0 0 1px rgba(167,139,250,.35)}
 .aviso.aj svg{color:var(--violet)}
+/* v55: CORES POR SIGNIFICADO (Rubão 19/11)
+   roxo = ação sua (APROVAR, + NOVO POST) · amarelo neon gema = pendente/hoje/copiar · laranja = atenção forte (ATRASO, avisos que pedem ação)
+   vermelho de verdade = apagar/erro · verde = postado/ok · ciano = baixar/RESERVAS/FEED · magenta = arte (PEDIR AJUSTE) e STORY */
+:root{--amber:#FFD60A;--hot:#FFD60A;--hot-fill:linear-gradient(160deg,#FFE84A,#FFC800);--hot-line:#FFF3A3;--hot-glow:rgba(255,214,10,.5);
+  --red:#FF3B3B;--orange:#FF8A1F;--magenta:#FF3FD2;--rose:#FF3FD2}
+.num,.capprev .more,.capnote{text-shadow:0 0 8px rgba(255,214,10,.5)!important}
+.pill.cp,.pill[data-tone="today"]{border-color:rgba(255,214,10,.55)!important;background:rgba(255,214,10,.09)!important}
+.tab.t-pend.on{background:linear-gradient(160deg,rgba(255,214,10,.28),rgba(255,214,10,.08))!important;box-shadow:0 0 16px rgba(255,214,10,.3)!important;color:#FFF3A3}
+#days .dtile.on[data-tone="today"],.fgrid .dtile.on[data-tone="today"]{box-shadow:0 0 0 1.5px var(--hot-line),0 0 12px var(--hot-glow),inset 0 0 20px rgba(255,214,10,.45)!important}
+/* texto/ícone em cima do amarelo: escuro, pra ler bem (amarelo vivo com branco some) */
+.ib.gold,.login .act,.act.primary,.ver.on{color:#1d1600!important;text-shadow:none!important}
+.ib.gold svg,.act.primary svg{color:#1d1600!important;filter:drop-shadow(0 0 1px rgba(255,255,255,.35))!important}
+.seg .tab.t-pend.on{color:#1d1600!important;text-shadow:none!important}
+.seg .tab.t-pend.on b{color:#1d1600!important}
+#days .dtile.on[data-tone="today"] .c,.fgrid .dtile.on[data-tone="today"] .c{color:#1d1600!important}
+.toast.warn .t-ic{color:#1d1600!important}
+/* ATRASO = laranja (urgente, não é erro) */
+.pill[data-tone="late"],.pill.late{color:var(--orange)!important;border-color:rgba(255,138,31,.5)!important;background:rgba(255,138,31,.09)!important}
+.dtile[data-tone="late"] .w,.dtile[data-tone="late"] .n,.dtile[data-tone="late"] .c{color:var(--orange)!important}
+#days .dtile.on[data-tone="late"],.fgrid .dtile.on[data-tone="late"]{box-shadow:0 0 0 1.5px #FFD3A8,0 0 12px rgba(255,138,31,.55),inset 0 0 20px rgba(255,138,31,.5)!important;background:linear-gradient(160deg,rgba(255,138,31,.3),rgba(255,138,31,.08))!important}
+#days .dtile.on[data-tone="late"] .c,.fgrid .dtile.on[data-tone="late"] .c{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 46%),linear-gradient(180deg,#FF8A1F,#B34A00)!important;box-shadow:0 0 0 1.5px #FFD3A8,0 0 10px rgba(255,138,31,.8),inset 0 1px 0 rgba(255,255,255,.35)!important;color:#fff!important}
+/* avisos que pedem ação sua (robô, VOCÊ POSTA, só FEED · story à mão) = laranja */
+.aviso:not(.erro):not(.aj){color:#FFE0C2!important;background:rgba(255,138,31,.10)!important;box-shadow:0 0 0 1px rgba(255,138,31,.5),0 0 14px rgba(255,138,31,.16)!important}
+.aviso:not(.erro):not(.aj) svg{color:var(--orange)!important;filter:drop-shadow(0 0 6px rgba(255,138,31,.6))!important}
+.pill.man{color:var(--orange)!important;border-color:rgba(255,138,31,.45)!important;background:rgba(255,138,31,.09)!important}
+.pill.comp{color:var(--cyan)!important;border-color:rgba(103,232,249,.35)!important;background:rgba(103,232,249,.07)!important}
+/* vermelho de verdade (apagar / erro) */
+#logout,#clrAll,.popclear,.ib.red,.clearall,.cfm.danger #cfmOk{color:#fff!important;
+  background:linear-gradient(160deg,rgba(255,59,59,.66),rgba(200,16,16,.44)),#160606!important;
+  box-shadow:0 0 0 1px rgba(255,150,150,.9),0 0 14px rgba(255,59,59,.55),0 0 28px rgba(220,20,20,.25),inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 12px rgba(255,59,59,.25)!important;text-shadow:0 0 8px rgba(255,59,59,.6)}
+#logout svg,#clrAll svg,.popclear svg,.ib.red svg,.clearall svg,.cfm.danger #cfmOk svg{color:#ffd1d1!important;filter:drop-shadow(0 0 6px rgba(255,59,59,.85))!important}
+.aviso.erro{color:#ffd1d1!important;background:rgba(255,59,59,.10)!important;box-shadow:0 0 0 1px rgba(255,59,59,.55),0 0 14px rgba(255,59,59,.18)!important}
+.aviso.erro svg{color:var(--red)!important;filter:drop-shadow(0 0 6px rgba(255,59,59,.6))!important}
+.cfm.danger .cfm-ic{color:var(--red)!important;background:rgba(255,59,59,.10)!important;box-shadow:0 0 0 1px rgba(255,59,59,.5),0 0 22px rgba(255,59,59,.3)!important}
+/* ERRO AO POSTAR = vermelho */
+.pill.erro{color:var(--red)!important;border-color:rgba(255,59,59,.55)!important;background:rgba(255,59,59,.10)!important}
+/* STORY = magenta (a bolinha dos stories) */
+.pill.dest.st.sel,.pill.story{color:var(--magenta)!important;background:rgba(255,63,210,.10)!important;border-color:rgba(255,63,210,.5)!important}
+.chip.st.on{background:linear-gradient(135deg,#FF3FD2,#A3007F)!important;box-shadow:0 0 0 1px rgba(255,170,236,.85),0 0 12px rgba(255,63,210,.5)!important}
+/* PEDIR AJUSTE = magenta (arte) */
+.ib.vio{color:#fff0fb!important;background:linear-gradient(160deg,rgba(255,63,210,.58),rgba(190,0,150,.36)),#16061a!important;
+  box-shadow:0 0 0 1px rgba(255,170,236,.9),0 0 14px rgba(255,63,210,.5),0 0 28px rgba(190,0,150,.22),inset 0 1px 0 rgba(255,255,255,.2),inset 0 0 12px rgba(255,63,210,.25)!important}
+.ib.vio svg{filter:drop-shadow(0 0 6px rgba(255,63,210,.85))!important}
+.ib.vio.ajon{box-shadow:0 0 0 1px #FFD0F4,0 0 18px rgba(255,63,210,.75),0 0 36px rgba(190,0,150,.4),inset 0 1px 0 rgba(255,255,255,.22),inset 0 0 14px rgba(255,63,210,.35)!important}
+.aviso.aj{color:#FFD9F5!important;background:rgba(255,63,210,.08)!important;box-shadow:0 0 0 1px rgba(255,63,210,.4)!important}
+.aviso.aj svg{color:var(--magenta)!important}
 </style>
 </head>
 <body>
@@ -1159,7 +1205,7 @@ function rowHTML(p){
   const horaPill = p.postado ? '' : `<button class="pill hora${p.hora?' set':''}" data-act="hora" data-id="${esc(p.id)}" aria-label="Escolher horário" ${trava||p.aprovado?'disabled':''}>${I.clock} ${esc(p.hora||'HORÁRIO')}</button>`;
   const stPill = p.ig_status==='publicado' ? (p.ig_permalink?`<a class="pill igok" href="${esc(p.ig_permalink)}" target="_blank" rel="noopener">${I.ig} NO INSTAGRAM ›</a>`:`<span class="pill igok">${I.ig} NO INSTAGRAM</span>`)
     : p.ig_status==='criando' ? `<span class="pill apr">${I.send} ${p.dia&&p.hora&&new Date(p.dia+'T'+p.hora+':00-03:00')>Date.now()?'PRONTO · SAI '+esc(p.hora):'POSTANDO…'}</span>`
-    : p.ig_status==='erro' ? `<span class="pill late" title="${esc(p.ig_erro||'')}">ERRO AO POSTAR</span>` : '';
+    : p.ig_status==='erro' ? `<span class="pill erro" title="${esc(p.ig_erro||'')}">ERRO AO POSTAR</span>` : '';
   const dFeed=p.destino==='feed'||p.destino==='feed_story', dStory=p.destino==='story'||p.destino==='feed_story', travaDest=trava||p.aprovado||p.postado;
   const fixo=destFixo(p);
   const destPills = fixo ? `<span class="pill dest sel fixo${fixo==='story'?' st':''}">${fixo==='story'?'STORY':'FEED'}</span>` : p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest st${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
