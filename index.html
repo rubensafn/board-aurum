@@ -1039,19 +1039,19 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 /* v55: CORES POR SIGNIFICADO (Rubão 19/11)
    roxo = ação sua (APROVAR, + NOVO POST) · amarelo neon gema = pendente/hoje/copiar · laranja = atenção forte (ATRASO, avisos que pedem ação)
    vermelho de verdade = apagar/erro · verde = postado/ok · ciano = baixar/RESERVAS/FEED · magenta = arte (PEDIR AJUSTE) e STORY */
-:root{--amber:#FFD60A;--hot:#FFD60A;--hot-fill:linear-gradient(160deg,#FFE84A,#FFC800);--hot-line:#FFF3A3;--hot-glow:rgba(255,214,10,.5);
+:root{--amber:#FFC21A;--hot:#FFC21A;--hot-fill:linear-gradient(160deg,rgba(255,204,20,.78),rgba(255,140,0,.52));--hot-line:#FFE082;--hot-glow:rgba(255,180,0,.5);
   --red:#FF3B3B;--orange:#FF8A1F;--magenta:#FF3FD2;--rose:#FF3FD2}
 .num,.capprev .more,.capnote{text-shadow:0 0 8px rgba(255,214,10,.5)!important}
 .pill.cp,.pill[data-tone="today"]{border-color:rgba(255,214,10,.55)!important;background:rgba(255,214,10,.09)!important}
-.tab.t-pend.on{background:linear-gradient(160deg,rgba(255,214,10,.28),rgba(255,214,10,.08))!important;box-shadow:0 0 16px rgba(255,214,10,.3)!important;color:#FFF3A3}
+.tab.t-pend.on{color:#fff8e1}
 #days .dtile.on[data-tone="today"],.fgrid .dtile.on[data-tone="today"]{box-shadow:0 0 0 1.5px var(--hot-line),0 0 12px var(--hot-glow),inset 0 0 20px rgba(255,214,10,.45)!important}
-/* texto/ícone em cima do amarelo: escuro, pra ler bem (amarelo vivo com branco some) */
-.ib.gold,.login .act,.act.primary,.ver.on{color:#1d1600!important;text-shadow:none!important}
-.ib.gold svg,.act.primary svg{color:#1d1600!important;filter:drop-shadow(0 0 1px rgba(255,255,255,.35))!important}
-.seg .tab.t-pend.on{color:#1d1600!important;text-shadow:none!important}
-.seg .tab.t-pend.on b{color:#1d1600!important}
-#days .dtile.on[data-tone="today"] .c,.fgrid .dtile.on[data-tone="today"] .c{color:#1d1600!important}
-.toast.warn .t-ic{color:#1d1600!important}
+/* v56: amarelo-laranja vivo na MESMA receita de vidro dos outros botões (cor forte translúcida + fundo escuro + texto/ícone CLARO) */
+.ib.gold,.login .act,.act.primary,.ver.on{color:#fff8e1!important;background:linear-gradient(160deg,rgba(255,204,20,.78),rgba(255,140,0,.52)),#160e02!important;
+  box-shadow:0 0 0 1px rgba(255,224,130,.92),0 0 14px rgba(255,180,0,.55),0 0 28px rgba(255,128,0,.24),inset 0 1px 0 rgba(255,255,255,.22),inset 0 0 12px rgba(255,190,0,.28)!important;text-shadow:0 1px 2px rgba(0,0,0,.4)!important}
+.ib.gold svg,.act.primary svg{color:#fff8e1!important;filter:drop-shadow(0 0 6px rgba(255,190,0,.85))!important}
+.seg-ind[data-v="pend"]{background:linear-gradient(160deg,rgba(255,204,20,.78),rgba(255,140,0,.52)),#160e02!important;box-shadow:0 0 0 1px rgba(255,224,130,.92),0 0 16px rgba(255,180,0,.5),inset 0 1px 0 rgba(255,255,255,.22)!important}
+#days .dtile.on[data-tone="today"] .c,.fgrid .dtile.on[data-tone="today"] .c{background:linear-gradient(160deg,rgba(255,204,20,.82),rgba(255,140,0,.55)),#160e02!important;color:#fff!important}
+.toast.warn .t-ic{background:linear-gradient(160deg,rgba(255,204,20,.82),rgba(255,140,0,.55)),#160e02!important;color:#fff!important}
 /* ATRASO = laranja (urgente, não é erro) */
 .pill[data-tone="late"],.pill.late{color:var(--orange)!important;border-color:rgba(255,138,31,.5)!important;background:rgba(255,138,31,.09)!important}
 .dtile[data-tone="late"] .w,.dtile[data-tone="late"] .n,.dtile[data-tone="late"] .c{color:var(--orange)!important}
