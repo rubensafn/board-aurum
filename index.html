@@ -1087,6 +1087,17 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 .ib.vio.ajon{box-shadow:0 0 0 1px #FFD0F4,0 0 18px rgba(255,63,210,.75),0 0 36px rgba(190,0,150,.4),inset 0 1px 0 rgba(255,255,255,.22),inset 0 0 14px rgba(255,63,210,.35)!important}
 .aviso.aj{color:#FFD9F5!important;background:rgba(255,63,210,.08)!important;box-shadow:0 0 0 1px rgba(255,63,210,.4)!important}
 .aviso.aj svg{color:var(--magenta)!important}
+
+/* v59: PUXAR PRA ATUALIZAR (só toque). No app (tela de início) não tem botão de recarregar do navegador. Mesma receita de vidro do #fab. */
+#ptr{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 64px);z-index:55;width:42px;height:42px;margin-left:-21px;border-radius:999px;display:none;place-items:center;pointer-events:none;color:#ddd6fe;opacity:0;
+  background:radial-gradient(circle at 35% 30%,rgba(167,139,250,.28),rgba(14,14,20,.94) 72%),#0e0e14;box-shadow:0 10px 26px rgba(0,0,0,.55),0 0 14px rgba(167,139,250,.35);transform:translateY(-60px)}
+#ptr::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;background:linear-gradient(135deg,#f3d977,#fb7185 35%,#a78bfa 68%,#67e8f9);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+#ptr svg{width:19px;height:19px;position:relative;z-index:1}
+#ptr.ok{box-shadow:0 10px 26px rgba(0,0,0,.55),0 0 20px rgba(167,139,250,.6)}
+#ptr.spin svg{animation:ptrspin .7s linear infinite}
+@keyframes ptrspin{to{transform:rotate(360deg)}}
+@media (pointer:coarse){#ptr{display:grid}}
 </style>
 </head>
 <body>
@@ -1117,6 +1128,7 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 <div class="cfm" id="cfm" role="alertdialog" aria-modal="true" aria-labelledby="cfmT"><div class="cfm-box glass"><span class="cfm-ic" id="cfmIc"></span><b id="cfmT"></b><p id="cfmP"></p><div class="cfm-bt"><button class="act" id="cfmNo">CANCELAR</button><button class="act primary" id="cfmOk"></button></div></div></div>
 <div class="toast glass" id="toast" role="status" aria-live="polite"><span class="t-ic" id="toastIc"></span><span id="toastMsg"></span><button id="toastBtn"></button></div>
 
+<div id="ptr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></div>
 <script>
 const SB_URL='https://gdtfwmqbvsqtxtccrydv.supabase.co', SB_KEY='sb_publishable_siBXDugL8v3hXhCEfZHW9g_WBln-WFt';
 const SESSAO_HORAS=8;
@@ -1945,6 +1957,16 @@ function start(){
 }
 document.addEventListener('visibilitychange',()=>{ if(document.hidden||!S.pin) return; if(!readSession()) logout('Sessão expirada, entra de novo'); else load(); });
 start();
+
+/* v59: puxar pra atualizar — no topo da página, puxa pra baixo, solta e recarrega. Não age com pop-up aberto. */
+(()=>{const el=document.getElementById('ptr'); if(!el||!matchMedia('(pointer:coarse)').matches) return;
+  const GO=72, MAX=110; let y0=null, v=0, busy=false; const svg=el.querySelector('svg');
+  const show=(px,anim)=>{el.style.transition=anim?'transform .25s ease,opacity .25s ease':'none'; el.style.transform=`translateY(${px-60}px)`; el.style.opacity=Math.min(1,px/40); el.classList.toggle('ok',px>=GO); if(!busy) svg.style.transform=`rotate(${px*3.2}deg)`;};
+  addEventListener('touchstart',e=>{ y0=(busy||window.scrollY>0||lockY!==null||e.touches.length>1)?null:e.touches[0].clientY; },{passive:true});
+  addEventListener('touchmove',e=>{ if(y0===null) return; const dy=e.touches[0].clientY-y0; if(dy<=0||window.scrollY>0){v=0;show(0,false);return;} v=Math.min(MAX,dy*.5); show(v,false); },{passive:true});
+  const end=()=>{ if(y0===null) return; y0=null; if(v>=GO){ busy=true; svg.style.transform=''; el.classList.add('spin'); show(GO,true); setTimeout(()=>location.reload(),250); } else show(0,true); v=0; };
+  addEventListener('touchend',end); addEventListener('touchcancel',end);
+})();
 </script>
 </body>
 </html>
