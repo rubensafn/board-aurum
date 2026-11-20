@@ -296,11 +296,12 @@ Deno.serve(async (req) => {
 
   if (body.action === "filmes") {
     // aba FILMES: só roda quando o Rubão abre a aba. Puxa em cartaz + lançamentos do site e devolve a lista.
-    // Filme novo entra marcado; o que ele já marcou/desmarcou (mexido) NUNCA muda por causa do site.
+    // Filme novo em cartaz entra marcado; estreia futura entra desmarcada (v18); o que ele já marcou/desmarcou (mexido) NUNCA muda por causa do site.
     const { data: ok } = await sb.rpc("fila_ok", { p_pin: body.pin });
     if (!ok) return json({ error: "pin" }, 401);
     const chave = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
     const site = new Map<string, any>();
+    const naProgramacao = new Set<string>(); // filmes com sessão no site (o AURUM passa)
     let erroSite = "";
     try {
       const [pr, up] = await Promise.all([
@@ -310,7 +311,7 @@ Deno.serve(async (req) => {
       for (const f of Array.isArray(pr) ? pr : []) {
         const t = String(f.filme_site || f.nome_filme || "").replace(/^\((dub|leg|nac)\)\s*/i, "").trim(); if (!t) continue;
         const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(f.data_estreia || ""));
-        const k = chave(t); if (!site.has(k)) site.set(k, { chave: k, titulo: t, poster: f.cartaz || null, estreia: m ? `${m[3]}-${m[2]}-${m[1]}` : null });
+        const k = chave(t); naProgramacao.add(k); if (!site.has(k)) site.set(k, { chave: k, titulo: t, poster: f.cartaz || null, estreia: m ? `${m[3]}-${m[2]}-${m[1]}` : null });
       }
       for (const f of (up?.items ?? []) as any[]) {
         const t = String(f.title || "").trim(); if (!t) continue;
@@ -321,8 +322,15 @@ Deno.serve(async (req) => {
       const agora = new Date().toISOString();
       const { data: ja } = await sb.from("fila_filmes").select("chave");
       const tem = new Set((ja ?? []).map((r: any) => r.chave));
-      const novos = [...site.values()].filter((f) => !tem.has(f.chave)).map((f) => ({ ...f, origem: "site", no_site: true, ativo: true, visto_em: agora }));
+      // v18 (Rubão 20/11): filme novo só entra MARCADO se já está em cartaz (tem sessão no site e a estreia já chegou).
+      // Estreia futura entra DESMARCADA. No dia da estreia, se o AURUM passa e o Rubão nunca mexeu (mexido=false), marca sozinho.
+      // Se ele mexeu (marcou/desmarcou), nunca mais muda.
+      const hoje = new Date().toLocaleDateString("sv-SE", { timeZone: "America/Sao_Paulo" });
+      const emCartaz = (f: any) => naProgramacao.has(f.chave) && (!f.estreia || f.estreia <= hoje);
+      const novos = [...site.values()].filter((f) => !tem.has(f.chave)).map((f) => ({ ...f, origem: "site", no_site: true, ativo: emCartaz(f), visto_em: agora }));
       if (novos.length) await sb.from("fila_filmes").insert(novos);
+      const estrearam = [...site.values()].filter((f) => tem.has(f.chave) && emCartaz(f)).map((f) => f.chave);
+      if (estrearam.length) await sb.from("fila_filmes").update({ ativo: true }).in("chave", estrearam).eq("origem", "site").eq("mexido", false).eq("ativo", false);
       for (const f of site.values()) if (tem.has(f.chave)) await sb.from("fila_filmes").update({ titulo: f.titulo, poster: f.poster, estreia: f.estreia, no_site: true, visto_em: agora }).eq("chave", f.chave).eq("origem", "site");
       await sb.from("fila_filmes").update({ no_site: false }).eq("origem", "site").lt("visto_em", agora);
     }
