@@ -1088,13 +1088,11 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 .aviso.aj{color:#FFD9F5!important;background:rgba(255,63,210,.08)!important;box-shadow:0 0 0 1px rgba(255,63,210,.4)!important}
 .aviso.aj svg{color:var(--magenta)!important}
 
-/* v59: PUXAR PRA ATUALIZAR (só toque). No app (tela de início) não tem botão de recarregar do navegador. Mesma receita de vidro do #fab. */
-#ptr{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 64px);z-index:55;width:42px;height:42px;margin-left:-21px;border-radius:999px;display:none;place-items:center;pointer-events:none;color:#ddd6fe;opacity:0;
-  background:radial-gradient(circle at 35% 30%,rgba(167,139,250,.28),rgba(14,14,20,.94) 72%),#0e0e14;box-shadow:0 10px 26px rgba(0,0,0,.55),0 0 14px rgba(167,139,250,.35);transform:translateY(-60px)}
-#ptr::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;background:linear-gradient(135deg,#f3d977,#fb7185 35%,#a78bfa 68%,#67e8f9);
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
-#ptr svg{width:19px;height:19px;position:relative;z-index:1}
-#ptr.ok{box-shadow:0 10px 26px rgba(0,0,0,.55),0 0 20px rgba(167,139,250,.6)}
+/* v59/v60: PUXAR PRA ATUALIZAR (só toque). No app (tela de início) não tem botão de recarregar do navegador. v60: CIANO cheio (receita do + do celular, em ciano) — Rubão 20/11. */
+#ptr{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 64px);z-index:55;width:42px;height:42px;margin-left:-21px;border-radius:999px;display:none;place-items:center;pointer-events:none;color:#fff;opacity:0;
+  background:linear-gradient(160deg,rgba(103,232,249,.72),rgba(8,145,178,.55)),#06161b;box-shadow:0 0 0 1.5px #a5f3fc,0 0 16px rgba(103,232,249,.6),0 10px 26px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.25);transform:translateY(-60px)}
+#ptr svg{width:19px;height:19px;position:relative;z-index:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4))}
+#ptr.ok{box-shadow:0 0 0 1.5px #a5f3fc,0 0 22px rgba(103,232,249,.8),0 10px 26px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.25)}
 #ptr.spin svg{animation:ptrspin .7s linear infinite}
 @keyframes ptrspin{to{transform:rotate(360deg)}}
 @media (pointer:coarse){#ptr{display:grid}}
