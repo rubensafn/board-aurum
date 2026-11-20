@@ -1096,6 +1096,18 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 #ptr.spin svg{animation:ptrspin .7s linear infinite}
 @keyframes ptrspin{to{transform:rotate(360deg)}}
 @media (pointer:coarse){#ptr{display:grid}}
+
+/* v62: cards um pouco mais altos (altura continua fixa e igual pra todos) e a fileira de pílulas quebra em 2 linhas em vez de arrastar pro lado (Rubão 20/11) */
+.row{height:276px}
+@media (min-width:760px){.row{height:330px}}
+.row .meta{flex-wrap:wrap!important;overflow:visible;-webkit-mask-image:none;mask-image:none;row-gap:5px}
+/* v62: RESV — quando a PRODUTORA postou (antes ficava na linha .fname, que some no celular). Box pequeno, quase quadrado, MAGENTA (escolha do Rubão 20/11) */
+.rsv .rdata{flex:none;margin-top:3px;display:flex}
+.rsv .rdata span{display:inline-flex;align-items:center;gap:4px;height:19px;padding:0 7px;border-radius:6px;font-family:var(--body);font-size:10px;font-weight:600;letter-spacing:.06em;color:var(--rd-tx);
+  background:var(--rd-bg);box-shadow:0 0 0 1px var(--rd-bd)}
+.rsv .rdata i{font-style:normal;opacity:.6}
+.rsv .rdata b{font-weight:700;letter-spacing:.02em}
+.rsv{--rd-tx:#ffe4f8;--rd-bg:linear-gradient(160deg,rgba(255,63,210,.30),rgba(170,20,140,.18)),#18071a;--rd-bd:rgba(255,140,230,.6)}
 </style>
 </head>
 <body>
@@ -1782,6 +1794,8 @@ async function abrirResv(){
   if(S.view==='resv'&&!S.sheet&&!S.panel){ $('#c-resv').textContent=S.resv?S.resv.length:(S.resvN??'·'); $('#list').innerHTML=resvHTML(); }
 }
 const dm=t=>{ if(!t) return ''; const d=new Date(t); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); };
+/* v62: data/hora em que a PRODUTORA postou (fila_vistos.postado_distribuidora), visível também no celular */
+const dmh=t=>{ if(!t) return ''; const d=new Date(t); return dm(t)+' · '+String(d.getHours()).padStart(2,'0')+'h'+String(d.getMinutes()).padStart(2,'0'); };
 const findR=sc=>(S.resv||[]).find(r=>r.shortcode===sc);
 function resvRow(r){
   const reel=/\/reel\//.test(r.permalink||''), sc=esc(r.shortcode);
@@ -1791,7 +1805,8 @@ function resvRow(r){
       ${reel?`<span class="play">${I.play}</span>`:''}</button>
     <div class="info">
       <div class="l1"><span class="film">${esc(r.filme||'Sem filme')}</span></div>
-      <div class="fname">@${esc(r.conta||'')}${r.postado_distribuidora?' · postou '+dm(r.postado_distribuidora):''}</div>
+      <div class="fname">@${esc(r.conta||'')}</div>
+      ${r.postado_distribuidora?`<div class="rdata"><span>PRODUTORA <i>—</i> <b>${dmh(r.postado_distribuidora)}</b></span></div>`:''}
       <div class="meta"><span class="pill rtipo">${reel?'REELS':'POST'}</span>${r.quero?`<span class="pill rok">${I.check} QUERO</span>`:''}</div>
       <button class="capprev" data-act="rver" data-sc="${sc}"><span class="clamp">${r.caption?esc(r.caption):'<i>Sem legenda</i>'}</span><span class="more">VER NO INSTAGRAM ›</span></button>
       ${r.quero
