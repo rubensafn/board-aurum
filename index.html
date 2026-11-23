@@ -1108,6 +1108,31 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 .rsv .rdata i{font-style:normal;opacity:.6}
 .rsv .rdata b{font-weight:700;letter-spacing:.02em}
 .rsv{--rd-tx:#ffe4f8;--rd-bg:linear-gradient(160deg,rgba(255,63,210,.30),rgba(170,20,140,.18)),#18071a;--rd-bd:rgba(255,140,230,.6)}
+
+/* v63 (23/11): pente fino do celular — nada vaza de botão/pop-up */
+/* brilho dos botões não pode ser cortado em retângulo pela coluna do card (era o "bloco escuro") */
+.row .info{overflow:visible!important}
+/* motivo do erro: 1 linha; toca e abre o texto inteiro no próprio card (card cresce) */
+.row .aviso.erro{cursor:pointer}
+.row .aviso.erro>span{flex:1 1 auto;min-width:0}
+.row .aviso.erro .mais{flex:none;align-self:center;white-space:nowrap;font-style:normal;writing-mode:horizontal-tb;margin-left:auto;padding:4px 9px;border-radius:999px;box-shadow:0 0 0 1px rgba(255,59,59,.55);font-family:var(--display);font-weight:700;font-size:9px;letter-spacing:.1em;color:#fff1f2;opacity:.85}
+.row.erro-open{height:auto!important}
+.row.erro-open .info{height:auto!important}
+.row.erro-open .aviso.erro span{display:block!important;-webkit-line-clamp:unset!important;overflow:visible!important}
+.row.erro-open .aviso.erro small{display:block!important;margin-top:6px}
+/* TENTAR DE NOVO / MUDAR HORÁRIO: texto sempre dentro do botão */
+.row .erro-bts .aprov{min-width:0;padding:0 8px!important;gap:6px!important;font-size:9px!important;letter-spacing:.03em!important;white-space:nowrap}
+.row .erro-bts .aprov svg{width:12px!important;height:12px!important}
+@media (max-width:374px){.row .erro-bts .aprov svg{display:none}}
+/* pop-up respeita a barra do topo e a de baixo do iPhone (modo app): título e X sempre visíveis */
+.sheet{top:calc(50% + (env(safe-area-inset-top) - env(safe-area-inset-bottom))/2)!important;
+  max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px)!important}
+.sheet .sh-head{flex:none}
+/* horários do pop-up: rótulo dentro do quadradinho; campo OUTRO HORÁRIO na largura toda */
+.hpick .dtile{padding-left:3px!important;padding-right:3px!important;min-width:0}
+.hpick .dtile .w{white-space:nowrap;letter-spacing:.02em!important}
+@media (max-width:420px){.hpick .dtile .w{font-size:8px!important;letter-spacing:.02em!important}}
+.edw .hother{grid-template-columns:1fr!important}
 </style>
 </head>
 <body>
@@ -1174,7 +1199,7 @@ const isMobile=()=>window.matchMedia('(max-width:759px)').matches;
 function readSession(){ try{ const s=JSON.parse(store.get('fila_sess')||'null'); if(s&&s.pin&&s.exp>Date.now()) return s.pin; }catch(_){} store.set('fila_sess',null); store.set('fila_pin',null); return ''; }
 function saveSession(pin){ store.set('fila_sess',JSON.stringify({pin,exp:Date.now()+SESSAO_HORAS*3600e3})); store.set('fila_pin',null); }
 
-const S={posts:[],view:(v=>['pend','resv','apr','done'].includes(v)?v:'pend')(store.get('fila_view')),filtros:{pend:store.get('fila_filtro')||'todos',apr:store.get('fila_filtro_apr')||'todos',done:store.get('fila_filtro_done')||'todos'},pin:readSession(),ver:{},copied:store.get('fila_copied')||'',loaded:false,sig:'',sheet:null,busy:new Set()};
+const S={posts:[],view:(v=>['pend','resv','apr','done'].includes(v)?v:'pend')(store.get('fila_view')),filtros:{pend:store.get('fila_filtro')||'todos',apr:store.get('fila_filtro_apr')||'todos',done:store.get('fila_filtro_done')||'todos'},pin:readSession(),ver:{},copied:store.get('fila_copied')||'',loaded:false,sig:'',sheet:null,busy:new Set(),erroAberto:new Set()};
 
 async function rpc(fn,body){
   const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -1237,7 +1262,7 @@ function rowHTML(p){
   const fixo=destFixo(p);
   const destPills = fixo ? `<span class="pill dest sel fixo${fixo==='story'?' st':''}">${fixo==='story'?'STORY':'FEED'}</span>` : p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest st${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
   const quando = p.dia&&p.hora ? dayText(p.dia)+' '+p.hora : '';
-  const erroBox = !p.postado&&p.ig_status==='erro' ? `<div class="aviso erro" title="${esc(p.ig_erro||'')}">${I.warn}<span><b>NÃO POSTOU · </b>${esc(motivoErro(p.ig_erro))}${p.ig_refeito?' Já tentei de novo sozinho 1x.':''}<small>${esc(p.ig_erro||'')}</small></span></div>`
+  const erroBox = !p.postado&&p.ig_status==='erro' ? `<div class="aviso erro" data-act="erroler" data-id="${esc(p.id)}" title="${esc(p.ig_erro||'')}">${I.warn}<span><b>NÃO POSTOU · </b>${esc(motivoErro(p.ig_erro))}${p.ig_refeito?' Já tentei de novo sozinho 1x.':''}<small>${esc(p.ig_erro||'')}</small></span><i class="mais">${S.erroAberto.has(p.id)?'FECHAR':'LER'}</i></div>`
     : p.postado&&p.ig_story_status==='erro' ? `<div class="aviso erro" title="${esc(p.ig_story_erro||'')}">${I.warn}<span><b>STORY NÃO SAIU · </b>O feed saiu, o Story não. ${esc(motivoErro(p.ig_story_erro))}<small>${esc(p.ig_story_erro||'')}</small></span></div>` : '';
   const erroActs = !p.postado&&p.ig_status==='erro' ? `<div class="erro-bts"><button class="aprov" data-act="retry" data-id="${esc(p.id)}">${I.send} TENTAR DE NOVO</button><button class="aprov alt" data-act="editar" data-id="${esc(p.id)}">${I.pen} MUDAR HORÁRIO</button></div>`
     : p.postado&&p.ig_story_status==='erro' ? `<div class="erro-bts"><button class="aprov" data-act="retrystory" data-id="${esc(p.id)}">${I.send} TENTAR O STORY DE NOVO</button></div>` : '';
@@ -1252,7 +1277,7 @@ function rowHTML(p){
        ${p.postado?`<button class="ib mute" data-act="undo" data-id="${esc(p.id)}" aria-label="Desfazer postado" title="Desfazer postado">${I.undo}</button>`
                   :`<button class="ib green" data-act="posted" data-id="${esc(p.id)}" aria-label="Marcar como postado" title="Marcar como postado">${I.check}</button>`}
        <button class="ib red" data-act="del" data-id="${esc(p.id)}" aria-label="Apagar post" title="Apagar post e arquivos">${I.trash}</button>`;
-  return `<article class="row glass${S.copied===p.id?' copied':''}" data-row="${esc(p.id)}">
+  return `<article class="row glass${S.copied===p.id?' copied':''}${S.erroAberto.has(p.id)&&!p.postado&&p.ig_status==='erro'?' erro-open':''}" data-row="${esc(p.id)}">
     ${thumb}
     <div class="info">
       <div class="l1"><span class="num">${esc(pad(p.num??0))}</span><span class="film">${esc(p.filme||p.nome||'Post')}</span></div>
@@ -1893,6 +1918,7 @@ document.addEventListener('click',e=>{
   else if(a==='hset'){ const v=($('#hin')||{}).value||''; if(!h24ok(v)){ toast('Digita o horário em 24 h (ex.: 18:45)'); return; } const p=find(id); closeSheet(); setHora(id,v); if(p) toast('Horário '+hInfo(hdOf(p),v).replace(/<[^>]+>/g,'')); }
   else if(a==='sethora'){ closeSheet(); setHora(id,b.dataset.h||null); }
   else if(a==='aprovar') setAprovado(id,true);
+  else if(a==='erroler'){ S.erroAberto.has(id)?S.erroAberto.delete(id):S.erroAberto.add(id); render(); }
   else if(a==='retry') setAprovado(id,true);
   else if(a==='retrystory') retryStory(id);
   else if(a==='dest') toggleDestino(id,b.dataset.v);
