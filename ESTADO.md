@@ -1,9 +1,12 @@
-# ESTADO DO BOARD — MUDOU DE LUGAR (18/11/2026)
+# ESTADO DO BOARD — ONDE FICA CADA COISA (atualizado 25/11/2026)
 
-**As regras e o estado do board NÃO ficam mais aqui.** Decisão do Rubão (18/11): um lugar só, na nuvem, pra não dar conflito.
-
-Leia ANTES de mexer em qualquer coisa (projeto **AURUM EDITS** no claude.ai, ferramenta Projects):
+**O PRINCIPAL das regras e do estado é o projeto AURUM EDITS (claude.ai, ferramenta Projects)** — a varredura lê de lá:
 - `claude/FILA-DE-POSTS-APP.md` — regras do Rubão, o que está no ar, pendências do BOARD.
 - `claude/AUTO-POSTAGEM-AURUM.md` — regras da VARREDURA e da postagem automática.
+- `claude/PADRAO-TAMANHOS-E-DESTINO.md` e `claude/SELO-AU-VIDEOS-PRODUTORA.md`.
 
-Toda mudança termina atualizando ESSES docs (não este arquivo). Este repositório guarda só o CÓDIGO (index.html, edge function `supabase/functions/fila-admin`, tools).
+**Este repositório guarda:**
+- O CÓDIGO (principal aqui): `index.html`, `supabase/functions/fila-admin/index.ts`, `tools/fila_push.py` (igual ao `claude/fila-de-posts/fila_push.py` do projeto).
+- CÓPIA DE SEGURANÇA (pra puxar se algo quebrar no projeto): `docs/` (docs acima, textos das tarefas agendadas em `docs/tarefas/`, scripts do selo em `docs/selo/`) e `supabase/banco/fila_estrutura.sql` (estrutura do banco do board, sem senhas/tokens e sem nada das cortesias).
+
+Sincronização: uma vez no fim de cada sessão de trabalho, só o que mudou, no mesmo commit em dev e main. Editar sempre no projeto, nunca nas cópias daqui. Tokens/senhas nunca entram no repositório.

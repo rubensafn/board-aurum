@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Sobe um lote pra FILA DE POSTS (board.aurumcinema.com.br).
+CÓPIA: o principal é claude/fila-de-posts/fila_push.py do projeto AURUM EDITS (é o que a varredura usa). Os dois são iguais.
 
 Uso:  FILA_TOKEN=... python3 fila_push.py lote.json
 
@@ -10,8 +11,12 @@ lote.json = {"lote": "11-11", "posts": [
 
 - Cada arquivo até 50 MB (limite do plano grátis). Carrossel = vários arquivos no mesmo post, na ordem.
 - Dia e "postado" não são enviados: quem define é o Rubão no app.
+- ALTERAÇÃO (14/11): cada post tem pasta FIXA no bucket (<lote>/<lote>_<num>/). Subir de novo o mesmo
+  lote+num SOBRESCREVE os arquivos da versão anterior (x-upsert) e substitui o post. Não cria post nem
+  arquivo duplicado. Manter o MESMO nome de arquivo entre versões. A URL leva ?v=<hora> pra não mostrar
+  a versão antiga em cache.
 """
-import json, os, secrets, subprocess, sys, urllib.request
+import json, os, subprocess, sys, time, urllib.request
 
 URL = "https://gdtfwmqbvsqtxtccrydv.supabase.co"
 FN = URL + "/functions/v1/fila-admin"
@@ -34,7 +39,7 @@ def put(token, path, local, mime):
     r = subprocess.run(["curl", "-sS", "-f", "-X", "PUT", "-H", f"Content-Type: {mime}", "-H", "x-upsert: true", "--data-binary", "@" + local, up], capture_output=True, text=True)
     if r.returncode:
         sys.exit(f"falha no upload de {local}: {r.stderr or r.stdout}")
-    return f"{URL}/storage/v1/object/public/{BUCKET}/{path}"
+    return f"{URL}/storage/v1/object/public/{BUCKET}/{path}?v={int(time.time())}"
 
 
 def dims(f):
@@ -51,13 +56,14 @@ def main():
     lote = spec["lote"]
     rows = []
     for p in spec["posts"]:
+        pid = f"{lote}_{int(p['num']):02d}"
+        folder = f"{lote}/{pid}"  # pasta fixa por post: versão nova sobrescreve a antiga
         arquivos = []
         for f in p["files"]:
             ext = os.path.splitext(f)[1].lower()
             size = os.path.getsize(f)
             if size > MAX:
                 sys.exit(f"{os.path.basename(f)} tem {size/1048576:.1f} MB (máx. 50 MB): gere uma versão menor e marque comprimido")
-            folder = f"{lote}/{secrets.token_hex(6)}"
             path = f"{folder}/{os.path.basename(f)}"
             url = put(token, path, f, MIME.get(ext, "application/octet-stream"))
             is_video = ext in (".mp4", ".mov")
@@ -72,7 +78,7 @@ def main():
                              "nome": os.path.basename(f), "kind": "video" if is_video else "image"})
             print("ok", os.path.basename(f), f"{size/1048576:.1f} MB")
         row = {k: p[k] for k in ("num", "nome", "filme", "tipo", "legenda_celular", "legenda_pc") if k in p}
-        row.update(id=f"{lote}_{int(p['num']):02d}", lote=lote.replace("-", "."), comprimido=bool(p.get("comprimido")), arquivos=arquivos)
+        row.update(id=pid, lote=lote.replace("-", "."), comprimido=bool(p.get("comprimido")), arquivos=arquivos)
         rows.append(row)
     res = call({"action": "upsert", "token": token, "posts": rows})
     print("fila:", res)

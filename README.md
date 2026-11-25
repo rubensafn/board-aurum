@@ -1,6 +1,6 @@
 # AURUM · Fila de Posts
 
-> **Antes de qualquer coisa, leia no projeto AURUM EDITS (claude.ai) os docs `claude/FILA-DE-POSTS-APP.md` (board) e `claude/AUTO-POSTAGEM-AURUM.md` (varredura)** — regras do Rubão, o que está no ar e as pendências ficam SÓ lá (lugar único, 18/11). Este repo guarda só o código.
+> **Antes de qualquer coisa, leia no projeto AURUM EDITS (claude.ai) os docs `claude/FILA-DE-POSTS-APP.md` (board) e `claude/AUTO-POSTAGEM-AURUM.md` (varredura)** — regras do Rubão, o que está no ar e as pendências ficam SÓ lá (lugar único, 18/11). Este repo guarda o código e uma cópia de segurança dos docs (`docs/`) e do banco (`supabase/banco/`) — ver ESTADO.md.
 
 
 Board de controle de postagem do AURUM Cinema (board.aurumcinema.com.br). Cada post do lote vira um card com prévia, legenda (CELULAR / PC) com botão de copiar, botão de baixar, dia e "marcar como postado". Filtro por dia no topo. Funciona no celular e no PC.
