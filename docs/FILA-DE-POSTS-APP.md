@@ -3,7 +3,7 @@
 
 **ESTE DOC (projeto AURUM EDITS) É O LUGAR PRINCIPAL DAS REGRAS E DO ESTADO DO BOARD.** Regras da varredura/postagem: `claude/AUTO-POSTAGEM-AURUM.md`. Toda conversa nova lê os dois antes de mexer. Toda mudança termina atualizando AQUI. O CÓDIGO (index.html, edge function, tools) tem o principal no GitHub `rubensafn/board-aurum` (a Vercel publica de lá). O GitHub guarda também uma CÓPIA de segurança dos docs em `docs/` (ver Sincronização).
 
-Atualizado em: 25/11/2026 — board **v65** (commit d0f963e), edge `fila-admin` **v20**.
+Atualizado em: 25/11/2026, 20h50 — board **v66** (commit 72a388b), edge `fila-admin` **v20**.
 
 ## 1. Regras do Rubão (não quebrar)
 
@@ -18,6 +18,8 @@ Atualizado em: 25/11/2026 — board **v65** (commit d0f963e), edge `fila-admin` 
 - Conferir no CELULAR (393 px, iPhone 14 Pro) e no PC. Classes como `.fname` ficam escondidas no celular.
 - **Texto cortado com "…" sem jeito de ler = proibido.** Se não cabe, o elemento expande no lugar (o card pode crescer).
 - **Texto/ícone nunca sai do botão.** Medir no Playwright `scrollWidth <= clientWidth` de todo botão em 360 e 393 antes de entregar.
+- **NADA sai do lugar, fica apertado, sobreposto ou cortado (Rubão 25/11 — regra pra tudo).** Antes de entregar, PREVER e já avisar. Falta espaço → propor solução (ex.: menu que expande), nunca espremer. Erro de 25/11: v64/v65 puseram HORÁRIOS no topo e o 6º botão no card → abas do topo encavaladas e card do Rocky cortado no iPhone real; o teste não pegou porque rodou SEM as fontes reais.
+- **Teste visual SEMPRE com as fontes reais** (Cinzel/Inter do Google Fonts): no Playwright passar o proxy da sessão (`proxy={'server': HTTPS_PROXY}`, `--ignore-certificate-errors`) e esperar `document.fonts.ready`. Auditar também: abas do topo (filho fora da aba, aba encostando na vizinha), botões fora da barra do topo, card cortando conteúdo.
 
 **Tarefas agendadas (decidido 21/11, confirmado 25/11): SEMPRE SEPARADAS**
 - Varredura das distribuidoras = NUVEM (3x/dia). Nunca "exigir este computador".
@@ -59,18 +61,30 @@ Atualizado em: 25/11/2026 — board **v65** (commit d0f963e), edge `fila-admin` 
 - **Ícones**: traço claro (lucide, stroke 2), sem preenchimento grande. Testar no tamanho real.
 - **Ícone do app**: AU do mesmo tamanho/posição do ícone do Cortesias (~52% da largura), sem brilho interno.
 - Abas: PENDENTES amarelo-laranja · RESERVAS ciano · APROVADOS violeta · POSTADOS verde.
-- **Cards: altura FIXA e igual pra todos** (276 px celular / 330 px PC). Exceções que crescem: card com erro ABERTO (LER) e card A FAZER. Pílulas (`.meta`) quebram em 2 linhas. Não usar a classe genérica `.on` em botão novo.
+- **Cards: altura MÍNIMA igual pra todos** (276 px celular / 330 px PC) e CRESCEM o quanto precisar pra caber tudo (v66) — nunca cortar botão/aviso. Pílulas (`.meta`) quebram em 2 linhas. Não usar a classe genérica `.on` em botão novo.
+
+## 1b. JÁ CORRIGIDO — NÃO DESFAZER (conferir antes de mexer)
+- Aviso de baixo no rodapé (não subir). Confirmações sempre pop-up no centro.
+- Menu do celular cabe numa linha (v66: botão que expande). Página só rola pra cima/baixo.
+- Card nunca corta conteúdo; no máximo 5 botões na fileira; texto/ícone nunca sai do botão (v63: TENTAR DE NOVO/MUDAR HORÁRIO 9 px, sem ícone < 375 px).
+- Pop-ups respeitam a barra do iPhone no modo app (`env(safe-area-inset-*)`, v63). Neon dos botões do card não é cortado (`.row .info{overflow:visible}`, v63).
+- Erro "NÃO POSTOU" com LER/FECHAR que expande o card (v63). Data da PRODUTORA visível no celular (box magenta, v62).
+- Puxar pra atualizar (bolinha ciano, v59/v60). Ícone do app = AU do tamanho do Cortesias, sem brilho interno (v58/v61).
+- Cores por significado (seção 1) e receita de vidro com texto claro (v41/v56) — nunca amarelo com texto preto.
+- Horário sempre 24 h com máscara HH:MM; FEED+STORY não volta pra só STORY; EDITAR do aprovado sem voltar pra pendente (v50).
+- Vídeo +60 s = só FEED + "Só FEED · story à mão" (v48), sem corte automático.
 
 ## 2. O que existe hoje (no ar)
 - `index.html` — board inteiro (HTML/CSS/JS num arquivo). Camadas de CSS por versão no fim do `<style>` (… v62, v63, v64/v65 no final).
 - `manifest.webmanifest` + `icons/` — modo app no celular ("Board AU", sem service worker).
-- Abas: PENDENTES · RESERVAS · APROVADOS · POSTADOS (celular: PEND · RESV · APROV · POST). Topo: HORÁRIOS (some abaixo de 375 px; a mesma tabela aparece no pop-up de horário do card), FILMES, + NOVO POST, SAIR.
-- **Card**: capa + número + filme + box PRODUTORA (data em que a distribuidora postou, quando o post veio da varredura) + DIA + HORÁRIO + destino + status do Instagram + avisos + prévia da legenda + APROVAR + copiar / baixar / PEDIR AJUSTE / postado / MANDAR PRA RESERVA (só pendente que veio da varredura) / lixeira.
+- Abas: PENDENTES · RESERVAS · APROVADOS · POSTADOS (celular: PEND · RESV · APROV · POST). Topo no PC: HORÁRIOS, FILMES, + NOVO POST, SAIR. **Topo no celular (v66): AU + abas + UM botão (grade/X) que abre, animado pra baixo, HORÁRIOS · FILMES · SAIR** (fundo escurece; toque fora fecha). + NOVO POST no celular = bolinha roxa.
+- **Card**: capa + número + filme + box PRODUTORA (data em que a distribuidora postou, quando o post veio da varredura) + DIA + HORÁRIO + destino + status do Instagram + avisos + prévia da legenda + APROVAR + copiar / baixar / PEDIR AJUSTE / postado / lixeira — **no máximo 5 botões**. A lixeira de pendente que veio da varredura abre pop-up com 3 opções: RESERVA (volta pra aba RESV) · CANCELAR · REJEITAR (v66).
 - **Horários**: botões 12:30 · 15:00 · 17:30 · 20:30 · 21:30 (TESTE) + OUTRO HORÁRIO. Etiquetas e barras vêm da TABELA AO VIVO (`fila_config.horarios`, RPC `fila_horarios`; se não carregar, usa a fixa `HDADOS` de 14/11). Pop-up HORÁRIOS no topo: Reels, Estático e TESTE DA NOITE (7 dias). Faixa com menos de 5 posts aparece apagada.
 - **+ NOVO POST**: dois modos.
   - ARTE PRONTA: arquivo próprio, filme, onde posta, legenda ou GERAR LEGENDA, dia/hora, selo AU ✓/✗ → PENDENTES.
   - LINK DO INSTAGRAM (v65): link do post + O QUE QUERO (texto ou microfone — reconhecimento de voz do navegador, pt-BR; sem suporte, usa o microfone do teclado) + SEGUIR NOSSO PADRÃO (vem marcado) + filme + onde posta (opcional) + legenda/GERAR + dia/hora → card A FAZER em PENDENTES. A próxima varredura baixa e faz (regra no AUTO-POSTAGEM). Não dá pra aprovar enquanto A FAZER (trava no banco).
-- **Avisos de baixo (v65)**: pílula grande acima da barra do iPhone, contorno e brilho fortes na cor do significado (verde ok, vermelho erro, amarelo atenção), barrinha de tempo; 3,5 s (DESFAZER 6 s, erro 5 s).
+- **Avisos de baixo**: NO RODAPÉ (18–20 px acima da barra do iPhone — v66 corrigiu o v65 que tinha subido), pílula grande com contorno e brilho fortes na cor do significado (verde ok, vermelho erro, amarelo atenção), barrinha de tempo; 3,5 s (DESFAZER 6 s, erro 5 s).
+- **Abrir post do Instagram (RESV e NO INSTAGRAM)**: no modo app do iPhone abre direto o app do Instagram (`instagram://media?id=` calculado do código do link) — com `window.open` ficava uma tela em branco por cima do board ao voltar (v66). No navegador normal: nova aba.
 - Vídeo +60 s: card mostra "Só FEED · story à mão" (a API só aceita story até 60 s). Sem corte automático (Rubão, 25/11).
 - `supabase/functions/fila-admin/index.ts` — edge v20. Ações: sign/upsert/varrer/feed/set_meta (token), publicar (cron_key), delete/cleanup/upload_sign/filmes/reservas (senha). `cleanup` com cron_key também recalcula `fila_config.horarios` (90 dias, sem programação; nunca com a senha do board).
 - Tabelas: `fila_posts` (+ `subido`, `selo_pendente`, `manual`, `ajuste_pedido`, `ajuste_em`, `ajuste_resposta`, `a_fazer`, `link_origem`, `pedido_arte`, `seguir_padrao`), `fila_filmes` (+ `mexido`), `fila_config`, `fila_vistos` (+ `quero`, `quero_em`, `postado_distribuidora`).
@@ -78,7 +92,7 @@ Atualizado em: 25/11/2026 — board **v65** (commit d0f963e), edge `fila-admin` 
 
 ## 3. Pendências
 - 4 rodadas (12h, 15h, 18h, 21h): só quando o Rubão mandar.
-- Conferir com o Rubão no iPhone: v64/v65 (horários ao vivo, pop-up HORÁRIOS, RESERVA, PRODUTORA nos cards, avisos novos, + NOVO POST por link e microfone no modo app).
+- Conferir com o Rubão no iPhone: v66 (menu que expande, cards, aviso no rodapé, RESERVA na lixeira, abrir Instagram no modo app sem tela branca) e o + NOVO POST por link/microfone.
 - 1º post A FAZER de verdade: conferir que a varredura fez certo.
 - Vídeo deitado 16:9: confirmar que a API da Meta publica.
 - Capa com selo AU: implementar `cover_url` no `fila-admin`.
