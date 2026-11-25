@@ -1201,6 +1201,9 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 .cfm .cfm-bt .cfm-alt{grid-column:1/-1;order:-1}
 
 /* ===== v67 (25/11): fim da página sem sobra ===== */
+/* v68: prévia da legenda curta de novo (2 linhas no celular, 4 no PC); o card continua crescendo pra caber avisos e botões */
+.row .capprev{flex:0 1 auto!important;max-height:72px}
+@media (min-width:760px){.row .capprev{max-height:110px}}
 @media (max-width:759px){.list{padding-bottom:52px!important}} /* só o espaço pra bolinha + e o calendário não taparem os botões do último card */
 </style>
 </head>
