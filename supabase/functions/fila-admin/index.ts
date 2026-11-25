@@ -4,7 +4,7 @@
 // Erro do Instagram: tenta de novo 1x sozinho; se falhar de novo, marca erro e avisa o Rubão no celular (ntfy, fila_config.notify_url).
 // + NOVO POST (upload_sign, senha da fila) e aba FILMES (filmes: puxa do aurumcinema.com.br só quando o Rubão abre a aba).
 // aba RESV (reservas: miniaturas só quando o Rubão abre a aba; não grava nada).
-// SÓ mexe nas tabelas fila_posts e fila_filmes (+ fila_vistos pelas RPCs da aba RESV), na fila_config (chaves meta_*/cron_key/notify_url) e no bucket fila-posts. Nunca tocar no SISTEMA DE CORTESIAS (mesmo projeto).
+// SÓ mexe nas tabelas fila_posts e fila_filmes (+ fila_vistos pelas RPCs da aba RESV), na fila_config (chaves meta_*/cron_key/notify_url/horarios) e no bucket fila-posts. Nunca tocar no SISTEMA DE CORTESIAS (mesmo projeto).
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
@@ -26,6 +26,57 @@ const toPath = (u: unknown): string | null => {
   const p = (i >= 0 ? u.slice(i + PUB.length) : u).split("?")[0];
   return p && !p.includes("..") && !p.startsWith("/") && !p.startsWith("http") ? decodeURIComponent(p) : null;
 };
+
+
+// ---------- TABELA DE HORÁRIOS AO VIVO (plano 25/11) ----------
+// Roda 1x/dia dentro do cleanup do pg_cron (cron_key) — NUNCA com a senha do board (senão chamaria a Meta a cada abertura).
+// Últimos 90 dias do @aurum.cinema, sem PROGRAMAÇÃO, horário de Brasília, faixas de 1 h das 12h às 22h, REELS x ESTÁTICO/CARROSSEL.
+// Salva em fila_config k='horarios'. Se a Meta falhar, fica a do dia anterior.
+const PROG_RE = /programa[çc][ãa]o|sess[õo]es|hor[áa]rios/i;
+async function calcHorarios(sb: any) {
+  const tok = await conf(sb, "meta_token"); const ig = await conf(sb, "meta_ig_user");
+  if (!tok || !ig) return { erro: "sem token" };
+  const desde = Date.now() - 90 * 864e5;
+  const posts: any[] = [];
+  let url: string | null = `${GRAPH}/${ig}/media?` + new URLSearchParams({ fields: "timestamp,media_type,media_product_type,caption,insights.metric(reach,total_interactions)", limit: "100", access_token: tok });
+  for (let pg = 0; url && pg < 8; pg++) {
+    const r = await fetch(url); const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.error) throw new Error(j?.error?.message || `HTTP ${r.status}`);
+    let velho = false;
+    for (const m of j.data || []) {
+      const t = new Date(m.timestamp).getTime();
+      if (t < desde) { velho = true; continue; }
+      if (PROG_RE.test(m.caption || "")) continue;
+      const ins: Record<string, number> = {};
+      for (const x of m.insights?.data || []) ins[x.name] = Number(x.values?.[0]?.value ?? x.total_value?.value ?? 0);
+      if (ins.reach == null) continue;
+      const loc = new Date(t - 3 * 3600e3); // Brasília (sem horário de verão)
+      posts.push({ t, h: loc.getUTCHours(), mi: loc.getUTCMinutes(), reels: m.media_product_type === "REELS" || m.media_type === "VIDEO", reach: ins.reach || 0, int: ins.total_interactions || 0 });
+    }
+    url = velho ? null : (j.paging?.next || null);
+  }
+  const med = (a: number[]) => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
+  const r2 = (x: number) => Math.round(x * 100) / 100;
+  const grupo = (reels: boolean) => {
+    const g = posts.filter((p) => p.reels === reels);
+    const mr = med(g.map((p) => p.reach)), mint = med(g.map((p) => p.int));
+    const faixas = [];
+    for (let h = 12; h <= 22; h++) {
+      const f = g.filter((p) => p.h === h);
+      faixas.push({ h, n: f.length, alcance: mr ? r2(med(f.map((p) => p.reach)) / mr) : 0, inter: mint ? r2(med(f.map((p) => p.int)) / mint) : 0, pouco: f.length < 5 });
+    }
+    // teste da noite: últimos 7 dias, posts às 20:30 e 21:30 (±5 min)
+    const sete = Date.now() - 7 * 864e5, noite: Record<string, unknown> = {};
+    for (const [hh, mm] of [[20, 30], [21, 30]]) {
+      const f = g.filter((p) => p.t >= sete && p.h === hh && Math.abs(p.mi - mm) <= 5);
+      noite[`${hh}:${mm}`] = { n: f.length, alcance: mr && f.length ? r2(med(f.map((p) => p.reach)) / mr) : null, inter: mint && f.length ? r2(med(f.map((p) => p.int)) / mint) : null };
+    }
+    return { n: g.length, media_alcance: Math.round(mr), media_inter: Math.round(mint), faixas, noite };
+  };
+  const out = { atualizado: new Date().toISOString(), dias: 90, n: posts.length, reels: grupo(true), estatico: grupo(false) };
+  await sb.from("fila_config").upsert([{ k: "horarios", v: JSON.stringify(out) }], { onConflict: "k" });
+  return { ok: true, n: posts.length };
+}
 
 // ---------- Instagram ----------
 async function g(path: string, params: Record<string, string>, method = "GET") {
@@ -382,7 +433,10 @@ Deno.serve(async (req) => {
       await sb.from("fila_posts").update({ arquivos_apagados: true }).eq("id", r.id);
       apagados++;
     }
-    return json({ apagados });
+    // recálculo diário da tabela de horários: SÓ quando vem a cron_key (pg_cron), nunca com a senha do board
+    let horarios: unknown = null;
+    if (key && body.key === key) { try { horarios = await calcHorarios(sb); } catch (e) { horarios = { erro: String((e as Error).message) }; } }
+    return json({ apagados, horarios });
   }
 
   return json({ error: "action" }, 400);

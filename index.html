@@ -1546,9 +1546,17 @@ async function edSalvar(id,agoraOk){
 const HORAS=['12:30','15:00','17:30','20:30','21:30'];
 /* alcance x média do @aurum.cinema — últimos 200 posts (06/10 a 14/11/2026) */
 /* alcance x média do @aurum.cinema — últimos 300 posts (09/09 a 14/11/2026), horário de Brasília */
-const HDADOS={
+let HDADOS={
   reels:{t:'REELS',fx:[['12h–13h',1.02,'12:30'],['14h',1.72,''],['15h–16h',.92,'15:00'],['17h',1.15,'17:30'],['18h–19h',.93,''],['20h–21h',.80,'20:30 21:30']],n:'Reels: 14h foi o melhor (8 posts) e 17h acima da média. À noite (20h–21h, 13 posts) ficou abaixo até agora.'},
   est:{t:'ESTÁTICO / CARROSSEL',fx:[['12h–14h',1.62,'12:30'],['15h–17h',.80,'15:00 17:30'],['18h',1.14,''],['20h',1.08,'20:30'],['21h–22h',.51,'21:30']],n:'Estático: 12h–14h é o mais forte (16 posts). 20h acima da média. 21h–22h só 4 posts, pouco pra confiar.'}};
+/* v64: tabela de horários AO VIVO (fila_config.horarios, recalculada 1x/dia às 04:17 pelo fila-limpar). Se não vier, fica a fixa acima. */
+S.horarios=null;
+function aplicarHorarios(h){ if(!h||!h.reels||!h.estatico) return; S.horarios=h;
+  const dt=new Date(h.atualizado), quando=String(dt.getDate()).padStart(2,'0')+'.'+String(dt.getMonth()+1).padStart(2,'0');
+  const mk=(g,t,nome)=>{ const fx=g.faixas.filter(f=>f.n>0).map(f=>[f.h+'h',f.alcance,HORAS.filter(x=>+x.slice(0,2)===f.h).join(' '),f.pouco]);
+    const ok=g.faixas.filter(f=>!f.pouco).sort((a,b)=>b.alcance-a.alcance), top=ok.slice(0,2).map(f=>f.h+'h').join(' e ');
+    return {t, fx, per:h.dias+' DIAS', n:`${nome}: melhores agora ${top||'—'} (alcance × média). Tabela ao vivo · ${quando} · ${h.dias} dias · ${g.n} posts. Faixa apagada = menos de 5 posts (pouco dado).`}; };
+  HDADOS.reels=mk(h.reels,'REELS','Reels'); HDADOS.est=mk(h.estatico,'ESTÁTICO / CARROSSEL','Estático'); }
 function hdOf(p){ const f=(p.arquivos||[])[0]; return f&&f.kind==='video'?HDADOS.reels:HDADOS.est; }
 const HMERC='Estudos 2026: no Brasil o pico de uso do Instagram é 18h–22h (Metricool: 19h–21h; Sociality: 20h–0h). No @aurum.cinema tem poucos posts à noite: 20:30 e 21:30 são TESTE (21:30 = quem está em casa decidindo o cinema de amanhã).';
 function hTag(d,h){ if(h==='21:30') return {t:'TESTE',c:'tst'}; const r=d.fx.find(x=>x[2].split(' ').includes(h)); if(!r) return {t:'SEM DADO',c:''}; const v=Math.round((r[1]-1)*100); return {t:v>0?'+'+v+'%<i class="xl"> ALCANCE</i>':v<0?v+'%<i class="xl"> ALCANCE</i>':'NA MÉDIA',c:v>0?'up':'',v}; }
@@ -1560,15 +1568,15 @@ function hInfo(d,h){ if(!/^\d{2}:\d{2}$/.test(h||'')) return '';
   const v=Math.round((r[1]-1)*100), t=v>0?'+'+v+'% de alcance':v<0?v+'% de alcance':'na média de alcance';
   return `<b>${h}</b> · <span class="${v>0?'up':v<0?'dn':''}">${t}</span> · faixa ${r[0]} · ${d.t.toLowerCase()}${hh>=20?' · <i>noite em teste</i>':''}`; }
 function hdataHTML(d){ const mx=Math.max(...d.fx.map(x=>x[1]));
-  return `<div class="hdata glass"><span class="ht">ALCANCE x MÉDIA · ${d.t} · ÚLTIMOS 300 POSTS</span>
-      ${d.fx.map(x=>{const v=Math.round((x[1]-1)*100);return `<div class="hr ${v>0?'up':v<0?'dn':''}"><span>${x[0]}</span><b style="width:${Math.round(x[1]/mx*100)}%"></b><span>${v>0?'+':''}${v}%</span></div>`}).join('')}
+  return `<div class="hdata glass"><span class="ht">ALCANCE x MÉDIA · ${d.t} · ${d.per||'ÚLTIMOS 300 POSTS'}</span>
+      ${d.fx.map(x=>{const v=Math.round((x[1]-1)*100);return `<div class="hr ${v>0?'up':v<0?'dn':''}"${x[3]?' style="opacity:.45"':''}><span>${x[0]}</span><b style="width:${Math.round(x[1]/mx*100)}%"></b><span>${v>0?'+':''}${v}%</span></div>`}).join('')}
       <span class="hn">${d.n}</span><span class="hn">${HMERC}</span></div>`; }
 function horaSheetHTML(p){
   const d=hdOf(p), tags=HORAS.map(h=>hTag(d,h)), best=Math.max(...tags.map(t=>t.v??-99));
   const mx=Math.max(...d.fx.map(x=>x[1]));
   return `<div class="dpick hpick">${HORAS.map((h,i)=>`<button class="dtile glass${p.hora===h?' on':''}${tags[i].v===best&&best>0?' best':''}" data-act="sethora" data-h="${h}" data-id="${esc(p.id)}"><span class="w">${h==='12:30'?'ALMOÇO':h==='15:00'?'TARDE':h==='17:30'?'FIM TARDE':h==='20:30'?'NOITE':'P/ AMANHÃ'}</span><span class="n">${h}</span><span class="x ${tags[i].c}">${tags[i].t}</span></button>`).join('')}</div>
-    <div class="hdata glass"><span class="ht">ALCANCE x MÉDIA · ${d.t} · ÚLTIMOS 300 POSTS</span>
-      ${d.fx.map(x=>{const v=Math.round((x[1]-1)*100);return `<div class="hr ${v>0?'up':v<0?'dn':''}"><span>${x[0]}</span><b style="width:${Math.round(x[1]/mx*100)}%"></b><span>${v>0?'+':''}${v}%</span></div>`}).join('')}
+    <div class="hdata glass"><span class="ht">ALCANCE x MÉDIA · ${d.t} · ${d.per||'ÚLTIMOS 300 POSTS'}</span>
+      ${d.fx.map(x=>{const v=Math.round((x[1]-1)*100);return `<div class="hr ${v>0?'up':v<0?'dn':''}"${x[3]?' style="opacity:.45"':''}><span>${x[0]}</span><b style="width:${Math.round(x[1]/mx*100)}%"></b><span>${v>0?'+':''}${v}%</span></div>`}).join('')}
       <span class="hn">${d.n}</span><span class="hn">${HMERC}</span></div>
     <div class="hother"><span>${I.clock} OUTRO HORÁRIO</span><input class="field" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" autocomplete="off" data-h24="1" id="hin" data-hd="${esc(p.id)}" value="${esc(p.hora||'')}" aria-label="Outro horário"><button class="act primary" data-act="hset" data-id="${esc(p.id)}">USAR</button></div>
     <div class="hval" id="hinv">${HORAS.includes(p.hora)||!p.hora?'Digita um horário pra ver o alcance dele.':hInfo(hdOf(p),p.hora)}</div>
@@ -1991,6 +1999,7 @@ function start(){
   $('#top').hidden=false; $('#fabNovo').hidden=false; S.loaded=false; render(); load();
   rpc('fila_reservas_list',{p_pin:S.pin}).then(r=>{ S.resvN=(r||[]).length; if(!S.resv) $('#c-resv').textContent=S.resvN; }).catch(()=>{}); /* v49: só a contagem da aba RESV, 1x ao abrir o board */
   if(S.view==='resv') abrirResv();
+  rpc('fila_horarios',{p_pin:S.pin}).then(aplicarHorarios).catch(()=>{}); /* v64: tabela ao vivo, 1x ao abrir (só lê o banco, nunca a Meta) */
   fetch(SB_URL+'/functions/v1/fila-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cleanup',pin:S.pin})}).then(r=>r.json()).then(r=>{ if(r&&r.apagados){S.sig='';load();} }).catch(()=>{});
   clearInterval(poll); poll=setInterval(()=>{ if(!readSession()){logout('Sessão expirada, entra de novo');return;} if(!document.hidden) load(); },30000);
 }
