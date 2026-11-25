@@ -1,11 +1,16 @@
 <!-- CÓPIA de segurança — o PRINCIPAL é claude/SELO-AU-VIDEOS-PRODUTORA.md do projeto AURUM EDITS. Editar lá. -->
-# Selo AU em vídeos da produtora (padrão de 25/10/2026, atualizado em 11/11)
+# Selo AU em posts/vídeos da produtora — PADRÃO (atualizado 25/11/2026; doc único do selo, só o que vale hoje)
 
 Fluxo: Rubão manda o vídeo pronto da produtora → só aplicar o selo AU → devolver em 1080x1920 pra postar no Insta. Não mexer em corte, cor nem áudio.
 Lote misto (vídeos + posts + carrosséis num zip, separado por pasta) → mesma regra pra tudo, saída organizada em VIDEOS/, POSTS/ e uma pasta por carrossel, numerados, + LEGENDAS_<data>.txt com uma legenda por arquivo (mesmo número e nome).
 Nomes em CAIXA ALTA com underscore e o tamanho no fim (ex.: 04_VINGADORES_DOUTOR_DESTINO_1080X1920.mp4).
 Arquivos repetidos no lote (mesmo hash): ignorar, entra só um.
-Depois de entregar: jogar o lote na FILA DE POSTS (`claude/FILA-DE-POSTS-APP.md`).
+Depois de entregar: jogar o lote na FILA DE POSTS (`claude/FILA-DE-POSTS-APP.md`). Atalho do Rubão: "subir no board" = subir com o fila_push.py, sem perguntar.
+
+## Regras de entrega (Rubão, 14/11)
+- Post feito do zero pro AURUM TAMBÉM leva o selo AU.
+- Entrega no chat: arte como arquivo + legendas CELULAR e PC escritas no texto da resposta, cada uma num bloco de código (botão de copiar). Não mandar só .txt nem texto solto.
+- Board: pode subir a arte assim que fizer, mas cada peça é UM post só: a cada alteração, subir por cima do MESMO id (mesmo lote + num). Nunca criar post novo por versão.
 
 ## Legendas: SEMPRE AS DUAS VERSÕES (regra do Rubão, 11/11)
 - NÃO perguntar: fazer SEMPRE duas versões de cada legenda, CELULAR e PC (mesmo texto, muda só o bloco de hashtags). No app vão em `legenda_celular` e `legenda_pc`.
@@ -39,7 +44,8 @@ Depois de entregar: jogar o lote na FILA DE POSTS (`claude/FILA-DE-POSTS-APP.md`
 
 ## POSIÇÃO NAS IMAGENS: ANALISAR CADA ARTE (regra do Rubão, 26/10)
 - NÃO existe canto fixo. Olhar cada arte e pôr o AU onde fica mais bonito e faz sentido.
-- Artes centralizadas → AU ALINHADO AO CENTRO (x=494; x=498 em arte de 1088 de largura), encaixado num respiro entre os elementos.
+- Artes centralizadas → AU ALINHADO AO CENTRO (x=494; x=498 em arte de 1088 de largura), encaixado num respiro entre os elementos. Exemplos que ele aprovou: Cara de Barro → logo acima do selo DC STUDIOS; Jogos Vorazes → centro, EMBAIXO, logo acima do bloco do título; carrossel Vingadores → no respiro entre o logo e a classificação, setinha na mesma linha (930).
+- Centro todo ocupado → canto livre (66,66 / 930,66), sempre no respiro, nunca em cima de texto.
 - Carrossel segue um padrão entre as lâminas.
 - Nunca encostar em texto, aspas, botões, logos ou nomes. Vidro sempre contrastando com o fundo logo atrás.
 
@@ -60,7 +66,7 @@ Depois de entregar: jogar o lote na FILA DE POSTS (`claude/FILA-DE-POSTS-APP.md`
 - Eu Sou o Rocky (âmbar): rgba(226,120,20,0.64) / rgb(255,184,92) / rgba(240,130,30,0.52).
 - Jogos Vorazes: Amanhecer na Colheita (roxo): rgba(112,36,178,0.64) / rgb(190,130,255) / rgba(140,60,230,0.55).
 - Se Eu Fosse Você 3: vidro na cor OPOSTA ao fundo — rosa rgba(228,30,138,0.64)/rgb(255,120,192); azul rgba(18,150,228,0.66)/rgb(120,210,255).
-- Os Farofeiros 3: rgba(255,96,10,0.68) / rgb(255,176,80) / rgba(255,110,20,0.55).
+- Os Farofeiros 3 (laranja da campanha): rgba(255,96,10,0.68) / rgb(255,176,80) / rgba(255,110,20,0.55).
 
 ## Como é feito
-- Imagens: Playwright (HTML com a imagem de fundo e os elementos com backdrop-filter, screenshot no tamanho original) — `au-make.py`.
+- Imagens: Playwright (HTML com a imagem de fundo e os elementos com backdrop-filter, screenshot no tamanho original) — `claude/au-make.py`. Vídeo: `claude/au-anim.js` + `claude/au-vidanim.sh`.
