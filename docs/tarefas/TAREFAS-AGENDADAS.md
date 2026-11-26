@@ -1,15 +1,14 @@
-<!-- CÓPIA de segurança (25/11/2026). O PRINCIPAL é o texto de cada tarefa agendada no claude.ai (e as regras nos docs do projeto AURUM EDITS). -->
-# Tarefas agendadas do AURUM (sempre SEPARADAS)
+<!-- CÓPIA de segurança (26/11/2026). O PRINCIPAL é o texto de cada tarefa agendada no claude.ai (e as regras nos docs do projeto AURUM EDITS). Só as tarefas do BOARD; tokens trocados por <FILA_TOKEN>. -->
+# Tarefas agendadas do BOARD (sempre SEPARADAS)
 
 | Tarefa | id | Quando | Onde |
 |---|---|---|---|
 | AURUM · varredura das distribuidoras | trig_01TcQLbVPCUExKpeT8kkWntb | 11:22 · 15:22 · 18:22 (America/Sao_Paulo) | nuvem |
 | AURUM · artes do PC (manual) | trig_01EyY7DmZ8U9nmnUxv2igSC4 | só quando o Rubão executa | presa ao PC (`D:\AURUM - DSKP`) |
-| AURUM · Programação da semana (quarta 16h) | trig_015FiSsRWTTPYtqz9NrLGmJe | quarta 16:00 | nuvem + navegador do PC |
 
 ---
 
-## 1. Varredura das distribuidoras (texto de 25/11)
+## 1. Varredura das distribuidoras (texto completo, conferido 26/11)
 
 VARREDURA AUTOMÁTICA DO AURUM CINEMA (@aurum.cinema) — sessão agendada, ninguém está olhando. Responda e escreva tudo em português do Brasil. O cliente é o Rubão (CEO da CRIAS Studio). Seja econômico em token: só olhe imagens quando precisar escolher capa ou conferir o selo.
 
@@ -35,30 +34,27 @@ SELO AU NOS POSTS DO RUBÃO: `select id, nome, filme, arquivos, dia, hora, aprov
 ENGAJAMENTO: {"action":"feed","token":"<token>","limit":60,"insights":true} na Edge Function (reach, total_interactions, saved, shares) pra ver o que engaja POR FILME. Os melhores HORÁRIOS vêm da tabela ao vivo: `select v::jsonb from fila_config where k='horarios'` (não calcule horário pelo feed). Use isso pra decidir quem ganha post a mais (só se compensar) e os melhores horários (regras no doc). Na rodada das 18h: 1 linha de RETORNO DO TESTE DA NOITE com o bloco `noite` da tabela.
 
 PASSO A PASSO
-1. Varredura (o token da Meta NUNCA aparece; use só a Edge Function): POST https://gdtfwmqbvsqtxtccrydv.supabase.co/functions/v1/fila-admin com JSON {"action":"varrer","token":"<FILA_TOKEN>","users":["sonypicturesbr","wbpictures_br","paramountbrasil","disneystudiosbr","marvelbrasil","parisfilmes","diamondfilmsbr"],"limit":12}. Shortcodes já em `fila_vistos` (qualquer status) não são reavaliados.
+1. Varredura (o token da Meta NUNCA aparece; use só a Edge Function):
+   POST https://gdtfwmqbvsqtxtccrydv.supabase.co/functions/v1/fila-admin com JSON {"action":"varrer","token":"<FILA_TOKEN — está no texto da tarefa>","users":["sonypicturesbr","wbpictures_br","paramountbrasil","disneystudiosbr","marvelbrasil","parisfilmes","diamondfilmsbr"],"limit":12}
+   Shortcodes já em `fila_vistos` (qualquer status) não são reavaliados.
 2. Contra repetição: o feed + `select id, nome, filme, dia, hora, aprovado, postado, arquivado from fila_posts order by id desc limit 80` (sempre `not arquivado` ao avaliar o board; pra "já postado" conte também os arquivados). Só pula a MESMA PEÇA (mesma arte/vídeo, mesmo que volte com legenda nova). Assunto parecido é peça NOVA — nunca pule por "assunto repetido" (regra REPETIR do doc).
-3. Escolha pela CURADORIA, TODO FILME TODO DIA, QUANTIDADE = ANÁLISE, NA DÚVIDA SOBE EM PENDENTES, POST QUENTE, FILME EM ALTA, PESO POR FILME e ENGAJAMENTO do doc (QUERO ESSA primeiro). Na dúvida, sobe em PENDENTES (o que não couber hoje vai com dia de amanhã); reserva só pro que é claramente mais fraco. Filme sem nada novo nem reserva → dizer na notificação (Doutor Destino: pedir pro Rubão bolar post próprio). Se nada for escolhido: encerre. Notifique (resposta curta) se mexeu em legenda/selo/pedido do board OU se algum filme obrigatório ficou sem post; senão resposta final "nada novo" SEM notificar.
+3. Escolha pela CURADORIA, TODO FILME TODO DIA, QUANTIDADE = ANÁLISE, NA DÚVIDA SOBE EM PENDENTES, POST QUENTE, FILME EM ALTA, PESO POR FILME e ENGAJAMENTO do doc (QUERO ESSA primeiro). Na dúvida, sobe em PENDENTES (o que não couber hoje vai com dia de amanhã); reserva só pro que é claramente mais fraco. Filme sem nada novo nem reserva → dizer na notificação (Doutor Destino: pedir pro Rubão bolar post próprio). Se nada for escolhido: encerre. Notifique (resposta curta) se mexeu em legenda/selo/pedido do board OU se algum filme obrigatório (ex.: Doutor Destino, ou filme da lista sem post hoje) ficou sem post; senão resposta final "nada novo" SEM notificar.
 4. Para cada peça: baixar (vídeo: yt-dlp; imagem/carrossel: /embed/captioned/ como no doc), tamanho pelo PADRAO-TAMANHOS (feed 1080x1440 se der sem cortar info, senão mantém 1080x1350; deitado 16:9/4:3 posta NATIVO, só feed, sem faixa preta; story/reels 1080x1920), SELO AU (scripts no projeto: `claude/au-anim.js`, `claude/au-vidanim.sh`, `claude/au-make.py`), CAPA do Reels = frame de CENA reconhecível → `capa_ms`, legenda_celular e legenda_pc. Vídeo SEMPRE H.264 + AAC 48 kHz, 30 fps, sem música por cima; gravar `dur` (segundos) no json do arquivo.
-5. Subir com o script `claude/fila-de-posts/fila_push.py` do PROJETO (FILA_TOKEN = o token). Lote = data de hoje (DD-MM); continue a numeração. Só posts NOVOS — nunca reenviar id existente (exceto os PEDIDOS DO BOARD, que seguem o doc). Depois, por SQL, só em não aprovados: `dia`, `hora`, `capa_ms`, `aviso` (só coisa do app: caixinha, enquete, link — nunca música) e `destino` fixo quando o formato manda (1080x1440/1350/quadrado/deitado = 'feed'; estático 1080x1920 = 'story'; vídeo +60 s = 'feed'; Reels 1080x1920 até 60 s = NULL). Marcar em `fila_vistos` como 'baixado' com post_id. NUNCA aprovar, marcar postado, apagar, nem mexer em tabelas fora de fila_posts e fila_vistos (o SISTEMA DE CORTESIAS está no mesmo banco). Nunca mexer em pg_cron, Edge Functions ou estrutura do banco.
-6. Notificar o Rubão (resposta final curta, vira push): "Subi X posts no board (filmes …; N do QUERO ESSA; N da reserva; N A FAZER feitos). Destaque: … Dá uma conferida e aprova: board.aurumcinema.com.br" (+ legendas/selo/ajustes; + filmes sem post; + retorno do teste da noite na rodada das 18h). Se algo falhar, 1 linha dizendo o quê.
+5. Subir com o script `claude/fila-de-posts/fila_push.py` do PROJETO "AURUM EDITS" (ler com a ferramenta Projects e salvar como fila_push.py; NÃO precisa do GitHub; FILA_TOKEN = o token acima). Lote = data de hoje (DD-MM); continue a numeração. Só posts NOVOS — nunca reenviar id existente (exceto os PEDIDOS DO BOARD, que seguem o doc). Depois, por SQL, só em não aprovados: `dia`, `hora`, `capa_ms`, `aviso` (só coisa do app: caixinha, enquete, link — nunca música) e `destino` fixo quando o formato manda (1080x1440/1350/quadrado/deitado = 'feed'; estático 1080x1920 = 'story'; vídeo +60 s = 'feed'; Reels 1080x1920 até 60 s = NULL). Marcar em `fila_vistos` como 'baixado' com post_id. NUNCA aprovar, marcar postado, apagar, nem mexer em tabelas fora de fila_posts e fila_vistos (o SISTEMA DE CORTESIAS está no mesmo banco). Nunca mexer em pg_cron, Edge Functions ou estrutura do banco.
+6. Notificar o Rubão (resposta final curta, vira push): "Subi X posts no board (filmes …; N do QUERO ESSA; N da reserva; N A FAZER feitos). Destaque: <engajamento e o que fiz; se subiu mais que 1 de algum filme, por quê; se entrou POST QUENTE, qual>. Dá uma conferida e aprova: board.aurumcinema.com.br" (+ legendas/selo/ajustes se houve; + filmes sem post; + retorno do teste da noite na rodada das 18h). Se algo falhar, 1 linha dizendo o quê.
 
 ---
 
-## 2. Artes do PC (manual)
+## 2. Artes do PC (manual) (texto completo, conferido 26/11)
 
 AURUM Cinema — ARTES QUE FICAM NO PC (Farofeiros e outras pastas de arte do Rubão). Tarefa MANUAL: só roda quando o Rubão manda executar. Trabalho em português, direto.
 
-ANTES DE TUDO, ler no projeto AURUM EDITS (ferramenta Projects): claude/AUTO-POSTAGEM-AURUM.md, claude/SELO-AU-VIDEOS-PRODUTORA.md, claude/PADRAO-TAMANHOS-E-DESTINO.md e claude/FILA-DE-POSTS-APP.md. O que não estiver documentado: perguntar, nunca inventar.
+ANTES DE TUDO, ler no projeto AURUM EDITS (ferramenta Projects): claude/AUTO-POSTAGEM-AURUM.md (regras da varredura: horários, 1 h entre posts, todo filme todo dia, nunca repetir o que já foi postado, post quente), claude/SELO-AU-VIDEOS-PRODUTORA.md (selo AU), claude/PADRAO-TAMANHOS-E-DESTINO.md e claude/FILA-DE-POSTS-APP.md. O que não estiver documentado: perguntar, nunca inventar.
 
-1. Pasta: D:\AURUM - DSKP (no device_bash: $HOME/mnt/AURUM - DSKP). Olhar as pastas de arte dos filmes do mês. Só filmes marcados na aba FILMES do board.
-2. Pular o que já foi usado: conferir fila_vistos / fila_posts e as legendas do feed. Arquivos repetidos "(1)"/"(2)": usar hash. Story datado [DOWNTOWN]MM-DD_...: só no dia da data.
-3. Escolher pelas mesmas regras de curadoria do doc. PNG → JPG. Aplicar o selo AU.
-4. Subir em PENDENTES do board com fila_push.py (do projeto), depois gravar dia/hora/destino por SQL só em post não aprovado. Registrar cada peça em fila_vistos (baixado com post_id). NUNCA aprovar, marcar postado ou apagar.
-5. Cópia no PC: D:\AURUM - DSKP\<MÊS>\<DD.MM>\FINAIS. Não criar outras pastas.
+1. Pasta: D:\AURUM - DSKP (no device_bash: $HOME/mnt/AURUM - DSKP). Olhar as pastas de arte dos filmes do mês (ex.: NOVEMBRO\OS FAROFEIROS 3\POSTS FAROFEIROS, subpasta Story). Só filmes marcados na aba FILMES do board (fila_filmes where ativo and (no_site or origem='manual')).
+2. Pular o que já foi usado: conferir fila_vistos / fila_posts (sempre not arquivado) e as legendas do feed (fila-admin ação feed). Arquivos repetidos "(1)"/"(2)": usar hash. Story datado [DOWNTOWN]MM-DD_...: só no dia da data.
+3. Escolher pelas mesmas regras de curadoria do doc (não lotar o feed; o que sobra fica pra outro dia). PNG → JPG. Aplicar o selo AU (cor Farofeiros no doc).
+4. Subir em PENDENTES do board com fila_push.py (claude/fila-de-posts/fila_push.py do projeto), depois gravar dia/hora/destino por SQL só em post não aprovado, horário sugerido seguindo o doc (12:30–22:00, de 30 em 30, 1 h entre posts, nunca horário que já passou). Registrar cada peça em fila_vistos (baixado com post_id). NUNCA aprovar, marcar postado ou apagar.
+5. Cópia no PC: D:\AURUM - DSKP\<MÊS>\<DD.MM>\FINAIS (com selo + legendas). Não criar outras pastas.
 6. Banco: só fila_posts / fila_vistos (nunca tocar nas tabelas das CORTESIAS). Nada de cron novo.
-7. Ao terminar, notificar em 1 mensagem curta: o que subiu ou "nada novo nas artes do PC hoje".
-
----
-
-## 3. Programação da semana (quarta 16h)
-Resumo (texto completo na tarefa): lê `claude/VARREDURA-PROGRAMACAO-QUARTA.md`, `claude/PADROES-AURUM-INDICE.md`, `claude/PADRAO-PROGRAMACAO-SEMANAL.md`, `claude/PADRAO-STORIES-TEMPORADA-AUREA.md` e os kits; PARTE 1 prepara tudo com os dados de `/api/programacao` (navegador do PC) e pede o print dos selos; PARTE 2 gera regular + Temporada Áurea, atualiza os selos do site (repo `rubensafn/aurum-site`, branch `dev-v2` → `main`), salva os zips no Downloads. Programação NÃO sobe no board. Não mexe no board, no banco nem no Cortesias.
+7. Ao terminar, notificar em 1 mensagem curta: o que subiu (filme, peça, horário) ou "nada novo nas artes do PC hoje".

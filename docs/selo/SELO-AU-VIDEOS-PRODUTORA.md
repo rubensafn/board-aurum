@@ -1,5 +1,5 @@
 <!-- CÓPIA de segurança — o PRINCIPAL é claude/SELO-AU-VIDEOS-PRODUTORA.md do projeto AURUM EDITS. Editar lá. -->
-# Selo AU em posts/vídeos da produtora — PADRÃO (atualizado 25/11/2026; doc único do selo, só o que vale hoje)
+# Selo AU em posts/vídeos da produtora — PADRÃO (atualizado 26/11/2026; doc único do selo, só o que vale hoje)
 
 Fluxo: Rubão manda o vídeo pronto da produtora → só aplicar o selo AU → devolver em 1080x1920 pra postar no Insta. Não mexer em corte, cor nem áudio.
 Lote misto (vídeos + posts + carrosséis num zip, separado por pasta) → mesma regra pra tudo, saída organizada em VIDEOS/, POSTS/ e uma pasta por carrossel, numerados, + LEGENDAS_<data>.txt com uma legenda por arquivo (mesmo número e nome).
@@ -16,7 +16,7 @@ Depois de entregar: jogar o lote na FILA DE POSTS (`claude/FILA-DE-POSTS-APP.md`
 - NÃO perguntar: fazer SEMPRE duas versões de cada legenda, CELULAR e PC (mesmo texto, muda só o bloco de hashtags). No app vão em `legenda_celular` e `legenda_pc`.
 - Celular: no máximo 5 hashtags.
 - PC: ~10–11 por post: filme (PT + EN), elenco/estúdio, nicho/gênero e #AURUMCinema #CinemaGoiania #Goiania.
-- Evitar "amanhã"/"hoje" no texto, usar a data (ex.: "estreia nesta quinta, 12/11").
+- **Tempo no texto (Rubão, 26/11):** a legenda fala o tempo certo PRO DIA EM QUE O POST SAI, com base na legenda da distribuidora: estreia dia 26 postada no dia 25 = "ESTREIA AMANHÃ" (nunca "estreia dia 26", que soa como se fosse demorar); no dia = "ESTREIA HOJE" / "já em cartaz"; data distante = a data. Post que pode sair hoje ou amanhã (pendente): frase que vale nos dois dias (ex.: "Estreia da semana, já em cartaz no AURUM Cinema."). Regra completa: PRAZO DO TEXTO no `claude/AUTO-POSTAGEM-AURUM.md`.
 - Checar datas na web. Na dúvida, não cravar o dia. Não citar IMAX/Infinity Vision sem confirmar que o AURUM tem.
 
 ## VÍDEO: selo ANIMADO (regra do Rubão, 28/10)

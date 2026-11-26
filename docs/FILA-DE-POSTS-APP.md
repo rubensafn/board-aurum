@@ -3,7 +3,7 @@
 
 **ESTE DOC (projeto AURUM EDITS) É O LUGAR PRINCIPAL DAS REGRAS E DO ESTADO DO BOARD.** Regras da varredura/postagem: `claude/AUTO-POSTAGEM-AURUM.md`. Toda conversa nova lê os dois antes de mexer. Toda mudança termina atualizando AQUI. O CÓDIGO (index.html, edge function, tools) tem o principal no GitHub `rubensafn/board-aurum` (a Vercel publica de lá). O GitHub guarda também uma CÓPIA de segurança dos docs em `docs/` (ver Sincronização).
 
-Atualizado em: 25/11/2026, 20h50 — board **v69**, edge `fila-admin` **v20**.
+Atualizado em: 26/11/2026, 15h — board **v69**, edge `fila-admin` **v20**.
 
 ## 1. Regras do Rubão (não quebrar)
 
@@ -29,10 +29,10 @@ Atualizado em: 25/11/2026, 20h50 — board **v69**, edge `fila-admin` **v20**.
 - Toda mudança vai pra **dev E main juntas, no MESMO commit** (`git push origin HEAD:dev && git push origin HEAD:main`, com dev e main iguais antes). Só fica só na dev quando ele avisar.
 - Push pela sessão: o repo precisa estar nas fontes da sessão (`add_repo` rubensafn/board-aurum, acesso push).
 
-**Sincronização projeto ↔ GitHub (Rubão, 22/11 e 25/11)**
+**Sincronização projeto ↔ GitHub (Rubão, 26/11)**
 - PRINCIPAL: docs/regras = PROJETO (a varredura lê daqui); código = GitHub.
-- O GitHub guarda cópia de segurança: `docs/` (docs do board/varredura/tamanhos/selo + textos das tarefas + scripts do selo), `supabase/banco/` (estrutura do banco do board, sem senha/token/cron_key e NADA das cortesias), `tools/fila_push.py` (= `claude/fila-de-posts/fila_push.py` do projeto, o mesmo arquivo).
-- Sincronizar UMA VEZ no fim de cada sessão de trabalho, só o que mudou na sessão (economia de token), no mesmo commit em dev e main. Mudou o banco → atualizar `supabase/banco/` no mesmo commit. A varredura NUNCA lê o GitHub.
+- O GitHub (`board-aurum`) é SÓ DO BOARD: guarda cópia de segurança de `docs/` (docs do board/varredura/tamanhos/selo + textos das tarefas + scripts do selo), `supabase/banco/` (estrutura do banco do board, sem senha/token/cron_key e NADA das cortesias), `tools/fila_push.py` (= `claude/fila-de-posts/fila_push.py` do projeto, o mesmo arquivo). Índice geral, programação (regular, Áurea, V2) e campanhas de filme NUNCA vão pro GitHub.
+- **OBRIGATÓRIO — NA MESMA HORA:** atualizou um doc do board no projeto → atualizar a cópia no GitHub no mesmo momento (dev e main, mesmo commit), ANTES de responder ao Rubão. Nunca deixar pro fim da sessão. Mudou o banco → atualizar `supabase/banco/` no mesmo commit. A cópia é igual ao projeto, só com a 1ª linha de aviso "CÓPIA de segurança" e sem tokens/senhas. A varredura NUNCA lê o GitHub.
 
 **Banco (Supabase gdtfwmqbvsqtxtccrydv, plano grátis, MESMO banco do sistema de CORTESIAS)**
 - Nunca tocar nas tabelas das cortesias. Sempre olhar como está o banco antes de mexer.
@@ -107,7 +107,7 @@ Playwright com dados falsos: `add_init_script` com `localStorage fila_sess = {pi
 ## 5. Referência
 - Board: **https://board.aurumcinema.com.br** (Vercel, deploy automático do GitHub). Pede senha; sessão de 8 horas. A senha o Rubão tem; não guardar aqui. Trocar: `update public.fila_config set v = extensions.crypt('<nova>', extensions.gen_salt('bf')) where k='pin_hash'`.
 - Ele quer oferecer o board pra outros clientes: logo e cores num bloco "TEMA DO CLIENTE" no CSS (+ constante AU); ícone/manifest também são do cliente.
-- **REGRA GERAL**: TUDO que ele aprovar sobe no board (campanhas, artes próprias, vídeos). Exceção: stories que ele posta à mão e programação/foyer.
+- **REGRA GERAL**: TUDO que ele aprovar sobe no board (campanhas, artes próprias, vídeos). Exceção: stories que ele posta à mão e programação/foyer (só sobe se ele pedir na conversa — ex.: o carrossel do feed da programação, que é subido como um post CARROSSEL em PENDENTES).
 - **POSTAGEM MANUAL**: `fila_posts.manual` = o robô NUNCA posta; card mostra "VOCÊ POSTA" e "JÁ POSTEI".
 - Estrutura: `arquivos` = lista de `{path, url, poster, w, h, nome, kind, dur?}`. Bucket público `fila-posts` (máx. 50 MB por arquivo). Caminho FIXO `<DD-MM>/<DD-MM>_<num>/<arquivo>` (o fila_push sobrescreve a versão anterior: mesmo post, sem arquivo sobrando); + NOVO POST em `manual/`. Limites do grátis: 1 GB, ~5 GB/mês de tráfego.
 

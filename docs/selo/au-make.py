@@ -81,10 +81,34 @@ def image(src, dst, col, au, arrow=None):
     tmp = dst + '.png'; page(html, W, H, tmp)
     Image.open(tmp).convert('RGB').save(dst, quality=95, subsampling=0); os.remove(tmp)
 
-# Tabelas V/P/CAR (nome, cor e posição de cada peça) são preenchidas por lote — ver o arquivo do projeto pros exemplos de 26–27/10.
-V = {}
-P = {}
-CAR = {}
+V = {  # arquivo (prefixo) -> (saída, cor, Y)
+ # lote 27/10 (zona do selo conferida a 2 fps no vídeo todo: sem legenda/texto)
+ '2b4dc9': ('01_EU-SOU-O-ROCKY_voce-sabia', 'rocky', 1560),
+ '66ec33': ('02_STREET-FIGHTER_escolha-seu-lutador', 'streetfighter', 1560),
+ '7f2c39': ('03_CARA-DE-BARRO_premiere', 'caradebarro', 1560),
+ '99dcea': ('04_CARA-DE-BARRO_bastidores', 'caradebarro', 1560),
+ 'AQNgk8': ('01_STREET-FIGHTER', 'streetfighter', 1560),
+ 'AQNm2D': ('02_CARA-DE-BARRO_trailer', 'caradebarro', 1560),
+ 'AQOcu_': ('03_O-GATOLA-DA-CARTOLA_pre-estreia', 'gatola', 1560),
+ 'AQPGTF': ('04_EU-SOU-O-ROCKY', 'rocky', 1560),
+ 'AQPyBP': ('05_CARA-DE-BARRO_chocolate', 'caradebarro', 1712),  # endcard ocupa 1560-1610 -> desce pra faixa preta
+}
+# posição analisada peça a peça: AU (x,y) e setinha (x,y). Centro x=494 (AU 92) ; canto x=66 / setinha direita x=930
+P = {  # imagem única
+ 'd8eee6c0-image.jpg': ('05_CARA-DE-BARRO_filme-1-do-fim-de-semana', 'caradebarro', (494, 1018)),  # centro, acima do selo DC STUDIOS
+ '863849607': ('06_JOGOS-VORAZES_chama-ardente', 'jogosvorazes', (494, 1063)),  # centro, entre "CHAMA ARDENTE" e o bloco do título
+ '864950962': ('07_CARA-DE-BARRO_tradutor', 'caradebarro', (494, 1022)),          # centro, em cima do selo DC STUDIOS / logo
+ '866764040': ('08_JOGOS-VORAZES_livro-filme', 'jogosvorazes', (494, 1063)),      # centro, entre o livro e o bloco do título
+}
+CAR = {  # lista por lâmina: (cor, AU, setinha ou None)
+ 'CARROSSEL1_OOUTROLADODASREDES': ('09_CARROSSEL_O-OUTRO-LADO-DAS-REDES', [
+     ('outrolado', (66, 66), (930, 1252)), ('outrolado', (66, 66), (930, 1252)), ('outrolado', (66, 66), None)]),
+ 'CARROSSEL1_SEEUFOSSEVOC': ('10_CARROSSEL_SE-EU-FOSSE-VOCE-3', [
+     ('sefv_blue', (494, 342), (930, 1209)),  # centro, entre o logo e a pergunta (no y=66 colava no logo); setinha na altura do botão
+     ('sefv_pink', (494, 66), (930, 940)),    # topo centro na faixa azul; setinha no branco acima do logo
+     ('sefv_blue', (494, 66), (930, 940)),    # topo centro na faixa rosa; setinha no branco acima da faixa azul
+     ('sefv_pink', (66, 1005), None)]),       # pôster: topo e rodapé lotados (elenco, logos) -> esquerda, no branco ao lado do logo do filme
+}
 
 if __name__ == '__main__':
     only = sys.argv[sys.argv.index('--only') + 1] if '--only' in sys.argv else None
