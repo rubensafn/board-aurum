@@ -1,3 +1,4 @@
+<!-- CÓPIA de segurança — o PRINCIPAL é o doc claude/AUTO-POSTAGEM-AURUM.md do projeto AURUM EDITS (claude.ai). Editar lá, não aqui. -->
 # AUTO-POSTAGEM AURUM — pipeline automático (definido em 14/11/2026)
 
 Objetivo: o Rubão não precisa mais baixar nada. O Claude varre as distribuidoras, escolhe os melhores, baixa, aplica o selo AU (regras em `claude/SELO-AU-VIDEOS-PRODUTORA.md`), sobe no board com DIA + HORÁRIO SUGERIDOS, AVISA o Rubão, ele confere/troca o horário e APROVA no board, e o servidor publica sozinho no Instagram no horário. Tamanho/destino/capa: `claude/PADRAO-TAMANHOS-E-DESTINO.md`.
