@@ -3,7 +3,7 @@
 
 **ESTE DOC (projeto AURUM EDITS) É O LUGAR PRINCIPAL DAS REGRAS E DO ESTADO DO BOARD.** Regras da varredura/postagem: `claude/AUTO-POSTAGEM-AURUM.md`. Toda conversa nova lê os dois antes de mexer. Toda mudança termina atualizando AQUI. O CÓDIGO (index.html, edge function, tools) tem o principal no GitHub `rubensafn/board-aurum` (a Vercel publica de lá). O GitHub guarda também uma CÓPIA de segurança dos docs em `docs/` (ver Sincronização).
 
-Atualizado em: 26/11/2026, 15h — board **v69**, edge `fila-admin` **v20**.
+Atualizado em: 26/11/2026, 15h30 — board **v70**, edge `fila-admin` **v20**.
 
 ## 1. Regras do Rubão (não quebrar)
 
@@ -81,7 +81,7 @@ Atualizado em: 26/11/2026, 15h — board **v69**, edge `fila-admin` **v20**.
 - Abas: PENDENTES · RESERVAS · APROVADOS · POSTADOS (celular: PEND · RESV · APROV · POST). Topo no PC: HORÁRIOS, FILMES, + NOVO POST, SAIR. **Topo no celular (v66): AU + abas + UM botão (grade/X) que abre, animado pra baixo, HORÁRIOS · FILMES · SAIR** (fundo escurece; toque fora fecha). + NOVO POST no celular = bolinha roxa.
 - **Card**: capa + número + filme + box PRODUTORA (data em que a distribuidora postou, quando o post veio da varredura) + DIA + HORÁRIO + destino + status do Instagram + avisos + prévia da legenda + APROVAR + copiar / baixar / PEDIR AJUSTE / postado / lixeira — **no máximo 5 botões**. A lixeira de pendente que veio da varredura abre pop-up com 3 opções: RESERVA (volta pra aba RESV) · CANCELAR · REJEITAR (v66).
 - **Horários**: botões 12:30 · 15:00 · 17:30 · 20:30 · 21:30 (TESTE) + OUTRO HORÁRIO. Etiquetas e barras vêm da TABELA AO VIVO (`fila_config.horarios`, RPC `fila_horarios`; se não carregar, usa a fixa `HDADOS` de 14/11). Pop-up HORÁRIOS no topo: Reels, Estático e TESTE DA NOITE (7 dias). Faixa com menos de 5 posts aparece apagada.
-- **+ NOVO POST**: dois modos.
+- **+ NOVO POST**: dois modos. No campo FILME, além dos filmes da aba FILMES e do OUTRO, tem **SEM FILME** (v70): grava `filme = 'SEM FILME'` (sem mudar o banco) pra conteúdo do AURUM que não é de filme — a varredura faz a legenda e o selo dourado pela regra CONTEÚDO SEM FILME do AUTO-POSTAGEM.
   - ARTE PRONTA: arquivo próprio, filme, onde posta, legenda ou GERAR LEGENDA, dia/hora, selo AU ✓/✗ → PENDENTES.
   - LINK DO INSTAGRAM (v65): link do post + O QUE QUERO (texto ou microfone — reconhecimento de voz do navegador, pt-BR; sem suporte, usa o microfone do teclado) + SEGUIR NOSSO PADRÃO (vem marcado) + filme + onde posta (opcional) + legenda/GERAR + dia/hora → card A FAZER em PENDENTES. A próxima varredura baixa e faz (regra no AUTO-POSTAGEM). Não dá pra aprovar enquanto A FAZER (trava no banco).
 - **Avisos de baixo**: NO RODAPÉ (18–20 px acima da barra do iPhone — v66 corrigiu o v65 que tinha subido), pílula grande com contorno e brilho fortes na cor do significado (verde ok, vermelho erro, amarelo atenção), barrinha de tempo; 3,5 s (DESFAZER 6 s, erro 5 s).

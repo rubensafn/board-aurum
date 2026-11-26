@@ -22,7 +22,7 @@ Depois de entregar: jogar o lote na FILA DE POSTS (`claude/FILA-DE-POSTS-APP.md`
 ## VÍDEO: selo ANIMADO (regra do Rubão, 28/10)
 - Em vídeo o box do AU sempre tem animação de entrada, e o AU tem uma animação contínua bem leve. Em post estático NÃO anima.
 - Scripts (`au-anim.js` gera os frames, `au-vidanim.sh` compõe no ffmpeg): entrada 1,6 s (vidro surge com pop, AU se desenha pelo contorno e preenche); loop de 5 s (cheio ~3,4 s → esvazia pro contorno → luz corre pelo traço → preenche); borda/glow pulsa de leve; vidro de verdade segue a máscara animada.
-- Rodar o anim.js no fps do vídeo. Temas: red, blue, green, purple, orange, rocky, gatola (turquesa — nunca vermelho), gelo (Ebenezer).
+- Rodar o anim.js no fps do vídeo. Temas: red, blue, green, purple, orange, rocky, gatola (turquesa — nunca vermelho), gelo (Ebenezer), dourado (SEM FILME).
 - `node au-anim.js <tema> <fps> <pasta> [S]` (S = 132 padrão; 92 em vídeo de feed) e `au-vidanim.sh <in> <tema> <fps> <out> [X Y S largura altura]`. au.svg ao lado do anim.js.
 - VÍDEO DE FEED (720x960 → 1080x1440): selo animado no tamanho de imagem (92px, AU 72px).
 - Quando NENHUMA posição fica livre o vídeo todo, o selo pode sair (intro ao contrário ~0,55 s) e voltar — só por LEGENDA; texto de efeito rápido pode passar por cima.
@@ -67,6 +67,7 @@ Depois de entregar: jogar o lote na FILA DE POSTS (`claude/FILA-DE-POSTS-APP.md`
 - Jogos Vorazes: Amanhecer na Colheita (roxo): rgba(112,36,178,0.64) / rgb(190,130,255) / rgba(140,60,230,0.55).
 - Se Eu Fosse Você 3: vidro na cor OPOSTA ao fundo — rosa rgba(228,30,138,0.64)/rgb(255,120,192); azul rgba(18,150,228,0.66)/rgb(120,210,255).
 - Os Farofeiros 3 (laranja da campanha): rgba(255,96,10,0.68) / rgb(255,176,80) / rgba(255,110,20,0.55).
+- SEM FILME (conteúdo do AURUM, + NOVO POST marcado SEM FILME — tema `dourado` nos scripts): rgba(255,194,0,0.62) / rgb(255,224,130) / rgba(255,194,0,0.50).
 
 ## Como é feito
 - Imagens: Playwright (HTML com a imagem de fundo e os elementos com backdrop-filter, screenshot no tamanho original) — `claude/au-make.py`. Vídeo: `claude/au-anim.js` + `claude/au-vidanim.sh`.

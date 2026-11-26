@@ -32,6 +32,18 @@ Objetivo: o Rubão não precisa mais baixar nada. O Claude varre as distribuidor
 - Subir os arquivos NO MESMO POST: `sign` da Edge Function em `manual/<id>/<arquivo>` + PUT, e `update fila_posts set arquivos='<json igual ao do fila_push: path,url,poster,w,h,nome,kind,dur>', tipo='POST|VIDEO|CARROSSEL', a_fazer=false, ajuste_resposta='Feito do link: <1 frase>' where id=… and a_fazer`. Legenda: se `legenda_refazer`, escrever (regras de LEGENDA) e zerar `legenda_refazer`/`legenda_pedido`; se o Rubão escreveu, não mexer. Dia/hora vazios: sugerir pelas regras; destino pelo formato (só em não aprovado). Registrar o shortcode do link em `fila_vistos` como `baixado` com o post_id.
 - Nunca aprovar. Na notificação: 1 linha por post feito.
 
+## ⭐ CONTEÚDO SEM FILME (Rubão, 26/11, board v70) — SÓ posts do + NOVO POST com filme = `SEM FILME`
+- Vale SÓ pra post com `filme = 'SEM FILME'` (o Rubão marca SEM FILME no + NOVO POST, arte pronta ou link). NUNCA vale pros posts de filme nem pra varredura das distribuidoras (lá continua: legenda da distribuidora como base, sem ver vídeo, sem Whisper).
+- Ex.: conteúdo didático feito por ele, vídeo motivacional de um filósofo pego de outro perfil (com permissão).
+- **Legenda, nesta ordem de prioridade:**
+  1. O que ele pediu (`pedido_arte` / `legenda_pedido`) — manda sobre o resto.
+  2. A LEGENDA ORIGINAL do post do link (vem no HTML de `/p/<shortcode>/embed/captioned/`, o mesmo do download) — é a base.
+  3. Só quando não tem legenda (arquivo que ele mesmo subiu): arte → ler a imagem (já é aberta pro selo); vídeo COM fala → transcrever com Whisper na própria nuvem (`pip install faster-whisper --break-system-packages`, modelo `small`, `language='pt'`, só o texto entra na conversa); vídeo SEM fala → 2 ou 3 frames soltos. Nunca analisar o vídeo frame a frame.
+- Escrever sobre O QUE ESTÁ NO POST: sem chamada de filme/ingresso ("Em cartaz…", "Ingressos…"). Linha em branco depois da 1ª frase. Hashtags do tema + #AURUMCinema #CinemaGoiania #Goiania (celular máx. 5; PC ~10).
+- SEM crédito nem marcação do perfil original (se pegou, foi com permissão).
+- Selo AU DOURADO (tema `dourado`: tinta rgba(255,194,0,0.62) / borda rgb(255,224,130) / glow rgba(255,194,0,0.50) — o #FFC200 do padrão). Tamanho/destino/capa: padrão de sempre.
+- Não conta no "todo filme todo dia", nem no peso/engajamento por filme. Nunca aprovar.
+
 ## ⭐ REPETIR = SÓ A MESMA PEÇA (Rubão, 22/11 — regra GERAL, vale pra qualquer filme e qualquer conteúdo)
 - O ÚNICO motivo de "já postado" pra pular é ser a MESMA ARTE/VÍDEO (a mesma peça, mesmo que volte com legenda nova — ver regra "NUNCA SUGERIR O QUE JÁ FOI POSTADO").
 - **Assunto parecido NUNCA é motivo pra pular.** Peça nova sobre um assunto que já apareceu é CONTEÚDO NOVO e segue a curadoria normal: notícia que atualiza (números, repercussão, críticas, conquistas), nova peça da mesma campanha/chamada, novo ângulo do mesmo tema. As distribuidoras voltam aos mesmos temas o tempo todo; o que conta é se a PEÇA é nova.

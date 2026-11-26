@@ -1201,6 +1201,7 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 .cfm .cfm-bt .cfm-alt{grid-column:1/-1;order:-1}
 
 /* ===== v67 (25/11): fim da página sem sobra ===== */
+/* v70: + NOVO POST ganha o chip SEM FILME (filme = "SEM FILME", conteúdo do AURUM) */
 /* v69: nada dentro dos pop-ups encolhe quando o conteúdo cresce (TIRAR O HORÁRIO/O DIA amassados) — o pop-up rola */
 .sheet .sh-body>*,.sheet .dclear{flex-shrink:0!important}
 /* v68: prévia da legenda curta de novo (2 linhas no celular, 4 no PC); o card continua crescendo pra caber avisos e botões */
@@ -1831,7 +1832,7 @@ function novoHTML(){
   const ativos=(S.filmes||[]).filter(f=>f.ativo).map(f=>f.titulo);
   const nomes=[...new Set(ativos)];
   const days=[]; for(let i=0;i<5;i++){ const d=new Date(); d.setDate(d.getDate()+i); const k=iso(d), pp=parts(k); days.push({k,w:i===0?'HOJE':i===1?'AMANHÃ':pp.w+' '+pp.d}); }
-  const filmeOn=n.filme&&nomes.includes(n.filme), lk=n.modo==='link';
+  const SF='SEM FILME', semF=n.filme===SF&&!n.outro, filmeOn=n.filme&&(nomes.includes(n.filme)||n.filme===SF), lk=n.modo==='link';
   const modo=`<div class="chips nv-modo"><button class="chip d${!lk?' on':''}" data-act="nvmodo" data-v="arq">${I.up} ARTE PRONTA</button><button class="chip d${lk?' on':''}" data-act="nvmodo" data-v="link">${I.link} LINK DO INSTAGRAM</button></div>`;
   const topo=lk?`<div class="pn-sec">LINK DO POST</div><input class="nv-in" id="nvlink" type="url" inputmode="url" placeholder="https://www.instagram.com/p/…" value="${esc(n.link)}" aria-label="Link do post do Instagram" autocomplete="off">
     <div class="pn-sec">O QUE QUERO NESSE POST <i>(ideia e direção de arte)</i></div>
@@ -1841,7 +1842,8 @@ function novoHTML(){
   return `${modo}${topo}${lk?'':((n.files.length?`<div class="nv-files">${n.files.map((f,i)=>`<div class="nv-f${f.bad?' bad':''}">${f.thumb?`<img src="${esc(f.thumb)}" alt="">`:'<img alt="">'}${f.kind==='video'?'<span class="vd">VÍDEO</span>':''}<button class="rm" data-act="nvrm" data-i="${i}" aria-label="Tirar arquivo">${I.x}</button><span>${f.bad?'ACIMA DE 50 MB':esc(mb(f.file.size))}</span></div>`).join('')}</div>`:'')+`
     <label class="nv-drop">${I.up}<span>${n.files.length?'TROCAR / ADICIONAR ARQUIVOS':'ESCOLHER ARQUIVO'}</span><small>Imagem ou vídeo · até 50 MB cada · vários = carrossel</small><input type="file" id="nvfile" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" multiple hidden></label>`)}
     <div class="pn-sec">FILME</div>
-    <div class="chips">${nomes.map(t=>`<button class="chip${n.filme===t&&!n.outro?' on':''}" data-act="nvfilme" data-t="${esc(t)}">${esc(t)}</button>`).join('')}<button class="chip${n.outro||(n.filme&&!filmeOn)?' on':''}" data-act="nvoutro">OUTRO</button></div>
+    <div class="chips">${nomes.map(t=>`<button class="chip${n.filme===t&&!n.outro?' on':''}" data-act="nvfilme" data-t="${esc(t)}">${esc(t)}</button>`).join('')}<button class="chip${semF?' on':''}" data-act="nvfilme" data-t="SEM FILME">SEM FILME</button><button class="chip${n.outro||(n.filme&&!filmeOn)?' on':''}" data-act="nvoutro">OUTRO</button></div>
+    ${semF?'<span class="fl-empty">Conteúdo do AURUM (não é de filme): selo AU dourado; a legenda sai do que você pedir, da legenda do post do link ou do que está na arte/vídeo.</span>':''}
     ${n.outro||(n.filme&&!filmeOn)?`<input class="nv-in" id="nvfilmein" placeholder="Nome do filme" value="${esc(n.filme)}" maxlength="120" aria-label="Nome do filme">`:''}
     <div class="pn-sec">ONDE POSTA</div>
     <div class="chips cwrap">${fx&&!lk?`<button class="chip d on${fx==='story'?' st':''}" disabled style="opacity:1">${fx==='story'?'SÓ STORY':'SÓ FEED'}</button><span class="fl-empty">${fx==='story'?'Imagem 9:16 vai só no Story.':nvLongo()?'Vídeo com mais de 60 s: o Instagram só aceita no feed. O story você encaminha à mão.':'Esse formato vai só no feed.'}</span>`
