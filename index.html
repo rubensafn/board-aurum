@@ -1201,6 +1201,8 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 .cfm .cfm-bt .cfm-alt{grid-column:1/-1;order:-1}
 
 /* ===== v67 (25/11): fim da página sem sobra ===== */
+/* v69: nada dentro dos pop-ups encolhe quando o conteúdo cresce (TIRAR O HORÁRIO/O DIA amassados) — o pop-up rola */
+.sheet .sh-body>*,.sheet .dclear{flex-shrink:0!important}
 /* v68: prévia da legenda curta de novo (2 linhas no celular, 4 no PC); o card continua crescendo pra caber avisos e botões */
 .row .capprev{flex:0 1 auto!important;max-height:72px}
 @media (min-width:760px){.row .capprev{max-height:110px}}

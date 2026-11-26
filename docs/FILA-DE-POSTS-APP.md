@@ -3,7 +3,7 @@
 
 **ESTE DOC (projeto AURUM EDITS) É O LUGAR PRINCIPAL DAS REGRAS E DO ESTADO DO BOARD.** Regras da varredura/postagem: `claude/AUTO-POSTAGEM-AURUM.md`. Toda conversa nova lê os dois antes de mexer. Toda mudança termina atualizando AQUI. O CÓDIGO (index.html, edge function, tools) tem o principal no GitHub `rubensafn/board-aurum` (a Vercel publica de lá). O GitHub guarda também uma CÓPIA de segurança dos docs em `docs/` (ver Sincronização).
 
-Atualizado em: 25/11/2026, 20h50 — board **v68**, edge `fila-admin` **v20**.
+Atualizado em: 25/11/2026, 20h50 — board **v69**, edge `fila-admin` **v20**.
 
 ## 1. Regras do Rubão (não quebrar)
 
@@ -67,6 +67,7 @@ Atualizado em: 25/11/2026, 20h50 — board **v68**, edge `fila-admin` **v20**.
 - Aviso de baixo no rodapé (não subir). Confirmações sempre pop-up no centro.
 - Menu do celular cabe numa linha (v66: botão que expande). Página só rola pra cima/baixo.
 - Card nunca corta conteúdo (cresce inteiro, botões sempre dentro); prévia da legenda curta; no máximo 5 botões na fileira; MANDAR PRA RESERVA fica no pop-up da lixeira (decisão do Rubão 25/11 — não mudar); texto/ícone nunca sai do botão (v63: TENTAR DE NOVO/MUDAR HORÁRIO 9 px, sem ícone < 375 px).
+- Nada dentro dos pop-ups encolhe quando o conteúdo cresce: o pop-up rola (v69; TIRAR O HORÁRIO/O DIA tinham amassado).
 - Pop-ups respeitam a barra do iPhone no modo app (`env(safe-area-inset-*)`, v63). Neon dos botões do card não é cortado (`.row .info{overflow:visible}`, v63).
 - Erro "NÃO POSTOU" com LER/FECHAR que expande o card (v63). Data da PRODUTORA visível no celular (box magenta, v62).
 - Puxar pra atualizar (bolinha ciano, v59/v60). Ícone do app = AU do tamanho do Cortesias, sem brilho interno (v58/v61).
