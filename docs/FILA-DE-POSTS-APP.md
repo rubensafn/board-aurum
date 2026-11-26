@@ -95,6 +95,7 @@ Atualizado em: 26/11/2026, 15h30 — board **v70**, edge `fila-admin` **v20**.
 - 4 rodadas (12h, 15h, 18h, 21h): só quando o Rubão mandar.
 - Conferir com o Rubão no iPhone: v66 (menu que expande, cards, aviso no rodapé, RESERVA na lixeira, abrir Instagram no modo app sem tela branca) e o + NOVO POST por link/microfone.
 - 1º post A FAZER de verdade: conferir que a varredura fez certo.
+- 1º post SEM FILME (v70) de verdade: conferir legenda (pedido > legenda original > arte/Whisper), selo dourado e que não entrou chamada de filme.
 - Vídeo deitado 16:9: confirmar que a API da Meta publica.
 - Capa com selo AU: implementar `cover_url` no `fila-admin`.
 - Teste da noite fecha ~28/11 → resumo pro Rubão.
