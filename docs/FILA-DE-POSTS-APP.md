@@ -76,7 +76,7 @@ Atualizado em: 28/11/2026, 03h — board **v73**, edge `fila-admin` **v21**.
 - Vídeo +60 s = só FEED + "Só FEED · story à mão" (v48), sem corte automático.
 - Horário = GRADE 09:00–22:00 de 30 em 30 (v71): tocar só MARCA e mostra o alcance embaixo; grava no USAR (pop-up do card) / SALVAR (editar aprovado). Nunca voltar pros 5 botões que gravavam no toque.
 - Vermelho único (v71): TODO botão de apagar/sair/rejeitar (SAIR do menu, EXCLUIR TODAS, APAGAR TODOS, lixeira, confirmar) usa o vermelho vivo da lixeira do card (`#FF3B3B`, camada v71 no fim do CSS). Botão vermelho novo entra nessa lista.
-- Pílula de horário do card (v73): SEMPRE numa linha só, na linha dela (embaixo do dia), cresce pra direita — nunca quebra o texto. Mostra o % do horário com ESCALA DE CORES (pílula inteira na cor): verde ≥ +15% · turquesa +5 a +15% · azul na média (−10 a +5%) · laranja −10 a −25% · coral abaixo de −25%. Estimativa = contorno TRACEJADO + "EST" lilás. Menos de 1 h de outro post de feed do dia = ⏱ laranja "30′ DO 04". Story não leva %.
+- Pílula de horário do card (v73): SEMPRE numa linha só, na linha dela (embaixo do dia), cresce pra direita — nunca quebra o texto. Mostra o % do horário com ESCALA DE CORES (pílula inteira na cor): verde ≥ +15% · turquesa +5 a +15% · azul na média (−10 a +5%) · laranja −10 a −25% · vermelho abaixo de −25% (pedido do Rubão). Estimativa = contorno TRACEJADO + "EST" lilás. Menos de 1 h de outro post de feed do dia = ⏱ laranja "30′ DO 04". Story não leva %.
 - Sem zoom no iPhone (v71: viewport sem zoom + `touch-action` + bloqueio da pinça). Não tirar.
 
 ## 2. O que existe hoje (no ar)
