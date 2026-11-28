@@ -1278,18 +1278,22 @@ button,a,label,input,textarea{touch-action:manipulation}
   .dock.arrasta,.dock.arrasta .dock-box{transition:none!important}
   /* v76: alça = ETIQUETA colorida (degradê da marca na vertical, pra aparecer todas as cores), reta do lado da borda/box e arredondada só do lado de fora.
      Fechado: colada na borda direita, só a ponta aparece e dá um empurrãozinho de vez em quando. Aberto: sai de TRÁS do box. */
-  .dock-alca{width:26px;height:42px;flex:none;margin-bottom:.75px;margin-right:-1.25px;z-index:2;display:grid;place-items:center;position:relative;
-    filter:drop-shadow(-2px 4px 6px rgba(170,60,0,.5)) drop-shadow(0 0 6px rgba(255,120,0,.4))}
-  .dock-tag{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-  .dock-alca i{position:relative;left:-1px;top:4px}
+  .dock-alca{width:24px;height:42px;flex:none;align-self:flex-end;z-index:4;display:grid;place-items:center;position:relative}
+  /* v77: UM contorno só pra alça + box (SVG desenhado pelo JS): mesma linha passa pela alça e pelo box inteiro, sem emenda.
+     Contorno claro alaranjado com neon laranja, na receita dos outros botões. A parte do box acompanha o fade. */
+  .dock-linha{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:3}
+  .dk-line{fill:none;stroke:#FFE2C6;stroke-width:1.5;stroke-linejoin:round;filter:drop-shadow(0 0 3px rgba(255,140,30,.9)) drop-shadow(0 0 8px rgba(255,110,0,.45))}
+  .dk-box-line{opacity:var(--p);transition:opacity .34s cubic-bezier(.22,.61,.36,1)}
+  .dock.arrasta .dk-box-line{transition:none}
+  #dkTagFill{filter:drop-shadow(0 0 8px rgba(255,120,0,.45))}
+  .dock-alca i{position:relative;z-index:5;left:1px}
   .dock-alca::before{content:"";position:absolute;inset:-18px -6px -18px -18px} /* área de pegar maior */
   .dock-alca i{width:7px;height:7px;border-left:2.2px solid #fff;border-bottom:2.2px solid #fff;transform:translateX(2px) rotate(45deg);transition:transform .34s cubic-bezier(.22,.61,.36,1);filter:drop-shadow(0 0 3px rgba(255,120,0,.95))}
   body.dock-on .dock-alca i{transform:translateX(-1px) rotate(-135deg)}
   .dock-alca b{position:absolute;top:-9px;left:-9px;z-index:3;min-width:20px;height:20px;padding:0 4px;border-radius:999px;display:grid;place-items:center;font:700 10.5px/1 var(--body);color:#fff;background:linear-gradient(160deg,#a78bfa,#7c3aed);box-shadow:0 0 0 1.5px #ddd6fe,0 0 10px rgba(167,139,250,.7)}
   .dock-alca b[hidden],body.dock-on .dock-alca b{display:none}
-  .dock-box{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px;border-radius:26px 26px 26px 0;opacity:var(--p);transition:opacity .34s cubic-bezier(.22,.61,.36,1);
-    border:1.5px solid transparent;background:linear-gradient(160deg,rgba(40,36,56,.9),rgba(14,12,22,.92)) padding-box,linear-gradient(180deg,#FFB35C,#FF6A00) border-box;
-    -webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);box-shadow:0 6px 16px rgba(170,60,0,.45),0 0 12px rgba(255,120,0,.25)}
+  .dock-box{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:9.5px;border-radius:26px 26px 26px 0;opacity:var(--p);transition:opacity .34s cubic-bezier(.22,.61,.36,1);
+    background:linear-gradient(160deg,rgba(40,36,56,.9),rgba(14,12,22,.92));-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);box-shadow:0 6px 16px rgba(170,60,0,.45)}
     box-shadow:0 0 0 1.5px rgba(214,204,255,.8),0 0 16px rgba(167,139,250,.45),inset 0 1px 0 rgba(255,255,255,.22),0 12px 30px rgba(0,0,0,.5)}
   body:not(.dock-on) .dock:not(.arrasta) .dock-box{pointer-events:none}
   .dock-box #fab,.dock-box .fabnovo{position:relative!important;transform:none!important;opacity:1!important;margin:0!important;right:auto!important;bottom:auto!important;width:42px!important;height:42px!important}
@@ -1332,7 +1336,7 @@ button,a,label,input,textarea{touch-action:manipulation}
 <button class="fchip glass" id="fchip" data-act="fsheet" aria-label="Filtrar por dia"></button>
 <button class="fab" id="fab" data-act="fsheet" aria-label="Filtrar por dia" hidden></button>
 <button class="fabnovo" id="fabNovo" data-act="novo" aria-label="Novo post" hidden></button>
-<div class="dock" id="dock" hidden><div class="dock-alca" id="dockTab" aria-label="Arrasta pra abrir os atalhos (novo post e filtro)" role="button"><svg class="dock-tag" viewBox="0 0 26 42" aria-hidden="true"><defs><linearGradient id="dockTagG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A2E"/><stop offset="1" stop-color="#FF6A00"/></linearGradient></defs><path d="M24.75 0Q24.75 8 16.75 8L10 8A10 10 0 0 0 0 18L0 31.25A10 10 0 0 0 10 41.25L26 41.25L26 0Z" fill="url(#dockTagG)"/><path d="M24.75 0Q24.75 8 16.75 8L10 8A10 10 0 0 0 0 18L0 31.25A10 10 0 0 0 10 41.25L26 41.25" fill="none" stroke="#FF6A00" stroke-width="1.5"/></svg><i></i><b hidden></b></div><div class="dock-box" id="dockBox"></div></div>
+<div class="dock" id="dock" hidden><div class="dock-alca" id="dockTab" aria-label="Arrasta pra abrir os atalhos (novo post e filtro)" role="button"><i></i><b hidden></b></div><div class="dock-box" id="dockBox"></div><svg class="dock-linha" id="dockLinha" aria-hidden="true"><defs><linearGradient id="dockTagG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A2E"/><stop offset="1" stop-color="#FF6A00"/></linearGradient></defs><path id="dkTagFill" fill="url(#dockTagG)"/><path id="dkBoxLine" class="dk-line dk-box-line"/><path id="dkTagLine" class="dk-line"/></svg></div>
 <main class="wrap"><div class="list" id="list"></div></main>
 <div class="sheet-bg" id="sheetBg"></div>
 <section class="sheet glass" id="sheet" role="dialog" aria-modal="true" aria-label="Detalhes do post"></section>
@@ -2311,7 +2315,13 @@ start();
   const mob=()=>innerWidth<760;
   function mover(){ const fn=$('#fabNovo'), fb=$('#fab'); if(mob()){ if(fn&&fn.parentElement!==box) box.appendChild(fn); if(fb&&fb.parentElement!==box) box.appendChild(fb); } else { if(fn&&fn.parentElement===box) document.body.appendChild(fn); if(fb&&fb.parentElement===box) document.body.appendChild(fb); } }
   mover(); addEventListener('resize',mover);
-  const off=()=>{ const v=(box.offsetWidth||60)+14; dk.style.setProperty('--off',v+'px'); return v; };
+  function linha(){ const sv=$('#dockLinha'); if(!sv) return; const t=24, W=box.offsetWidth, H=box.offsetHeight, r=26, h=34, f=8, q=10; if(!W||!H) return;
+    sv.setAttribute('width',t+W); sv.setAttribute('height',H); sv.setAttribute('viewBox',`0 0 ${t+W} ${H}`);
+    const y1=H-h, i=.75; /* linha 0,75 px pra dentro, igual borda */
+    $('#dkTagFill').setAttribute('d',`M${t+1} ${y1-f}Q${t} ${y1} ${t-f} ${y1}L${q} ${y1}A${q} ${q} 0 0 0 0 ${y1+q}L0 ${H-q}A${q} ${q} 0 0 0 ${q} ${H}L${t+1} ${H}Z`);
+    $('#dkTagLine').setAttribute('d',`M${t+i} ${y1-f}Q${t+i} ${y1+i} ${t-f} ${y1+i}L${q} ${y1+i}A${q-i} ${q-i} 0 0 0 ${i} ${y1+q}L${i} ${H-q}A${q-i} ${q-i} 0 0 0 ${q} ${H-i}L${t+i} ${H-i}`);
+    $('#dkBoxLine').setAttribute('d',`M${t+i} ${H-i}L${t+W-r} ${H-i}A${r-i} ${r-i} 0 0 0 ${t+W-i} ${H-r}L${t+W-i} ${r}A${r-i} ${r-i} 0 0 0 ${t+W-r} ${i}L${t+r} ${i}A${r-i} ${r-i} 0 0 0 ${t+i} ${r}L${t+i} ${y1-f}`); }
+  const off=()=>{ linha(); const v=(box.offsetWidth||60)+12; dk.style.setProperty('--off',v+'px'); return v; };
   const aberto=()=>document.body.classList.contains('dock-on');
   const abre=on=>{ dk.style.removeProperty('--p'); document.body.classList.toggle('dock-on',on); };
   window.dockAbre=abre;
