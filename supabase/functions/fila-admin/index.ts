@@ -30,8 +30,12 @@ const toPath = (u: unknown): string | null => {
 
 // ---------- TABELA DE HORÁRIOS AO VIVO (plano 25/11) ----------
 // Roda 1x/dia dentro do cleanup do pg_cron (cron_key) — NUNCA com a senha do board (senão chamaria a Meta a cada abertura).
-// Últimos 90 dias do @aurum.cinema, sem PROGRAMAÇÃO, horário de Brasília, faixas de 1 h das 12h às 22h, REELS x ESTÁTICO/CARROSSEL.
+// Últimos 90 dias do @aurum.cinema, sem PROGRAMAÇÃO, horário de Brasília, faixas de 1 h das 9h às 22h, REELS x ESTÁTICO/CARROSSEL.
+// v21: faixa com pouco dado (< 5 posts) ganha ESTIMATIVA (est_alcance/est_inter): mistura o que a faixa tem com os vizinhos
+// que têm dado, ajustado pela curva de uso do Instagram no Brasil (MERC). É estimativa, o board mostra como EST.
 // Salva em fila_config k='horarios'. Se a Meta falhar, fica a do dia anterior.
+// curva de uso do Instagram no Brasil por hora (relativa; pico 18h–22h — Metricool/Sociality/Buffer 2026). Só pra estimar faixa sem dado.
+const MERC: Record<number, number> = { 9: 0.75, 10: 0.8, 11: 0.85, 12: 0.95, 13: 0.95, 14: 0.9, 15: 0.9, 16: 0.9, 17: 0.95, 18: 1.05, 19: 1.15, 20: 1.2, 21: 1.15, 22: 1.0 };
 const PROG_RE = /programa[çc][ãa]o|sess[õo]es|hor[áa]rios/i;
 async function calcHorarios(sb: any) {
   const tok = await conf(sb, "meta_token"); const ig = await conf(sb, "meta_ig_user");
@@ -60,10 +64,22 @@ async function calcHorarios(sb: any) {
   const grupo = (reels: boolean) => {
     const g = posts.filter((p) => p.reels === reels);
     const mr = med(g.map((p) => p.reach)), mint = med(g.map((p) => p.int));
-    const faixas = [];
-    for (let h = 12; h <= 22; h++) {
+    const faixas: any[] = [];
+    for (let h = 9; h <= 22; h++) {
       const f = g.filter((p) => p.h === h);
-      faixas.push({ h, n: f.length, alcance: mr ? r2(med(f.map((p) => p.reach)) / mr) : 0, inter: mint ? r2(med(f.map((p) => p.int)) / mint) : 0, pouco: f.length < 5 });
+      faixas.push({ h, n: f.length, alcance: mr && f.length ? r2(med(f.map((p) => p.reach)) / mr) : 0, inter: mint && f.length ? r2(med(f.map((p) => p.int)) / mint) : 0, pouco: f.length < 5 });
+    }
+    // estimativa das faixas com pouco dado
+    const firmes = faixas.filter((x) => !x.pouco);
+    for (const x of faixas) {
+      if (!x.pouco) continue;
+      for (const k of ["alcance", "inter"]) {
+        let sw = 0, sv = 0;
+        for (const y of firmes) { const d = Math.abs(y.h - x.h); if (d > 3) continue; const w = 1 / d; sw += w; sv += w * y[k] * (MERC[x.h] / MERC[y.h]); }
+        const viz = sw ? sv / sw : MERC[x.h];
+        const K = 5; // a faixa precisa de ~5 posts pra valer mais que a estimativa
+        x["est_" + k] = r2((x.n * x[k] + K * viz) / (x.n + K));
+      }
     }
     // teste da noite: últimos 7 dias, posts às 20:30 e 21:30 (±5 min)
     const sete = Date.now() - 7 * 864e5, noite: Record<string, unknown> = {};
@@ -119,14 +135,16 @@ async function criarContainer(ig: string, tok: string, p: any) {
   if (!fs.length) throw new Error("post sem arquivo");
   if (destinoDe(p) === "story") {
     // Story: mesmo arquivo, sem legenda (o Instagram não usa legenda em Story). Não dá pra "compartilhar o post do feed" pela API.
-    const f = fs[0];
+    // v21: vários arquivos = STORIES EM SEQUÊNCIA; ig_seq = qual sai agora (0 = o 1º). Um por vez, na ordem.
+    const f = fs[Math.min(p.ig_seq ?? 0, fs.length - 1)];
     return (await g(`${ig}/media`, f.kind === "video" ? { media_type: "STORIES", video_url: f.url, access_token: tok } : { media_type: "STORIES", image_url: f.url, access_token: tok }, "POST")).id;
   }
   if (fs.length === 1) {
     const f = fs[0];
     if (f.kind === "video") {
       const prm: Record<string, string> = { media_type: "REELS", video_url: f.url, caption, share_to_feed: "true", access_token: tok };
-      if (p.capa_ms != null) prm.thumb_offset = String(p.capa_ms); // capa escolhida (frame do vídeo, em ms)
+      if (f.capa) prm.cover_url = f.capa; // v21: capa pronta (frame da cena + selo AU mais pra cima)
+      else if (p.capa_ms != null) prm.thumb_offset = String(p.capa_ms); // capa escolhida (frame do vídeo, em ms)
       return (await g(`${ig}/media`, prm, "POST")).id;
     }
     return (await g(`${ig}/media`, { image_url: f.url, caption, access_token: tok }, "POST")).id;
@@ -145,6 +163,32 @@ async function criarContainer(ig: string, tok: string, p: any) {
     await new Promise((r) => setTimeout(r, 5000));
   }
   return (await g(`${ig}/media`, { media_type: "CAROUSEL", children: kids.join(","), caption, access_token: tok }, "POST")).id;
+}
+
+// STORIES EM SEQUÊNCIA (v21): publica do item i em diante, esperando cada um ficar pronto antes do próximo.
+// Para no máximo ~90 s por chamada; o que faltar sai no próximo toque (2 min). Erro: para ali, card mostra em qual parou.
+async function seguirSequencia(sb: any, ig: string, tok: string, p: any, i: number): Promise<string> {
+  const fs = (p.arquivos ?? []) as any[], t0 = Date.now();
+  for (; i < fs.length; i++) {
+    await sb.from("fila_posts").update({ ig_seq: i, ig_container: null, ig_tentativas: 0 }).eq("id", p.id);
+    let c: string;
+    try { c = await criarContainer(ig, tok, { ...p, ig_seq: i }); }
+    catch (e) { await marcarErro(sb, p, `parou no story ${i + 1} de ${fs.length}: ${(e as Error).message}`); return "erro"; }
+    await sb.from("fila_posts").update({ ig_container: c }).eq("id", p.id);
+    let ok = false;
+    for (let t = 0; t < 12; t++) {
+      const st = await g(c, { fields: "status_code", access_token: tok });
+      if (st.status_code === "ERROR" || st.status_code === "EXPIRED") { await marcarErro(sb, p, `parou no story ${i + 1} de ${fs.length}: ${await motivo(c, tok, st.status_code)}`); return "erro"; }
+      if (!st.status_code || st.status_code === "FINISHED") { ok = true; break; }
+      if (Date.now() - t0 > 90e3) break;
+      await new Promise((r) => setTimeout(r, 4000));
+    }
+    if (!ok) return "esperando"; // o container fica em ig_container; o próximo toque publica e segue
+    await g(`${ig}/media_publish`, { creation_id: c, access_token: tok }, "POST");
+    if (Date.now() - t0 > 90e3 && i + 1 < fs.length) { await sb.from("fila_posts").update({ ig_seq: i + 1, ig_container: null, ig_status: null }).eq("id", p.id); return "continua"; }
+  }
+  await sb.from("fila_posts").update({ ig_status: "publicado", ig_erro: null, postado: true, postado_em: new Date().toISOString() }).eq("id", p.id);
+  return "fim";
 }
 
 async function marcarErro(sb: any, p: any, msg: string) {
@@ -180,6 +224,12 @@ async function publicar(sb: any) {
       }
       if (!chegouHora(p)) { log.push([p.id, "pronto, esperando o horário"]); continue; }
       const pub = await g(`${ig}/media_publish`, { creation_id: p.ig_container, access_token: tok }, "POST");
+      const nfs = ((p.arquivos ?? []) as any[]).length;
+      if (destinoDe(p) === "story" && nfs > 1 && (p.ig_seq ?? 0) + 1 < nfs) {
+        // STORIES EM SEQUÊNCIA: publicou o atual → já cria e publica os próximos, um depois do outro (nunca em paralelo)
+        const r = await seguirSequencia(sb, ig, tok, p, (p.ig_seq ?? 0) + 1);
+        log.push([p.id, "sequência", r]); if (r !== "fim") pendente = true; continue;
+      }
       let link = null; try { link = (await g(pub.id, { fields: "permalink", access_token: tok })).permalink; } catch { /* sem link */ }
       await sb.from("fila_posts").update({ ig_status: "publicado", ig_media_id: pub.id, ig_permalink: link, ig_erro: null, postado: true, postado_em: new Date().toISOString() }).eq("id", p.id);
       log.push([p.id, "publicado"]);
@@ -320,7 +370,7 @@ Deno.serve(async (req) => {
     if (error) return json({ error: error.message }, 500);
     if (!row) return json({ ok: true, apagados: 0 });
     const paths = new Set<string>();
-    for (const a of (row.arquivos ?? []) as any[]) for (const v of [a?.path, a?.url, a?.poster]) { const p = toPath(v); if (p) paths.add(p); }
+    for (const a of (row.arquivos ?? []) as any[]) for (const v of [a?.path, a?.url, a?.poster, a?.capa]) { const p = toPath(v); if (p) paths.add(p); }
     if (paths.size) {
       const { error: e2 } = await sb.storage.from(BUCKET).remove([...paths]);
       if (e2) return json({ error: e2.message }, 500);
@@ -425,7 +475,7 @@ Deno.serve(async (req) => {
     let apagados = 0;
     for (const r of rows ?? []) {
       const paths = new Set<string>();
-      for (const a of (r.arquivos ?? []) as any[]) for (const v of [a?.path, a?.poster]) { const p = toPath(v); if (p) paths.add(p); }
+      for (const a of (r.arquivos ?? []) as any[]) for (const v of [a?.path, a?.poster, a?.capa]) { const p = toPath(v); if (p) paths.add(p); }
       if (paths.size) {
         const { error: e2 } = await sb.storage.from(BUCKET).remove([...paths]);
         if (e2) continue;

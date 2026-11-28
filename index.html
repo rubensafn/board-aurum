@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#08080c">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=3">
@@ -682,7 +682,7 @@ html{overscroll-behavior-x:none;-webkit-text-size-adjust:100%;text-size-adjust:1
   transition:transform .28s cubic-bezier(.2,.9,.25,1),opacity .22s!important}
 .sheet.open{transform:translate(-50%,-50%)!important;opacity:1!important;pointer-events:auto!important}
 .sheet .grab{display:none!important}
-.sh-body{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.sh-body{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;position:relative}
 .sheet-bg,.cfm{touch-action:none;overscroll-behavior:contain}
 @media (max-width:759px){
   #clrAll{position:fixed!important;left:auto!important;right:14px!important;top:auto!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;transform:none!important;
@@ -1208,6 +1208,35 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 .row .capprev{flex:0 1 auto!important;max-height:72px}
 @media (min-width:760px){.row .capprev{max-height:110px}}
 @media (max-width:759px){.list{padding-bottom:52px!important}} /* só o espaço pra bolinha + e o calendário não taparem os botões do último card */
+/* v71: GRADE DE HORÁRIOS 09:00–22:00 (tocar marca, painel mostra o alcance, grava no CONFIRMAR) */
+.hpk{display:grid;gap:10px;margin:2px 0 4px}
+.hpk-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-height:239px;overflow-y:auto;overscroll-behavior:contain;padding:5px;margin:-5px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.hpk-g::-webkit-scrollbar{display:none}
+.hpt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;height:52px;border-radius:16px;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.13);color:var(--ink-2)}
+.hpt b{font-family:Inter,sans-serif;font-size:15px;font-weight:700;color:#fff;letter-spacing:.01em;line-height:1}
+.hpt i{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.03em;line-height:1;white-space:nowrap;color:var(--mute)}
+.hpt i.up{color:#4ade80}.hpt i.dn{color:#f87171}.hpt i.est{opacity:.72}
+.hpt i s{text-decoration:none;font-size:8px;margin-left:3px;letter-spacing:.06em;color:#c4b5fd}
+.hpt.best{box-shadow:inset 0 0 0 1.5px rgba(74,222,128,.55)}
+.hpt.on{background:linear-gradient(180deg,rgba(167,139,250,.55),rgba(124,58,237,.35));box-shadow:inset 0 0 0 1.5px #c4b5fd,0 0 14px rgba(167,139,250,.45)}
+.hpt.on i{color:#f5f3ff}
+.hpk-info{font-size:12.5px;line-height:1.45;color:var(--ink-2);padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);min-height:44px}
+.hpk-info b{color:#fff}.hpk-info .up{color:#4ade80;font-weight:700}.hpk-info .dn{color:#f87171;font-weight:700}
+.hpk-info small{display:block;margin-top:3px;font-size:11px;color:var(--mute)}
+.hpk-dica{color:var(--mute)}
+.hpk-t{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--mute)}.hpk-t i{font-style:normal;color:#c4b5fd}
+.hpk-pas{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.hpk-pas .act{white-space:nowrap;justify-content:center;min-width:0}
+@media (max-width:374px){.hpt b{font-size:14px}.hpt i{font-size:9px}.hpk-pas .act{padding-left:10px;padding-right:10px;font-size:11px}}
+/* v71: NOVO POST — ordem dos arquivos (stories em sequência / carrossel) */
+.nv-f .ord{position:absolute!important;left:5px;bottom:30px;width:22px;height:22px;padding:0!important;border-radius:999px;display:grid!important;place-items:center;background:rgba(0,0,0,.72);color:#fff!important;font-size:11px!important;font-weight:800!important}
+.nv-f .mv{position:absolute;right:4px;bottom:28px;display:flex;gap:4px}
+.nv-f .mv button{width:26px;height:26px;border-radius:999px;background:rgba(0,0,0,.72);color:#fff;font-size:16px;line-height:1;display:grid;place-items:center}
+.nv-f .mv button:disabled{opacity:.3}
+.nv-seq{margin:6px 2px 0;font-size:11.5px;line-height:1.4;color:#f0abfc}
+/* v71: sem zoom por toque duplo/pinça (iPhone) */
+html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%}
+button,a,label,input,textarea{touch-action:manipulation}
 </style>
 </head>
 <body>
@@ -1326,8 +1355,11 @@ function pedirDur(p){ const fs=p.arquivos||[], f=fs[0]; if(p.postado||p.arquivos
   DUR_IR.add(f.url); const v=document.createElement('video'); v.preload='metadata'; v.muted=true;
   v.onloadedmetadata=()=>{ if(isFinite(v.duration)&&v.duration>0){ DUR[f.url]=v.duration; if(v.duration>STORY_MAX) patchRow(p.id); } v.removeAttribute('src'); v.load(); };
   v.src=f.url; }
+/* v71: vários arquivos TODOS em pé (9:16) = STORIES EM SEQUÊNCIA (ex.: programação) — saem um depois do outro, na ordem */
+const emPe=f=>f&&f.w&&f.h&&f.h/f.w>1.6;
+const seqStories=p=>{ const fs=p.arquivos||[]; return fs.length>1&&fs.every(f=>emPe(f)&&!(f.kind==='video'&&(f.dur||0)>STORY_MAX)); };
 function destFixo(p){ const fs=p.arquivos||[], f=fs[0]; if(!f) return null; const alto=f.w&&f.h&&f.h/f.w>1.6;
-  if(fs.length>1) return 'feed'; if(f.kind!=='video') return alto?'story':'feed'; if(longo(p)) return 'feed';
+  if(fs.length>1) return seqStories(p)?'story':'feed'; if(f.kind!=='video') return alto?'story':'feed'; if(longo(p)) return 'feed';
   if(alto&&/(^|_)STORY_/i.test(f.nome||'')) return 'story'; /* versão story de um post que já tem a versão de feed */
   return alto?null:'feed'; }
 /* ---- linha (card) ---- */
@@ -1348,7 +1380,7 @@ function rowHTML(p){
     : p.ig_status==='erro' ? `<span class="pill erro" title="${esc(p.ig_erro||'')}">ERRO AO POSTAR</span>` : '';
   const dFeed=p.destino==='feed'||p.destino==='feed_story', dStory=p.destino==='story'||p.destino==='feed_story', travaDest=trava||p.aprovado||p.postado;
   const fixo=destFixo(p);
-  const destPills = fixo ? `<span class="pill dest sel fixo${fixo==='story'?' st':''}">${fixo==='story'?'STORY':'FEED'}</span>` : p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest st${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
+  const destPills = fixo ? `<span class="pill dest sel fixo${fixo==='story'?' st':''}">${fixo==='story'?(seqStories(p)?files(p).length+' STORIES EM ORDEM':'STORY'):'FEED'}</span>` : p.postado&&!p.destino ? '' : `<button class="pill dest${dFeed?' sel':''}" data-act="dest" data-v="feed" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dFeed}">${dFeed?I.check:''}FEED</button><button class="pill dest st${dStory?' sel':''}" data-act="dest" data-v="story" data-id="${esc(p.id)}" ${travaDest?'disabled':''} aria-pressed="${dStory}">${dStory?I.check:''}STORY</button>`;
   const quando = p.dia&&p.hora ? dayText(p.dia)+' '+p.hora : '';
   const erroBox = !p.postado&&p.ig_status==='erro' ? `<div class="aviso erro" data-act="erroler" data-id="${esc(p.id)}" title="${esc(p.ig_erro||'')}">${I.warn}<span><b>NÃO POSTOU · </b>${esc(motivoErro(p.ig_erro))}${p.ig_refeito?' Já tentei de novo sozinho 1x.':''}<small>${esc(p.ig_erro||'')}</small></span><i class="mais">${S.erroAberto.has(p.id)?'FECHAR':'LER'}</i></div>`
     : p.postado&&p.ig_story_status==='erro' ? `<div class="aviso erro" title="${esc(p.ig_story_erro||'')}">${I.warn}<span><b>STORY NÃO SAIU · </b>O feed saiu, o Story não. ${esc(motivoErro(p.ig_story_erro))}<small>${esc(p.ig_story_erro||'')}</small></span></div>` : '';
@@ -1613,7 +1645,7 @@ function editSheetHTML(p){
     <div class="dpick">${opts.map(o=>`<button class="dtile glass${e.dia===o.k?' on':''}" ${o.tn?`data-tone="${o.tn}"`:''} data-act="eday" data-d="${o.k}"><span class="w">${o.w}</span><span class="n">${o.n}</span></button>`).join('')}</div>
     <label class="act dother">${I.cal} OUTRA DATA<input type="date" id="edate" value="${esc(e.dia||'')}" aria-label="Outra data"></label>
     <span class="ed-sec">HORÁRIO</span>
-    <div class="dpick hpick">${HORAS.map((h,i)=>`<button class="dtile glass${e.hora===h?' on':''}${tags[i].v===best&&best>0?' best':''}" data-act="ehora" data-h="${h}"><span class="w">${h==='12:30'?'ALMOÇO':h==='15:00'?'TARDE':h==='17:30'?'FIM TARDE':h==='20:30'?'NOITE':'P/ AMANHÃ'}</span><span class="n">${h}</span><span class="x ${tags[i].c}">${tags[i].t}</span></button>`).join('')}</div>
+    ${hpkHTML('ed',hd,e.hora,p.id)}
     <div class="hother"><span>${I.clock} OUTRO HORÁRIO</span><input class="field" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" autocomplete="off" data-h24="1" id="ehin" data-hd="${esc(p.id)}" value="${esc(e.hora||'')}" aria-label="Outro horário"></div>
     <div class="hval" id="ehinv">${HORAS.includes(e.hora)||!e.hora?'Digita um horário pra ver o alcance dele.':hInfo(hd,e.hora)}</div>
     <div class="ed-res" id="edres">POSTA ${esc(dayText(e.dia))} ÀS ${esc(e.hora)}</div>
@@ -1647,7 +1679,10 @@ function aplicarHorarios(h){ if(!h||!h.reels||!h.estatico) return; S.horarios=h;
   const mk=(g,t,nome)=>{ const fx=g.faixas.filter(f=>f.n>0).map(f=>[f.h+'h',f.alcance,HORAS.filter(x=>+x.slice(0,2)===f.h).join(' '),f.pouco]);
     const ok=g.faixas.filter(f=>!f.pouco).sort((a,b)=>b.alcance-a.alcance), top=ok.slice(0,2).map(f=>f.h+'h').join(' e ');
     return {t, fx, per:h.dias+' DIAS', n:`${nome}: melhores agora ${top||'—'} (alcance × média). Tabela ao vivo · ${quando} · ${h.dias} dias · ${g.n} posts. Faixa apagada = menos de 5 posts (pouco dado).`}; };
-  HDADOS.reels=mk(h.reels,'REELS','Reels'); HDADOS.est=mk(h.estatico,'ESTÁTICO / CARROSSEL','Estático'); }
+  HDADOS.reels=mk(h.reels,'REELS','Reels'); HDADOS.est=mk(h.estatico,'ESTÁTICO / CARROSSEL','Estático');
+  /* v71: por hora (9h–22h), com ESTIMATIVA nas faixas de pouco dado (est_alcance/est_inter da edge v21) */
+  const ph=g=>{ const o={}; (g.faixas||[]).forEach(f=>{ const est=f.pouco&&f.est_alcance!=null; o[f.h]={a:est?f.est_alcance:f.alcance,i:est?f.est_inter:f.inter,n:f.n,est,pouco:f.pouco}; }); return o; };
+  HDADOS.reels.ph=ph(h.reels); HDADOS.est.ph=ph(h.estatico); }
 function hdOf(p){ const f=(p.arquivos||[])[0]; return f&&f.kind==='video'?HDADOS.reels:HDADOS.est; }
 const HMERC='Estudos 2026: no Brasil o pico de uso do Instagram é 18h–22h (Metricool: 19h–21h; Sociality: 20h–0h). No @aurum.cinema tem poucos posts à noite: 20:30 e 21:30 são TESTE (21:30 = quem está em casa decidindo o cinema de amanhã).';
 function hTag(d,h){ if(h==='21:30') return {t:'TESTE',c:'tst'}; const r=d.fx.find(x=>x[2].split(' ').includes(h)); if(!r) return {t:'SEM DADO',c:''}; const v=Math.round((r[1]-1)*100); return {t:v>0?'+'+v+'%<i class="xl"> ALCANCE</i>':v<0?v+'%<i class="xl"> ALCANCE</i>':'NA MÉDIA',c:v>0?'up':'',v}; }
@@ -1662,10 +1697,37 @@ function hdataHTML(d){ const mx=Math.max(...d.fx.map(x=>x[1]));
   return `<div class="hdata glass"><span class="ht">ALCANCE x MÉDIA · ${d.t} · ${d.per||'ÚLTIMOS 300 POSTS'}</span>
       ${d.fx.map(x=>{const v=Math.round((x[1]-1)*100);return `<div class="hr ${v>0?'up':v<0?'dn':''}"${x[3]?' style="opacity:.45"':''}><span>${x[0]}</span><b style="width:${Math.round(x[1]/mx*100)}%"></b><span>${v>0?'+':''}${v}%</span></div>`}).join('')}
       <span class="hn">${d.n}</span><span class="hn">${HMERC}</span></div>`; }
+/* ---- v71: GRADE DE HORÁRIOS (09:00–22:00, de 30 em 30) — tocar só MARCA e mostra o alcance embaixo; grava no CONFIRMAR ---- */
+const HGRADE=(()=>{ const a=[]; for(let m=9*60;m<=22*60;m+=30) a.push(String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')); return a; })();
+function hv(d,h){ if(!/^\d{2}:\d{2}$/.test(h||'')) return null; const hh=+h.slice(0,2);
+  if(d.ph&&d.ph[hh]) { const x=d.ph[hh]; if(x.a==null||(!x.n&&!x.est)) return null; return x; }
+  const r=d.fx.find(x=>{ const f=faixa(x[0]); return f&&hh>=f[0]&&hh<=f[1]; }); return r?{a:r[1],i:null,n:null,est:false,pouco:!!r[3]}:null; }
+const pct=x=>{ const v=Math.round((x-1)*100); return (v>0?'+':v<0?'−':'')+Math.abs(v)+'%'; };
+function hpkHTML(ctx,d,sel,id){
+  const vs=HGRADE.map(h=>hv(d,h)), firmes=vs.filter(x=>x&&!x.est).map(x=>x.a).sort((a,b)=>b-a), corte=firmes[Math.min(2,firmes.length-1)]??99;
+  const tiles=HGRADE.map((h,i)=>{ const x=vs[i]; const c=!x?'':x.a>=1.05?'up':x.a<=.95?'dn':'';
+    return `<button class="hpt${sel===h?' on':''}${x&&!x.est&&x.a>=corte&&x.a>1?' best':''}" data-act="hpk" data-ctx="${ctx}" data-h="${h}"${id?` data-id="${esc(id)}"`:''}><b>${h}</b><i class="${c}${x&&x.est?' est':''}">${x?pct(x.a)+(x.est?'<s>EST</s>':''):'—'}</i></button>`; }).join('');
+  const x=hv(d,sel), info=!sel?'<span class="hpk-dica">Toca num horário pra ver o alcance dele. Só grava quando confirmar.</span>'
+    :!x?`<b>${sel}</b> · sem dado nesse horário`
+    :`<b>${sel}</b> · <span class="${x.a>=1.05?'up':x.a<=.95?'dn':''}">${pct(x.a)} de alcance</span>${x.i!=null?` · ${pct(x.i)} de interações`:''} · ${d.t.toLowerCase()}<br><small>${x.est?`ESTIMATIVA: ${x.n?`só ${x.n} post${x.n>1?'s':''}`:'nenhum post'} nessa hora. Conta com os horários vizinhos e o padrão de uso do Instagram no Brasil.`:`média de ${x.n??'vários'} posts nessa hora (× média do perfil).`}</small>`;
+  const passo=ctx!=='nv'&&sel?`<div class="hpk-pas"><button class="act" data-act="hstep" data-ctx="${ctx}" data-v="-30"${id?` data-id="${esc(id)}"`:''} aria-label="30 minutos antes">‹ 30 MIN</button>${ctx==='sh'?`<button class="act primary" data-act="hok" data-id="${esc(id)}">${I.check} USAR ${sel}</button>`:'<span></span>'}<button class="act" data-act="hstep" data-ctx="${ctx}" data-v="30"${id?` data-id="${esc(id)}"`:''} aria-label="30 minutos depois">30 MIN ›</button></div>`:'';
+  return `<div class="hpk" id="hpk-${ctx}"><span class="hpk-t">ROLA A GRADE · 09:00 ATÉ 22:00 · <i>EST</i> = ESTIMATIVA</span><div class="hpk-g">${tiles}</div><div class="hpk-info">${info}</div>${passo}</div>`;
+}
+function hpkSel(ctx){ return ctx==='sh'?S.hsel:ctx==='ed'?(S.ed&&S.ed.hora):(S.nv&&S.nv.hora); }
+function hpkSet(ctx,h,id){
+  if(ctx==='sh') S.hsel=h; else if(ctx==='ed'){ S.ed.hora=h; const r=$('#edres'); if(r) r.textContent='POSTA '+dayText(S.ed.dia)+' ÀS '+h; const e=$('#ehin'); if(e) e.value=h; }
+  else { S.nv.hora=S.nv.hora===h?'':h; }
+  const box=$('#hpk-'+ctx); if(!box) return; const g=box.querySelector('.hpk-g'), top=g?g.scrollTop:0;
+  const p=id?find(id):null, d=ctx==='nv'?nvHd():p?hdOf(p):HDADOS.est;
+  box.outerHTML=hpkHTML(ctx,d,hpkSel(ctx),id); const g2=$('#hpk-'+ctx+' .hpk-g'); if(g2) g2.scrollTop=top;
+}
+function nvHd(){ const f=S.nv&&S.nv.files[0]; return f&&f.kind==='video'?HDADOS.reels:HDADOS.est; }
+function hpkRolar(){ document.querySelectorAll('.hpk-g').forEach(g=>{ const on=g.querySelector('.hpt.on')||g.querySelector('.hpt.best'); if(!on) return; const passo=g.children[4]?g.children[4].offsetTop-g.children[0].offsetTop:59; g.scrollTop=Math.max(0,on.offsetTop-g.children[0].offsetTop-passo); }); }
 function horaSheetHTML(p){
   const d=hdOf(p), tags=HORAS.map(h=>hTag(d,h)), best=Math.max(...tags.map(t=>t.v??-99));
   const mx=Math.max(...d.fx.map(x=>x[1]));
-  return `<div class="dpick hpick">${HORAS.map((h,i)=>`<button class="dtile glass${p.hora===h?' on':''}${tags[i].v===best&&best>0?' best':''}" data-act="sethora" data-h="${h}" data-id="${esc(p.id)}"><span class="w">${h==='12:30'?'ALMOÇO':h==='15:00'?'TARDE':h==='17:30'?'FIM TARDE':h==='20:30'?'NOITE':'P/ AMANHÃ'}</span><span class="n">${h}</span><span class="x ${tags[i].c}">${tags[i].t}</span></button>`).join('')}</div>
+  S.hsel=S.hsel||p.hora||'';
+  return `${hpkHTML('sh',d,S.hsel,p.id)}
     <div class="hdata glass"><span class="ht">ALCANCE x MÉDIA · ${d.t} · ${d.per||'ÚLTIMOS 300 POSTS'}</span>
       ${d.fx.map(x=>{const v=Math.round((x[1]-1)*100);return `<div class="hr ${v>0?'up':v<0?'dn':''}"${x[3]?' style="opacity:.45"':''}><span>${x[0]}</span><b style="width:${Math.round(x[1]/mx*100)}%"></b><span>${v>0?'+':''}${v}%</span></div>`}).join('')}
       <span class="hn">${d.n}</span><span class="hn">${HMERC}</span></div>
@@ -1697,7 +1759,7 @@ function openSheet(id,mode){
   if(mode==='day'){
     body=daySheetHTML(p);
   } else if(mode==='hora'){
-    body=horaSheetHTML(p);
+    S.hsel=p.hora||''; body=horaSheetHTML(p);
   } else if(mode==='edit'){
     S.ed={dia:p.dia,hora:p.hora}; body=editSheetHTML(p);
   } else if(mode==='media'){
@@ -1735,6 +1797,7 @@ function openSheet(id,mode){
   $('#sheet').innerHTML=head+`<div class="sh-body">${body}</div>`;
   $('#sheet').classList.add('open'); $('#sheetBg').classList.add('open'); lockScroll(true);
   const tr=$('#track'); if(tr) tr.addEventListener('scroll',()=>slideUI(tr),{passive:true});
+  if(mode==='hora'||mode==='edit') setTimeout(hpkRolar,30);
   const ta=$('#capin'); if(ta&&mode==='capedit') setTimeout(()=>{ ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length); },60);
 }
 function slideUI(tr){ const n=tr.children.length, i=Math.round(tr.scrollLeft/tr.clientWidth);
@@ -1839,8 +1902,8 @@ function novoHTML(){
     <div class="nv-micw"><textarea class="nv-ta" id="nvped2" placeholder="Fala ou escreve: o que fazer, texto, estilo… (em branco = nosso padrão)" aria-label="O que quero">${esc(n.ped2)}</textarea><button class="nv-mic${S.rec?' on':''}" data-act="nvmic" aria-label="${S.rec?'Parar gravação':'Gravar voz'}">${I.mic}</button></div>
     <button class="nv-gerar${n.padrao?' on':''}" data-act="nvpadrao"><span class="ck">${n.padrao?I.check:''}</span><span><b>SEGUIR NOSSO PADRÃO</b><small>Selo AU, tamanho e legenda como sempre fazemos</small></span></button>`:'';
   const dest2=lk?n.destino:dest;
-  return `${modo}${topo}${lk?'':((n.files.length?`<div class="nv-files">${n.files.map((f,i)=>`<div class="nv-f${f.bad?' bad':''}">${f.thumb?`<img src="${esc(f.thumb)}" alt="">`:'<img alt="">'}${f.kind==='video'?'<span class="vd">VÍDEO</span>':''}<button class="rm" data-act="nvrm" data-i="${i}" aria-label="Tirar arquivo">${I.x}</button><span>${f.bad?'ACIMA DE 50 MB':esc(mb(f.file.size))}</span></div>`).join('')}</div>`:'')+`
-    <label class="nv-drop">${I.up}<span>${n.files.length?'TROCAR / ADICIONAR ARQUIVOS':'ESCOLHER ARQUIVO'}</span><small>Imagem ou vídeo · até 50 MB cada · vários = carrossel</small><input type="file" id="nvfile" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" multiple hidden></label>`)}
+  return `${modo}${topo}${lk?'':((n.files.length?`<div class="nv-files">${n.files.map((f,i)=>`<div class="nv-f${f.bad?' bad':''}">${f.thumb?`<img src="${esc(f.thumb)}" alt="">`:'<img alt="">'}${f.kind==='video'?'<span class="vd">VÍDEO</span>':''}<button class="rm" data-act="nvrm" data-i="${i}" aria-label="Tirar arquivo">${I.x}</button>${n.files.length>1?`<span class="ord">${i+1}</span><div class="mv"><button data-act="nvmv" data-i="${i}" data-d="-1" ${i?'':'disabled'} aria-label="Mais pra frente">‹</button><button data-act="nvmv" data-i="${i}" data-d="1" ${i<n.files.length-1?'':'disabled'} aria-label="Mais pra trás">›</button></div>`:''}<span>${f.bad?'ACIMA DE 50 MB':esc(mb(f.file.size))}</span></div>`).join('')}</div>${nvFixo()==='story'&&n.files.length>1?`<p class="nv-seq">${n.files.length} STORIES EM SEQUÊNCIA: saem um depois do outro, nessa ordem (1 → ${n.files.length}). Usa ‹ › pra mudar a ordem.</p>`:''}`:'')+`
+    <label class="nv-drop">${I.up}<span>${n.files.length?'TROCAR / ADICIONAR ARQUIVOS':'ESCOLHER ARQUIVO'}</span><small>Imagem ou vídeo · até 50 MB cada · vários = carrossel (vários em pé 9:16 = stories em sequência)</small><input type="file" id="nvfile" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" multiple hidden></label>`)}
     <div class="pn-sec">FILME</div>
     <div class="chips">${nomes.map(t=>`<button class="chip${n.filme===t&&!n.outro?' on':''}" data-act="nvfilme" data-t="${esc(t)}">${esc(t)}</button>`).join('')}<button class="chip${semF?' on':''}" data-act="nvfilme" data-t="SEM FILME">SEM FILME</button><button class="chip${n.outro||(n.filme&&!filmeOn)?' on':''}" data-act="nvoutro">OUTRO</button></div>
     ${semF?'<span class="fl-empty">Conteúdo do AURUM (não é de filme): selo AU dourado; a legenda sai do que você pedir, da legenda do post do link ou do que está na arte/vídeo.</span>':''}
@@ -1853,7 +1916,8 @@ function novoHTML(){
     ${n.gerar?`<textarea class="nv-ta ped" id="nvped" placeholder="O que a legenda precisa dizer? (opcional)" aria-label="Pedido da legenda">${esc(n.pedido)}</textarea>`:`<textarea class="nv-ta" id="nvleg" placeholder="Escreve a legenda aqui" aria-label="Legenda">${esc(n.leg)}</textarea>`}`}
     <div class="pn-sec">DIA E HORÁRIO <i>(pode escolher depois no card)</i></div>
     <div class="chips">${days.map(d=>`<button class="chip d${n.dia===d.k?' on':''}" data-act="nvdia" data-d="${d.k}">${d.w}</button>`).join('')}</div>
-    <div class="chips">${HORAS.map(h=>`<button class="chip d${n.hora===h?' on':''}" data-act="nvhora" data-h="${h}">${h}</button>`).join('')}<input class="nv-in" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" autocomplete="off" data-h24="1" id="nvhorain" value="${esc(HORAS.includes(n.hora)?'':n.hora)}" style="width:120px;flex:none;color-scheme:dark" aria-label="Outro horário"></div>
+    ${hpkHTML('nv',nvHd(),n.hora,'')}
+    <div class="chips"><input class="nv-in" type="text" inputmode="numeric" maxlength="5" placeholder="OUTRO HH:MM" autocomplete="off" data-h24="1" id="nvhorain" value="${esc(HGRADE.includes(n.hora)?'':n.hora)}" style="width:150px;flex:none;color-scheme:dark" aria-label="Outro horário"></div>
 ${lk?'':`    <div class="pn-sec">SELO AU <i>(obrigatório escolher)</i></div>
     <div class="nv-selo${n.tentou&&n.selo===null?' falta':''}"><button class="sim${n.selo===true?' on':''}" data-act="nvselo" data-v="1"><span class="au-m">${AU}</span><b>✓</b></button><button class="nao${n.selo===false?' on':''}" data-act="nvselo" data-v="0"><span class="au-m">${AU}</span><b>✗</b></button></div>
     ${n.selo===true?'<p class="pn-note">Com selo: a próxima varredura coloca o AU no arquivo. Aprova depois que o selo entrar.</p>':''}`}
@@ -2061,6 +2125,9 @@ document.addEventListener('click',e=>{
   else if(a==='del') pedeApagar(id);
   else if(a==='slide'){ const tr=$('#track'); if(tr) tr.scrollBy({left:tr.clientWidth*(+b.dataset.d),behavior:'smooth'}); }
   else if(a==='hora') openSheet(id,'hora');
+  else if(a==='hpk'){ hpkSet(b.dataset.ctx,b.dataset.h,b.dataset.id); }
+  else if(a==='hstep'){ const c=b.dataset.ctx, cur=hpkSel(c)||'12:00'; let m=+cur.slice(0,2)*60+ +cur.slice(3)+ +b.dataset.v; m=Math.max(0,Math.min(23*60+30,m)); hpkSet(c,String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'),b.dataset.id); }
+  else if(a==='hok'){ const h=S.hsel; if(!h24ok(h||'')){ toast('Escolhe um horário'); return; } const p=find(id); closeSheet(); setHora(id,h); if(p) toast('Horário '+h+' marcado'); }
   else if(a==='hset'){ const v=($('#hin')||{}).value||''; if(!h24ok(v)){ toast('Digita o horário em 24 h (ex.: 18:45)'); return; } const p=find(id); closeSheet(); setHora(id,v); if(p) toast('Horário '+hInfo(hdOf(p),v).replace(/<[^>]+>/g,'')); }
   else if(a==='sethora'){ closeSheet(); setHora(id,b.dataset.h||null); }
   else if(a==='aprovar') setAprovado(id,true);
@@ -2081,6 +2148,7 @@ document.addEventListener('click',e=>{
   else if(a==='fltog') filmeToggle(b.dataset.k);
   else if(a==='fladd') filmeAdd();
   else if(a==='fldel') filmeDel(b.dataset.k);
+  else if(a==='nvmv'){ const i=+b.dataset.i, j=i+ +b.dataset.d, fs=S.nv.files; if(j<0||j>=fs.length) return; [fs[i],fs[j]]=[fs[j],fs[i]]; nvRender(); }
   else if(a==='nvrm'){ S.nv.files.splice(+b.dataset.i,1); if(!nvFixo()&&['story','feed'].includes(S.nv.destino)&&!S.nv.files.length) S.nv.destino=''; nvRender(); }
   else if(a==='nvfilme'){ S.nv.filme=b.dataset.t; S.nv.outro=false; nvRender(); }
   else if(a==='nvoutro'){ S.nv.outro=true; S.nv.filme=''; nvRender(); setTimeout(()=>{const i=$('#nvfilmein'); if(i) i.focus();},40); }
@@ -2160,6 +2228,9 @@ start();
   const end=()=>{ if(y0===null) return; y0=null; if(v>=GO){ busy=true; svg.style.transform=''; el.classList.add('spin'); show(GO,true); setTimeout(()=>location.reload(),250); } else show(0,true); v=0; };
   addEventListener('touchend',end); addEventListener('touchcancel',end);
 })();
+/* v71: bloqueia zoom por pinça/toque duplo no iPhone (Safari ignora user-scalable=no) */
+['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
+/* toque duplo: resolvido pelo touch-action:manipulation (CSS v71), sem travar toques rápidos */
 </script>
 </body>
 </html>

@@ -9,6 +9,7 @@ lote.json = {"lote": "11-11", "posts": [
    "tipo": "VIDEO", "legenda_celular": "...", "legenda_pc": "...", "comprimido": false,
    "files": ["/caminho/01_CARA_DE_BARRO_PERRENGUES_1080X1440.mp4"]}, ...]}
 
+- "capa": "/caminho/capa.jpg" (opcional, no post de vídeo) = capa do Reels pronta com selo AU; vai como cover_url.
 - Cada arquivo até 50 MB (limite do plano grátis). Carrossel = vários arquivos no mesmo post, na ordem.
 - Dia e "postado" não são enviados: quem define é o Rubão no app.
 - ALTERAÇÃO (14/11): cada post tem pasta FIXA no bucket (<lote>/<lote>_<num>/). Subir de novo o mesmo
@@ -74,8 +75,13 @@ def main():
                 thumb = f"/tmp/{base}_THUMB.jpg"
                 subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "1.2", "-i", f, "-frames:v", "1", "-vf", "scale=360:-2", "-q:v", "4", thumb], check=True)
                 poster = put(token, f"{folder}/{base}_THUMB.jpg", thumb, "image/jpeg")
-            arquivos.append({"path": path, "url": url, "poster": poster, "w": w, "h": h,
-                             "nome": os.path.basename(f), "kind": "video" if is_video else "image"})
+            item = {"path": path, "url": url, "poster": poster, "w": w, "h": h,
+                    "nome": os.path.basename(f), "kind": "video" if is_video else "image"}
+            if is_video and p.get("capa") and not any(a.get("capa") for a in arquivos):
+                # capa do Reels pronta (frame da cena + selo AU mais pra cima) -> o fila-admin manda como cover_url
+                base = os.path.splitext(os.path.basename(f))[0]
+                item["capa"] = put(token, f"{folder}/{base}_CAPA.jpg", p["capa"], "image/jpeg")
+            arquivos.append(item)
             print("ok", os.path.basename(f), f"{size/1048576:.1f} MB")
         row = {k: p[k] for k in ("num", "nome", "filme", "tipo", "legenda_celular", "legenda_pc") if k in p}
         row.update(id=pid, lote=lote.replace("-", "."), comprimido=bool(p.get("comprimido")), arquivos=arquivos)
