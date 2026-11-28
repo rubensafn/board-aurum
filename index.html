@@ -1266,23 +1266,31 @@ button,a,label,input,textarea{touch-action:manipulation}
 .pill.hora[class*=" hn"] svg{color:var(--hc)!important}
 .pill.hora .hpct b{color:var(--hc,#fff)!important;text-shadow:none!important}
 .pill.hora .hpct{border-left-color:color-mix(in srgb,var(--hc,#fff) 45%,transparent)}
-/* v74: ABA na borda direita (celular): + NOVO POST e calendário ficam guardados; toca ou arrasta a aba pra abrir. Sem o espaço vazio no fim da página. */
-.dock-tab{display:none}
+/* v75: DOCK do celular — alça na borda direita presa a um box redondo de vidro com + NOVO POST e calendário. SÓ ARRASTAR (toque não abre, pra não abrir sem querer perto da lixeira).
+   Alça e box andam juntos com o dedo; soltou: abre/fecha pelo lado que passou da metade. Rolando a página a alça some e volta quando para. Fim da página sem sobra. */
+.dock{display:none}
 @media (max-width:759px){
-  .list{padding-bottom:8px!important}
-  .dock-tab:not([hidden]){display:grid;place-items:center;position:fixed;right:0;bottom:calc(96px + env(safe-area-inset-bottom));z-index:46;width:18px;height:68px;border-radius:14px 0 0 14px;
-    background:linear-gradient(160deg,rgba(167,139,250,.55),rgba(103,232,249,.25)),rgba(14,14,20,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
-    box-shadow:0 0 0 1px rgba(196,181,253,.75),0 0 14px rgba(167,139,250,.5);transition:width .25s cubic-bezier(.3,1.4,.5,1),opacity .2s;touch-action:none}
-  .dock-tab i{width:7px;height:7px;border-left:2px solid #f5f3ff;border-bottom:2px solid #f5f3ff;transform:translateX(2px) rotate(45deg);transition:transform .3s;filter:drop-shadow(0 0 4px rgba(167,139,250,.9))}
-  body.dock-on .dock-tab i{transform:translateX(-1px) rotate(-135deg)}
-  .dock-tab b{position:absolute;top:-9px;left:-9px;min-width:20px;height:20px;padding:0 4px;border-radius:999px;display:grid;place-items:center;font:700 10.5px/1 var(--body);color:#fff;background:linear-gradient(160deg,#a78bfa,#7c3aed);box-shadow:0 0 0 1.5px #ddd6fe,0 0 10px rgba(167,139,250,.7)}
-  .dock-tab b[hidden]{display:none}
-  .dock-tab:active{width:24px}
-  /* bolinhas guardadas atrás da aba; saem com mola, uma depois da outra */
-  #fab:not([hidden]),.fabnovo:not([hidden]){right:30px!important;transform:translateX(90px) scale(.6)!important;opacity:0!important;pointer-events:none!important;transition:transform .42s cubic-bezier(.3,1.45,.5,1),opacity .25s!important}
-  body.dock-on #fab:not([hidden]),body.dock-on .fabnovo:not([hidden]){transform:none!important;opacity:1!important;pointer-events:auto!important}
-  body.dock-on #fab:not([hidden]){transition-delay:.06s!important}
-  body:has(.sheet.open) .dock-tab,body:has(.cfm.show) .dock-tab,body:has(.toast.show) .dock-tab,body:has(.panel.open) .dock-tab{opacity:0;pointer-events:none}
+  main.wrap{padding-bottom:calc(14px + env(safe-area-inset-bottom))!important}
+  .list{padding-bottom:0!important}
+  .dock:not([hidden]){display:flex;align-items:center;position:fixed;right:0;bottom:calc(84px + env(safe-area-inset-bottom));z-index:46;--dx:0px;
+    transform:translateX(calc(var(--bw) - var(--dx)));transition:transform .45s cubic-bezier(.3,1.35,.5,1),opacity .25s;--bw:84px;touch-action:none}
+  .dock.arrasta{transition:opacity .25s}
+  body.dock-on .dock{--dx:var(--bw)}
+  .dock-alca{width:13px;height:62px;flex:none;border-radius:12px 0 0 12px;display:grid;place-items:center;position:relative;margin-right:-1px;
+    background:linear-gradient(160deg,rgba(167,139,250,.6),rgba(103,232,249,.28)),rgba(14,14,20,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    box-shadow:0 0 0 1px rgba(196,181,253,.8),0 0 12px rgba(167,139,250,.5)}
+  .dock-alca::before{content:"";position:absolute;inset:-14px -6px -14px -22px} /* área de pegar maior, sem aparecer */
+  .dock-alca i{width:3px;height:26px;border-radius:3px;background:rgba(245,243,255,.9);box-shadow:0 0 6px rgba(167,139,250,.9)}
+  .dock-alca b{position:absolute;top:-10px;left:-12px;min-width:20px;height:20px;padding:0 4px;border-radius:999px;display:grid;place-items:center;font:700 10.5px/1 var(--body);color:#fff;background:linear-gradient(160deg,#a78bfa,#7c3aed);box-shadow:0 0 0 1.5px #ddd6fe,0 0 10px rgba(167,139,250,.7)}
+  .dock-alca b[hidden],body.dock-on .dock-alca b{display:none}
+  .dock-box{width:var(--bw);box-sizing:border-box;padding:12px 0;border-radius:42px 0 0 42px;display:flex;flex-direction:column;align-items:center;gap:12px;
+    background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.04)),rgba(14,14,20,.62);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),0 10px 30px rgba(0,0,0,.45)}
+  .dock-box #fab,.dock-box .fabnovo{position:static!important;transform:none!important;opacity:1!important;margin:0!important;right:auto!important;bottom:auto!important}
+  .dock-box #fab[hidden],.dock-box .fabnovo[hidden]{display:none!important}
+  .dock-box #fab b{top:-4px!important;right:-3px!important}
+  .dock.some{opacity:0;pointer-events:none}
+  body:has(.sheet.open) .dock,body:has(.cfm.show) .dock,body:has(.toast.show) .dock{opacity:0;pointer-events:none}
 }
 </style>
 </head>
@@ -1315,7 +1323,7 @@ button,a,label,input,textarea{touch-action:manipulation}
 <button class="fchip glass" id="fchip" data-act="fsheet" aria-label="Filtrar por dia"></button>
 <button class="fab" id="fab" data-act="fsheet" aria-label="Filtrar por dia" hidden></button>
 <button class="fabnovo" id="fabNovo" data-act="novo" aria-label="Novo post" hidden></button>
-<button class="dock-tab" id="dockTab" aria-label="Abrir atalhos (novo post e filtro)" aria-expanded="false" hidden><i></i><b hidden></b></button>
+<div class="dock" id="dock" hidden><div class="dock-alca" id="dockTab" aria-label="Arrasta pra abrir os atalhos (novo post e filtro)" role="button"><i></i><b hidden></b></div><div class="dock-box" id="dockBox"></div></div>
 <main class="wrap"><div class="list" id="list"></div></main>
 <div class="sheet-bg" id="sheetBg"></div>
 <section class="sheet glass" id="sheet" role="dialog" aria-modal="true" aria-label="Detalhes do post"></section>
@@ -2062,7 +2070,7 @@ function abrirIG(url){ const sc=(/instagram\.com\/(?:[^/]+\/)?(?:p|reel|reels|tv
   window.open(url,'_blank','noopener'); }
 /* ---- login ---- */
 function logout(msg){ S.pin=''; store.set('fila_sess',null); closeSheet(); showLogin(msg); }
-function showLogin(msg){ const _fb=document.getElementById('fab'); if(_fb) _fb.hidden=true; const _fn=document.getElementById('fabNovo'); if(_fn) _fn.hidden=true; const _dt=document.getElementById('dockTab'); if(_dt) _dt.hidden=true; closePanel();
+function showLogin(msg){ const _fb=document.getElementById('fab'); if(_fb) _fb.hidden=true; const _fn=document.getElementById('fabNovo'); if(_fn) _fn.hidden=true; const _dt=document.getElementById('dock'); if(_dt) _dt.hidden=true; closePanel();
   $('#top').hidden=true; clearInterval(poll);
   $('#list').innerHTML=`<form class="login glass" id="login"><div class="au">${AU}</div><strong>BOARD</strong>
     <input class="field" id="pin" type="password" autocomplete="current-password" placeholder="SENHA" aria-label="Senha" required>
@@ -2289,19 +2297,26 @@ start();
 /* v71: bloqueia zoom por pinça/toque duplo no iPhone (Safari ignora user-scalable=no) */
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 /* toque duplo: resolvido pelo touch-action:manipulation (CSS v71), sem travar toques rápidos */
-/* v74: aba dos atalhos (celular) */
-(function(){ const tab=$('#dockTab'); if(!tab) return;
-  const abre=on=>{ document.body.classList.toggle('dock-on',on); tab.setAttribute('aria-expanded',on); };
+/* v75: dock do celular (só arrastar) */
+(function(){ const dk=$('#dock'), al=$('#dockTab'), box=$('#dockBox'); if(!dk) return;
+  const mob=()=>innerWidth<760;
+  function mover(){ const fn=$('#fabNovo'), fb=$('#fab'); if(mob()){ if(fn&&fn.parentElement!==box) box.appendChild(fn); if(fb&&fb.parentElement!==box) box.appendChild(fb); } else { if(fn&&fn.parentElement===box) document.body.appendChild(fn); if(fb&&fb.parentElement===box) document.body.appendChild(fb); } }
+  mover(); addEventListener('resize',mover);
+  const aberto=()=>document.body.classList.contains('dock-on');
+  const abre=on=>{ document.body.classList.toggle('dock-on',on); dk.style.removeProperty('--dx'); };
   window.dockAbre=abre;
-  tab.addEventListener('click',e=>{ e.stopPropagation(); abre(!document.body.classList.contains('dock-on')); });
-  let x0=null; tab.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; },{passive:true});
-  tab.addEventListener('touchmove',e=>{ if(x0==null) return; const dx=e.touches[0].clientX-x0; if(dx<-18){ abre(true); x0=null; } else if(dx>18){ abre(false); x0=null; } },{passive:true});
-  document.addEventListener('click',e=>{ if(document.body.classList.contains('dock-on')&&!e.target.closest('#dockTab')){ if(e.target.closest('#fab,#fabNovo')) setTimeout(()=>abre(false),60); else abre(false); } },true);
-  let sy=scrollY; window.addEventListener('scroll',()=>{ if(Math.abs(scrollY-sy)>24&&document.body.classList.contains('dock-on')) abre(false); if(!document.body.classList.contains('dock-on')) sy=scrollY; },{passive:true});
-  /* espiadinha na 1ª vez */
-  setTimeout(()=>{ if(store.get('dock_visto')||tab.hidden||innerWidth>=760) return; store.set('dock_visto','1'); abre(true); setTimeout(()=>abre(false),1400); },2200);
+  const bw=()=>box.offsetWidth||84;
+  let x0=null, base=0, mov=false;
+  const ini=e=>{ x0=e.touches[0].clientX; base=aberto()?bw():0; mov=false; dk.classList.add('arrasta'); };
+  const mexe=e=>{ if(x0==null) return; const dx=x0-e.touches[0].clientX; if(Math.abs(dx)>4) mov=true; const v=Math.max(0,Math.min(bw(),base+dx)); dk.style.setProperty('--dx',v+'px'); if(mov) e.preventDefault(); };
+  const fim=()=>{ if(x0==null) return; dk.classList.remove('arrasta'); const v=parseFloat(getComputedStyle(dk).getPropertyValue('--dx'))||0; x0=null; if(mov) abre(v>bw()/2); else dk.style.removeProperty('--dx'); };
+  [al,box].forEach(el=>{ el.addEventListener('touchstart',ini,{passive:true}); el.addEventListener('touchmove',mexe,{passive:false}); el.addEventListener('touchend',fim); el.addEventListener('touchcancel',fim); });
+  /* usou uma bolinha: fecha */
+  box.addEventListener('click',e=>{ if(e.target.closest('#fab,#fabNovo')) setTimeout(()=>abre(false),80); });
+  /* rolando: fecha se aberto; alça some e volta quando parar */
+  let t=null; addEventListener('scroll',()=>{ if(aberto()) abre(false); dk.classList.add('some'); clearTimeout(t); t=setTimeout(()=>dk.classList.remove('some'),550); },{passive:true});
 })();
-function dockSync(){ const tab=$('#dockTab'); if(!tab) return; const fn=$('#fabNovo'), fb=$('#fab'); tab.hidden=!((fn&&!fn.hidden)||(fb&&!fb.hidden));
+function dockSync(){ const tab=$('#dockTab'), dk=$('#dock'); if(!tab||!dk) return; const fn=$('#fabNovo'), fb=$('#fab'); dk.hidden=!((fn&&!fn.hidden)||(fb&&!fb.hidden));
   const b=tab.querySelector('b'), fil=S.filtros&&S.filtros[S.view]; const on=fb&&!fb.hidden&&fil&&fil!=='todos'; b.hidden=!on; if(on){ const c=fb.querySelector('b'); b.textContent=c?c.textContent:''; } }
 </script>
 </body>
