@@ -15,6 +15,7 @@
 ## Destino pelo FORMATO
 - 1080x1440, 1080x1350, quadrado ou deitado (estático OU vídeo) = SÓ FEED. Nunca vira Story automático. O card mostra FEED fixo + "!": "quer no story? depois que postar, encaminha e adiciona ao story pelo app".
 - Estático 1080x1920 = SÓ STORY (sem legenda, sem botões). Carrossel = FEED.
+- Vários arquivos TODOS 1080x1920 (vídeo até 60 s) = STORIES EM SEQUÊNCIA (v71): SÓ STORY, saem um depois do outro na ordem dos arquivos (ex.: stories da programação).
 - Quando a distribuidora tem as duas versões (feed 1080x1440 + story 1080x1920), a versão story leva `STORY_` no nome do arquivo → card fica SÓ STORY.
 - Só vídeo 1080x1920 (Reels) até 60 s mostra os botões FEED e STORY. Vídeo +60 s = só FEED (a API só aceita story até 60 s); card mostra "Só FEED · story à mão". Sem corte automático (Rubão, 25/11).
 - Board: `destFixo(p)` decide; ao aprovar grava o destino fixo via `fila_set_destino`.
@@ -32,13 +33,13 @@
 
 ## Capa do Reels
 - Sempre escolher a capa de todo vídeo de feed: frame do PRÓPRIO vídeo.
-- APROVADO por ele: capa = frame da cena + selo AU mais pra cima (por script). Vai como imagem separada (`cover_url`) — falta implementar no `fila-admin`. Arte de capa desenhada: NÃO (gasta token), só se ele pedir.
+- APROVADO por ele: capa = frame da cena + selo AU mais pra cima (por script). Vai como imagem separada (`cover_url`, edge v21): `"capa"` no post do `lote.json` (ver AUTO-POSTAGEM, Capa do Reels). Arte de capa desenhada: NÃO (gasta token), só se ele pedir.
 - Script de capa: amostra a 2 fps, nota nitidez+luz, pula 1 s do início e 1,5 s do fim, folha com 6 candidatos espaçados ≥2 s; olhar a folha e escolher.
 - REGRA DO RUBÃO: escolher uma CENA que mostre que é o filme (personagem/momento marcante), NÃO a cartela com nome/data. Evitar frame com gente correndo/borrado/cortado.
-- Banco: `fila_posts.capa_ms` (ms). A Edge Function manda `thumb_offset` no REELS.
+- Banco: `fila_posts.capa_ms` (ms). Sem capa pronta, a Edge Function manda `thumb_offset` no REELS.
 
 ## Horário no board
-- Botões 12:30 · 15:00 · 17:30 · 20:30 · 21:30 (TESTE) + OUTRO HORÁRIO, com o alcance × média da TABELA AO VIVO (`fila_config.horarios`, recalculada todo dia 04:17). Detalhes no AUTO-POSTAGEM (seção Horários) e no FILA-DE-POSTS-APP.
+- Grade 09:00–22:00 de 30 em 30 (v71; tocar marca, USAR grava), com o alcance × média (EST = estimativa) da TABELA AO VIVO (`fila_config.horarios`, recalculada todo dia 04:17). Detalhes no AUTO-POSTAGEM (seção Horários) e no FILA-DE-POSTS-APP.
 
 ## Publicação e horário que já passou
 - Ao aprovar, o banco agenda 3 toques só daquele post (15 min antes, na hora, +2 min) — não existe consulta periódica.

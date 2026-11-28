@@ -3,7 +3,7 @@
 
 **ESTE DOC (projeto AURUM EDITS) É O LUGAR PRINCIPAL DAS REGRAS E DO ESTADO DO BOARD.** Regras da varredura/postagem: `claude/AUTO-POSTAGEM-AURUM.md`. Toda conversa nova lê os dois antes de mexer. Toda mudança termina atualizando AQUI. O CÓDIGO (index.html, edge function, tools) tem o principal no GitHub `rubensafn/board-aurum` (a Vercel publica de lá). O GitHub guarda também uma CÓPIA de segurança dos docs em `docs/` (ver Sincronização).
 
-Atualizado em: 26/11/2026, 15h30 — board **v70**, edge `fila-admin` **v20**.
+Atualizado em: 28/11/2026, 03h — board **v71**, edge `fila-admin` **v21**.
 
 ## 1. Regras do Rubão (não quebrar)
 
@@ -74,21 +74,26 @@ Atualizado em: 26/11/2026, 15h30 — board **v70**, edge `fila-admin` **v20**.
 - Cores por significado (seção 1) e receita de vidro com texto claro (v41/v56) — nunca amarelo com texto preto.
 - Horário sempre 24 h com máscara HH:MM; FEED+STORY não volta pra só STORY; EDITAR do aprovado sem voltar pra pendente (v50).
 - Vídeo +60 s = só FEED + "Só FEED · story à mão" (v48), sem corte automático.
+- Horário = GRADE 09:00–22:00 de 30 em 30 (v71): tocar só MARCA e mostra o alcance embaixo; grava no USAR (pop-up do card) / SALVAR (editar aprovado). Nunca voltar pros 5 botões que gravavam no toque.
+- Vermelho único (v71): TODO botão de apagar/sair/rejeitar (SAIR do menu, EXCLUIR TODAS, APAGAR TODOS, lixeira, confirmar) usa o vermelho vivo da lixeira do card (`#FF3B3B`, camada v71 no fim do CSS). Botão vermelho novo entra nessa lista.
+- Sem zoom no iPhone (v71: viewport sem zoom + `touch-action` + bloqueio da pinça). Não tirar.
 
 ## 2. O que existe hoje (no ar)
 - `index.html` — board inteiro (HTML/CSS/JS num arquivo). Camadas de CSS por versão no fim do `<style>` (… v62, v63, v64/v65 no final).
 - `manifest.webmanifest` + `icons/` — modo app no celular ("Board AU", sem service worker).
 - Abas: PENDENTES · RESERVAS · APROVADOS · POSTADOS (celular: PEND · RESV · APROV · POST). Topo no PC: HORÁRIOS, FILMES, + NOVO POST, SAIR. **Topo no celular (v66): AU + abas + UM botão (grade/X) que abre, animado pra baixo, HORÁRIOS · FILMES · SAIR** (fundo escurece; toque fora fecha). + NOVO POST no celular = bolinha roxa.
+- **Card**: (v71) post com vários arquivos TODOS em pé (9:16) = **STORIES EM SEQUÊNCIA**: destino fixo STORY, pílula "N STORIES EM ORDEM"; saem um depois do outro, na ordem dos arquivos.
 - **Card**: capa + número + filme + box PRODUTORA (data em que a distribuidora postou, quando o post veio da varredura) + DIA + HORÁRIO + destino + status do Instagram + avisos + prévia da legenda + APROVAR + copiar / baixar / PEDIR AJUSTE / postado / lixeira — **no máximo 5 botões**. A lixeira de pendente que veio da varredura abre pop-up com 3 opções: RESERVA (volta pra aba RESV) · CANCELAR · REJEITAR (v66).
-- **Horários**: botões 12:30 · 15:00 · 17:30 · 20:30 · 21:30 (TESTE) + OUTRO HORÁRIO. Etiquetas e barras vêm da TABELA AO VIVO (`fila_config.horarios`, RPC `fila_horarios`; se não carregar, usa a fixa `HDADOS` de 14/11). Pop-up HORÁRIOS no topo: Reels, Estático e TESTE DA NOITE (7 dias). Faixa com menos de 5 posts aparece apagada.
+- **Horários (v71)**: GRADE rolável 09:00 até 22:00, de 30 em 30 min (4 por linha), cada um com o alcance × média (verde = acima, vermelho = abaixo, contorno verde = os melhores). Hora com menos de 5 posts mostra a ESTIMATIVA com "EST" (vem da edge v21: vizinhos com dado + curva de uso do Instagram no Brasil). Tocar só marca: o painel embaixo mostra alcance, interações e quantos posts; ‹ 30 MIN / 30 MIN › anda meia hora; **USAR HH:MM** grava (no editar do aprovado, grava no SALVAR). OUTRO HORÁRIO (digitar) continua pra minuto quebrado. A mesma grade está no + NOVO POST. Dados: TABELA AO VIVO (`fila_config.horarios`, RPC `fila_horarios`; sem ela, a fixa `HDADOS` de 14/11). Pop-up HORÁRIOS no topo: Reels, Estático e TESTE DA NOITE (7 dias).
 - **+ NOVO POST**: dois modos. No campo FILME, além dos filmes da aba FILMES e do OUTRO, tem **SEM FILME** (v70): grava `filme = 'SEM FILME'` (sem mudar o banco) pra conteúdo do AURUM que não é de filme — a varredura faz a legenda e o selo dourado pela regra CONTEÚDO SEM FILME do AUTO-POSTAGEM.
+  - ARTE PRONTA (v71): vários arquivos ganham número e setas ‹ › pra mudar a ORDEM. Vários em pé (9:16) = STORIES EM SEQUÊNCIA (aviso magenta embaixo).
   - ARTE PRONTA: arquivo próprio, filme, onde posta, legenda ou GERAR LEGENDA, dia/hora, selo AU ✓/✗ → PENDENTES.
   - LINK DO INSTAGRAM (v65): link do post + O QUE QUERO (texto ou microfone — reconhecimento de voz do navegador, pt-BR; sem suporte, usa o microfone do teclado) + SEGUIR NOSSO PADRÃO (vem marcado) + filme + onde posta (opcional) + legenda/GERAR + dia/hora → card A FAZER em PENDENTES. A próxima varredura baixa e faz (regra no AUTO-POSTAGEM). Não dá pra aprovar enquanto A FAZER (trava no banco).
 - **Avisos de baixo**: NO RODAPÉ (18–20 px acima da barra do iPhone — v66 corrigiu o v65 que tinha subido), pílula grande com contorno e brilho fortes na cor do significado (verde ok, vermelho erro, amarelo atenção), barrinha de tempo; 3,5 s (DESFAZER 6 s, erro 5 s).
 - **Abrir post do Instagram (RESV e NO INSTAGRAM)**: no modo app do iPhone abre direto o app do Instagram (`instagram://media?id=` calculado do código do link) — com `window.open` ficava uma tela em branco por cima do board ao voltar (v66). No navegador normal: nova aba.
 - Vídeo +60 s: card mostra "Só FEED · story à mão" (a API só aceita story até 60 s). Sem corte automático (Rubão, 25/11).
-- `supabase/functions/fila-admin/index.ts` — edge v20. Ações: sign/upsert/varrer/feed/set_meta (token), publicar (cron_key), delete/cleanup/upload_sign/filmes/reservas (senha). `cleanup` com cron_key também recalcula `fila_config.horarios` (90 dias, sem programação; nunca com a senha do board).
-- Tabelas: `fila_posts` (+ `subido`, `selo_pendente`, `manual`, `ajuste_pedido`, `ajuste_em`, `ajuste_resposta`, `a_fazer`, `link_origem`, `pedido_arte`, `seguir_padrao`), `fila_filmes` (+ `mexido`), `fila_config`, `fila_vistos` (+ `quero`, `quero_em`, `postado_distribuidora`).
+- `supabase/functions/fila-admin/index.ts` — edge v21 (v21: stories em sequência pelo `ig_seq`, um por vez, esperando cada um ficar pronto; erro para ali com "parou no story X de N" e TENTAR DE NOVO continua do mesmo; capa do Reels por `cover_url` quando o arquivo tem `capa`; tabela de horários 9h–22h com `est_alcance`/`est_inter`). Ações: sign/upsert/varrer/feed/set_meta (token), publicar (cron_key), delete/cleanup/upload_sign/filmes/reservas (senha). `cleanup` com cron_key também recalcula `fila_config.horarios` (90 dias, sem programação; nunca com a senha do board).
+- Tabelas: `fila_posts` (+ `ig_seq` v71, `selo_pendente`, `manual`, `ajuste_pedido`, `ajuste_em`, `ajuste_resposta`, `a_fazer`, `link_origem`, `pedido_arte`, `seguir_padrao`), `fila_filmes` (+ `mexido`), `fila_config`, `fila_vistos` (+ `quero`, `quero_em`, `postado_distribuidora`).
 - RPCs (senha): `fila_list` (traz `postado_distribuidora` e `tem_peca` do `fila_vistos`), `fila_set_*`, `fila_novo_post`, `fila_novo_link`, `fila_mandar_reserva`, `fila_horarios`, `fila_filmes_list`, `fila_filme_set/add/del`, `fila_reservas_list`, `fila_reserva_quero`, `fila_reserva_rejeitar`, `fila_reservas_excluir_todas`, `fila_apagar`, `fila_set_legenda`, `fila_pedir_legenda`, `fila_pedir_ajuste`. Gatilhos: `fila_posts_agenda`, `fila_posts_nao_apaga`, `fila_posts_trava_afazer`.
 
 ## 3. Pendências
@@ -97,8 +102,10 @@ Atualizado em: 26/11/2026, 15h30 — board **v70**, edge `fila-admin` **v20**.
 - 1º post A FAZER de verdade: conferir que a varredura fez certo.
 - 1º post SEM FILME (v70) de verdade: conferir legenda (pedido > legenda original > arte/Whisper), selo dourado e que não entrou chamada de filme.
 - Vídeo deitado 16:9: confirmar que a API da Meta publica.
-- Capa com selo AU: implementar `cover_url` no `fila-admin`.
-- Teste da noite fecha ~28/11 → resumo pro Rubão.
+- Conferir com o Rubão no iPhone: v71 (grade de horários, sem zoom, card de stories em ordem, setas de ordem no + NOVO POST).
+- 1ª sequência de stories de verdade (programação às 9h): conferir que saiu tudo, na ordem.
+- 1º Reels com capa `cover_url` de verdade: conferir a capa no grid.
+- Teste da noite: resultado entregue em 28/11 (21:30 fraco); esperar a decisão do Rubão.
 - Medir custo de 1 rodada da varredura (Configurações → Uso, antes/depois).
 - Ideias guardadas (ele ainda não pediu): marcar vários de uma vez; link sem senha pro cliente só ver/aprovar.
 
@@ -108,13 +115,14 @@ Playwright com dados falsos: `add_init_script` com `localStorage fila_sess = {pi
 ## 5. Referência
 - Board: **https://board.aurumcinema.com.br** (Vercel, deploy automático do GitHub). Pede senha; sessão de 8 horas. A senha o Rubão tem; não guardar aqui. Trocar: `update public.fila_config set v = extensions.crypt('<nova>', extensions.gen_salt('bf')) where k='pin_hash'`.
 - Ele quer oferecer o board pra outros clientes: logo e cores num bloco "TEMA DO CLIENTE" no CSS (+ constante AU); ícone/manifest também são do cliente.
+- **STORIES DA PROGRAMAÇÃO (Rubão, 28/11)**: quando ele pedir pra subir os stories da programação, sobem como UM post só, com os stories na ORDEM que ele disser (`files` na ordem; todos 1080x1920) → card "N STORIES EM ORDEM", dia + 09:00, sem legenda. Ele aprova e o servidor posta um depois do outro.
 - **REGRA GERAL**: TUDO que ele aprovar sobe no board (campanhas, artes próprias, vídeos). Exceção: stories que ele posta à mão e programação/foyer (só sobe se ele pedir na conversa — ex.: o carrossel do feed da programação, que é subido como um post CARROSSEL em PENDENTES).
 - **POSTAGEM MANUAL**: `fila_posts.manual` = o robô NUNCA posta; card mostra "VOCÊ POSTA" e "JÁ POSTEI".
 - Estrutura: `arquivos` = lista de `{path, url, poster, w, h, nome, kind, dur?}`. Bucket público `fila-posts` (máx. 50 MB por arquivo). Caminho FIXO `<DD-MM>/<DD-MM>_<num>/<arquivo>` (o fila_push sobrescreve a versão anterior: mesmo post, sem arquivo sobrando); + NOVO POST em `manual/`. Limites do grátis: 1 GB, ~5 GB/mês de tráfego.
 
 ## 6. Como subir lote (selo AU e varredura)
 1. `lote.json`: `{"lote": "DD-MM", "posts": [{"num","nome","filme","tipo": "POST"|"CARROSSEL"|"VIDEO","legenda_celular","legenda_pc","comprimido","files": ["/caminho"]}]}`.
-2. `FILA_TOKEN=<FILA_TOKEN — está no doc do projeto> python3 fila_push.py lote.json` (script `claude/fila-de-posts/fila_push.py` do projeto = `tools/fila_push.py` do GitHub). Precisa de ffmpeg/ffprobe.
+2. `FILA_TOKEN=<FILA_TOKEN — está no doc do projeto> python3 fila_push.py lote.json` (script `claude/fila-de-posts/fila_push.py` do projeto = `tools/fila_push.py` do GitHub). Precisa de ffmpeg/ffprobe. Capa do Reels com selo: `"capa": "/caminho/capa.jpg"` no post (vira `cover_url`).
 3. Depois, por SQL (o push não manda): `dia`, `hora`, `aviso`, `capa_ms`, `destino` quando for fixo; `dur` no json do vídeo.
 4. Arquivo > 50 MB: cópia de ~46 MB marcada `"comprimido": true`.
 Alteração de arte: mesmo lote+num+nome → substitui. Não apagar nem mexer em dia/postado sem ele pedir.

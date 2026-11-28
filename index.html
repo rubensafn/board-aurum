@@ -1237,6 +1237,11 @@ body.v-resv .daysbar,body.v-resv #fchip,body.v-resv #fab{display:none!important}
 /* v71: sem zoom por toque duplo/pinça (iPhone) */
 html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%}
 button,a,label,input,textarea{touch-action:manipulation}
+/* v71: TODO botão vermelho (apagar/sair/rejeitar) = o MESMO vermelho vivo da lixeira do card (receita v41/#FF3B3B). Inclui SAIR do menu do celular e EXCLUIR TODAS da RESV, que estavam no vermelho antigo. */
+#logout,#clrAll,.popclear,.ib.red,.clearall,.cfm.danger #cfmOk,.mmenu .mout,.rsv-top .rclear,.rclear{color:#fff!important;
+  background:linear-gradient(160deg,rgba(255,59,59,.66),rgba(200,16,16,.44)),#160606!important;
+  box-shadow:0 0 0 1px rgba(255,150,150,.9),0 0 14px rgba(255,59,59,.55),0 0 28px rgba(220,20,20,.25),inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 12px rgba(255,59,59,.25)!important;text-shadow:0 0 8px rgba(255,59,59,.6)!important;border-color:transparent!important}
+#logout svg,#clrAll svg,.popclear svg,.ib.red svg,.clearall svg,.cfm.danger #cfmOk svg,.mmenu .mout svg,.rsv-top .rclear svg,.rclear svg{color:#ffd1d1!important;filter:drop-shadow(0 0 6px rgba(255,59,59,.85))!important}
 </style>
 </head>
 <body>
