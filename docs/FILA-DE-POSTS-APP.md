@@ -3,7 +3,7 @@
 
 **ESTE DOC (projeto AURUM EDITS) É O LUGAR PRINCIPAL DAS REGRAS E DO ESTADO DO BOARD.** Regras da varredura/postagem: `claude/AUTO-POSTAGEM-AURUM.md`. Toda conversa nova lê os dois antes de mexer. Toda mudança termina atualizando AQUI. O CÓDIGO (index.html, edge function, tools) tem o principal no GitHub `rubensafn/board-aurum` (a Vercel publica de lá). O GitHub guarda também uma CÓPIA de segurança dos docs em `docs/` (ver Sincronização).
 
-Atualizado em: 28/11/2026, 03h — board **v75**, edge `fila-admin` **v21**.
+Atualizado em: 28/11/2026, 03h — board **v76**, edge `fila-admin` **v21**.
 
 ## 1. Regras do Rubão (não quebrar)
 
@@ -77,13 +77,13 @@ Atualizado em: 28/11/2026, 03h — board **v75**, edge `fila-admin` **v21**.
 - Horário = GRADE 09:00–22:00 de 30 em 30 (v71): tocar só MARCA e mostra o alcance embaixo; grava no USAR (pop-up do card) / SALVAR (editar aprovado). Nunca voltar pros 5 botões que gravavam no toque.
 - Vermelho único (v71): TODO botão de apagar/sair/rejeitar (SAIR do menu, EXCLUIR TODAS, APAGAR TODOS, lixeira, confirmar) usa o vermelho vivo da lixeira do card (`#FF3B3B`, camada v71 no fim do CSS). Botão vermelho novo entra nessa lista.
 - Pílula de horário do card (v73): SEMPRE numa linha só, na linha dela, cresce pra direita. Ordem no card: linha 1 = DIA + FEED/STORY (cabe sempre: medido 360/393); linha 2 = HORÁRIO sozinho (ao lado do dia NÃO cabe quando tem aviso: AMANHÃ 78 px + horário até 188 px > 207/240 px) — nunca quebra o texto. Mostra o % do horário com ESCALA DE CORES (pílula inteira na cor): verde ≥ +15% · turquesa +5 a +15% · azul na média (−10 a +5%) · laranja −10 a −25% · vermelho abaixo de −25% (pedido do Rubão). Estimativa = contorno TRACEJADO + "EST" lilás. Menos de 1 h de outro post de feed do dia = ⏱ laranja "30′ DO 04". Story não leva %.
-- Bolinhas + e calendário do celular no DOCK de arrastar (v75), sem espaço vazio no fim da página (`main.wrap` só 14 px + barra do iPhone). Não voltar bolinhas fixas, não abrir por toque, não pôr espiadinha.
+- DOCK do celular (v76, aprovado): etiqueta laranja + box de vidro escuro. Não voltar bolinhas fixas, não abrir por toque, sem espiadinha, sem pulinho, sem mola, alça nunca roxa/dourada/bolinha redonda. Fim da página sem sobra (`main.wrap` 14 px + barra do iPhone).
 - Sem zoom no iPhone (v71: viewport sem zoom + `touch-action` + bloqueio da pinça). Não tirar.
 
 ## 2. O que existe hoje (no ar)
 - `index.html` — board inteiro (HTML/CSS/JS num arquivo). Camadas de CSS por versão no fim do `<style>` (… v62, v63, v64/v65 no final).
 - `manifest.webmanifest` + `icons/` — modo app no celular ("Board AU", sem service worker).
-- Abas: PENDENTES · RESERVAS · APROVADOS · POSTADOS (celular: PEND · RESV · APROV · POST). Topo no PC: HORÁRIOS, FILMES, + NOVO POST, SAIR. **Topo no celular (v66): AU + abas + UM botão (grade/X) que abre, animado pra baixo, HORÁRIOS · FILMES · SAIR** (fundo escurece; toque fora fecha). + NOVO POST e calendário no celular ficam num **DOCK** (v75): alça fininha na borda direita presa a um box redondo de vidro com as duas bolinhas. **SÓ ARRASTAR** (toque na alça NÃO abre — fica perto da lixeira): arrasta pra esquerda, alça e box vêm juntos com o dedo; arrasta pra direita fecha. Também fecha ao rolar ou usar uma bolinha. Rolando, a alça some e volta quando para. Filtro de dia ligado = número na alça. Sem espiadinha (Rubão não gostou).
+- Abas: PENDENTES · RESERVAS · APROVADOS · POSTADOS (celular: PEND · RESV · APROV · POST). Topo no PC: HORÁRIOS, FILMES, + NOVO POST, SAIR. **Topo no celular (v66): AU + abas + UM botão (grade/X) que abre, animado pra baixo, HORÁRIOS · FILMES · SAIR** (fundo escurece; toque fora fecha). + NOVO POST e calendário no celular ficam num **DOCK** (v76, aprovado pelo Rubão em 28/11): ETIQUETA LARANJA (degradê #FF9A2E→#FF6A00, contorno #FFC48A, neon laranja, setinha branca com brilho laranja), reta do lado da borda/box e arredondada só do lado de fora, MESMO tamanho aberta e fechada (só ~18 px aparecem). Fechada: colada na borda direita, parada (sem pulinho). Aberta: sai de TRÁS do box. Box = cápsula de VIDRO ESCURO toda arredondada, contorno em degradê da marca, solta 12 px da borda, sombra leve; bolinhas de 42 px. **SÓ ARRASTAR** (toque não abre). Abre/fecha fluido (desliza + fade, sem mola). Fecha ao rolar ou usar uma bolinha. Alça sempre visível. Filtro de dia ligado = número na alça. Sem espiadinha.
 - **Card**: (v71) post com vários arquivos TODOS em pé (9:16) = **STORIES EM SEQUÊNCIA**: destino fixo STORY, pílula "N STORIES EM ORDEM"; saem um depois do outro, na ordem dos arquivos.
 - **Card**: capa + número + filme + box PRODUTORA (data em que a distribuidora postou, quando o post veio da varredura) + DIA + HORÁRIO + destino + status do Instagram + avisos + prévia da legenda + APROVAR + copiar / baixar / PEDIR AJUSTE / postado / lixeira — **no máximo 5 botões**. A lixeira de pendente que veio da varredura abre pop-up com 3 opções: RESERVA (volta pra aba RESV) · CANCELAR · REJEITAR (v66).
 - **Horários (v71)**: GRADE rolável 09:00 até 22:00, de 30 em 30 min (4 por linha), cada um com o alcance × média (verde = acima, vermelho = abaixo, contorno verde = os melhores). Hora com menos de 5 posts mostra a ESTIMATIVA com "EST" (vem da edge v21: vizinhos com dado + curva de uso do Instagram no Brasil). Tocar só marca: o painel embaixo mostra alcance, interações e quantos posts; ‹ 30 MIN / 30 MIN › anda meia hora; **USAR HH:MM** grava (no editar do aprovado, grava no SALVAR). OUTRO HORÁRIO (digitar) continua pra minuto quebrado. A mesma grade está no + NOVO POST. Dados: TABELA AO VIVO (`fila_config.horarios`, RPC `fila_horarios`; sem ela, a fixa `HDADOS` de 14/11). Pop-up HORÁRIOS no topo: Reels, Estático e TESTE DA NOITE (7 dias).
@@ -104,6 +104,7 @@ Atualizado em: 28/11/2026, 03h — board **v75**, edge `fila-admin` **v21**.
 - 1º post A FAZER de verdade: conferir que a varredura fez certo.
 - 1º post SEM FILME (v70) de verdade: conferir legenda (pedido > legenda original > arte/Whisper), selo dourado e que não entrou chamada de filme.
 - Vídeo deitado 16:9: confirmar que a API da Meta publica.
+- Troca da barra de rolagem do iPhone por uma nossa: DEPOIS, numa versão de teste (página rolando numa caixa; adaptar os 8 usos de scrollY — puxar pra atualizar, topo, chip, trava dos pop-ups). Não pode quebrar o puxar pra atualizar.
 - Conferir com o Rubão no iPhone: v71 (grade de horários, sem zoom, card de stories em ordem, setas de ordem no + NOVO POST).
 - 1ª sequência de stories de verdade (programação às 9h): conferir que saiu tudo, na ordem.
 - 1º Reels com capa `cover_url` de verdade: conferir a capa no grid.
@@ -134,4 +135,4 @@ Entrega de lote feito em conversa: (1) subir no board, (2) mandar no chat cada a
 - ESCURO e minimalista, neon como identidade. Fundo com luz colorida difusa + grão + vinheta.
 - Vidro só em navegação e botões; nunca brilho que corta/vaza; nada de glow branco.
 - Cinzel em títulos/rótulos, Inter no texto.
-- Topo: AU volta pro topo; aba ativa com marcador que desliza; troca de aba desliza; recarregar mantém a aba. Todos os painéis abrem como pop-up no meio da tela, fundo travado. Celular: DOCK de arrastar na borda direita com o calendário (filtro por dia) e + NOVO POST (v75); puxar pra atualizar (bolinha ciano).
+- Topo: AU volta pro topo; aba ativa com marcador que desliza; troca de aba desliza; recarregar mantém a aba. Todos os painéis abrem como pop-up no meio da tela, fundo travado. Celular: DOCK de arrastar (etiqueta laranja) na borda direita com o calendário (filtro por dia) e + NOVO POST (v76); puxar pra atualizar (bolinha ciano).
