@@ -1248,6 +1248,24 @@ button,a,label,input,textarea{touch-action:manipulation}
 .pill.hora.hwarn{color:#ffe3c8!important;border-color:rgba(255,138,31,.75)!important;background:linear-gradient(160deg,rgba(255,138,31,.30),rgba(200,80,0,.14))!important;box-shadow:0 0 12px rgba(255,138,31,.35)!important}
 .pill.hora.hwarn svg{color:#FF8A1F!important}
 .pill.hora{max-width:100%;white-space:normal}
+/* v73: horário SEMPRE numa linha só, na linha dele (embaixo do dia), cresce pra direita; cores por nível */
+.meta .hrow{flex:0 0 100%;display:flex;min-width:0}
+.pill.hora{white-space:nowrap!important;max-width:none!important;flex:none}
+.pill.hora .hpct{display:inline-flex;align-items:center;gap:5px}
+.pill.hora .hpct b{font-weight:800}.pill.hora .hpct b.up{color:#4ade80}.pill.hora .hpct b.ok{color:var(--ink-2)}.pill.hora .hpct b.w{color:#FFB36B}.pill.hora .hpct b.ww{color:#FFD2A8;text-shadow:0 0 8px rgba(255,138,31,.9)}
+.pill.hora .hpct s{text-decoration:none;font-size:.82em;font-weight:800;letter-spacing:.06em;color:#c4b5fd}
+.pill.hora .hpct em{font-style:normal;display:inline-flex;align-items:center;gap:3px;color:#FFB36B;font-weight:800}
+.pill.hora .hpct em svg{width:11px;height:11px;color:#FF8A1F!important}
+.pill.hora.hest{border-style:dashed!important}
+.pill.hora.hforte{border-color:#FF8A1F!important;background:linear-gradient(160deg,rgba(255,138,31,.48),rgba(200,80,0,.24))!important;box-shadow:0 0 16px rgba(255,138,31,.6),0 0 30px rgba(255,120,0,.25)!important}
+/* v73: ESCALA DE CORES do horário (pílula inteira na cor; número na mesma cor):
+   n1 ótimo ≥ +15% verde · n2 bom +5..+15% turquesa · n3 na média −10..+5% azul · n4 fraco −10..−25% laranja · n5 muito fraco < −25% coral · EST = contorno tracejado + EST lilás */
+.pill.hora[class*=" hn"]{--hc:#7cb8ff}
+.pill.hora.hn1{--hc:#4ade80}.pill.hora.hn2{--hc:#2dd4bf}.pill.hora.hn3{--hc:#7cb8ff}.pill.hora.hn4{--hc:#FF8A1F}.pill.hora.hn5{--hc:#ff6f7d}
+.pill.hora[class*=" hn"]{color:#fff!important;border-color:var(--hc)!important;background:linear-gradient(160deg,color-mix(in srgb,var(--hc) 34%,transparent),color-mix(in srgb,var(--hc) 12%,transparent))!important;box-shadow:0 0 12px color-mix(in srgb,var(--hc) 40%,transparent)!important}
+.pill.hora[class*=" hn"] svg{color:var(--hc)!important}
+.pill.hora .hpct b{color:var(--hc,#fff)!important;text-shadow:none!important}
+.pill.hora .hpct{border-left-color:color-mix(in srgb,var(--hc,#fff) 45%,transparent)}
 </style>
 </head>
 <body>
@@ -1386,7 +1404,7 @@ function rowHTML(p){
     : `<button class="pill day" ${t?`data-tone="${t}"`:''} data-act="day" data-id="${esc(p.id)}" aria-label="Escolher dia" ${p.aprovado||p.ig_status==='criando'?'disabled':''}>${I.cal} ${esc(dayText(p.dia))}</button>`;
   const trava = p.ig_status==='criando'||p.ig_status==='publicado';
   const hq = p.postado ? null : horaQual(p);
-  const horaPill = p.postado ? '' : `<button class="pill hora${p.hora?' set':''}${hq&&hq.warn?' hwarn':''}" data-act="hora" data-id="${esc(p.id)}" aria-label="Escolher horário" ${trava||p.aprovado?'disabled':''}>${I.clock} ${esc(p.hora||'HORÁRIO')}${hq?`<i class="hpct ${hq.c}">${hq.t}</i>`:''}</button>`;
+  const horaPill = p.postado ? '' : `<button class="pill hora${p.hora?' set':''}${hq&&hq.nivel?' h'+hq.nivel:''}${hq&&hq.est?' hest':''}" data-act="hora" data-id="${esc(p.id)}" aria-label="Escolher horário" ${trava||p.aprovado?'disabled':''}>${I.clock} ${esc(p.hora||'HORÁRIO')}${hq?`<i class="hpct ${hq.c}">${hq.t}</i>`:''}</button>`;
   const stPill = p.ig_status==='publicado' ? (p.ig_permalink?`<a class="pill igok" href="${esc(p.ig_permalink)}" data-act="igopen" data-url="${esc(p.ig_permalink)}" target="_blank" rel="noopener">${I.ig} NO INSTAGRAM ›</a>`:`<span class="pill igok">${I.ig} NO INSTAGRAM</span>`)
     : p.ig_status==='criando' ? `<span class="pill apr">${I.send} ${p.dia&&p.hora&&new Date(p.dia+'T'+p.hora+':00-03:00')>Date.now()?'PRONTO · SAI '+esc(p.hora):'POSTANDO…'}</span>`
     : p.ig_status==='erro' ? `<span class="pill erro" title="${esc(p.ig_erro||'')}">ERRO AO POSTAR</span>` : '';
@@ -1415,7 +1433,7 @@ function rowHTML(p){
       <div class="l1"><span class="num">${esc(pad(p.num??0))}</span><span class="film">${esc(p.filme||p.nome||'Post')}</span></div>
       <div class="fname">${esc(p.nome||'')}</div>
       ${p.postado_distribuidora?`<div class="rdata"><span>PRODUTORA <i>—</i> <b>${dmh(p.postado_distribuidora)}</b></span></div>`:''}
-      <div class="meta">${p.a_fazer?'<span class="pill afz">A FAZER</span>':''}${p.manual&&!p.postado?'<span class="pill man">VOCÊ POSTA</span>':''}${p.subido&&!p.postado?'<span class="pill sub">SEU POST</span>':''}${p.selo_pendente&&!p.postado?'<span class="pill selo">SELO AU PEDIDO</span>':''}${dayPill}${horaPill}${destPills}${stPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.legenda_refazer&&!p.postado?'<span class="pill apr">NOVA LEGENDA PEDIDA</span>':''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
+      <div class="meta">${p.a_fazer?'<span class="pill afz">A FAZER</span>':''}${p.manual&&!p.postado?'<span class="pill man">VOCÊ POSTA</span>':''}${p.subido&&!p.postado?'<span class="pill sub">SEU POST</span>':''}${p.selo_pendente&&!p.postado?'<span class="pill selo">SELO AU PEDIDO</span>':''}${dayPill}${horaPill?`<span class="hrow">${horaPill}</span>`:''}${destPills}${stPill}${S.copied===p.id?`<span class="pill cp">${I.check} COPIADA</span>`:''}${p.legenda_refazer&&!p.postado?'<span class="pill apr">NOVA LEGENDA PEDIDA</span>':''}${p.comprimido&&fs.length?'<span class="pill comp">COMPRIMIDO</span>':''}${p.arquivos_apagados?'<span class="pill">ARQUIVO APAGADO</span>':''}</div>
       ${p.a_fazer?`<div class="aviso aj afz">${I.link}<span><b>A FAZER · </b>a próxima varredura (11h, 15h ou 18h) baixa o link e faz${p.seguir_padrao?' no nosso padrão':''}${p.pedido_arte?': “'+esc(p.pedido_arte)+'”':'.'} <a href="${esc(p.link_origem||'')}" target="_blank" rel="noopener">ABRIR LINK ›</a></span></div>`:''}
       ${p.ajuste_pedido&&!p.postado?`<div class="aviso aj">${I.wand}<span><b>Ajuste pedido:</b> “${esc(p.ajuste_pedido)}” · sai na próxima varredura (11h, 15h ou 18h).</span></div>`:p.ajuste_resposta&&!p.postado?`<div class="aviso aj">${I.wand}<span>${esc(p.ajuste_resposta)}</span></div>`:''}
       ${p.aviso&&!p.postado?`<div class="aviso">${I.hand}<span>${esc(p.aviso)}</span></div>`:p.selo_pendente&&!p.postado?`<div class="aviso">${I.hand}<span>Selo AU pedido: entra na próxima varredura (11h, 15h ou 18h). Se o post sair antes, vai sem selo.</span></div>`:longo(p)&&!p.postado?`<div class="aviso hot">${I.hand}<span><i class="lg">Vídeo de ${durTxt(durOf(p.arquivos[0]))}: vai só no FEED. O Story não aceita +60 s, encaminha à mão.</i><i class="sm">Só FEED · story à mão</i></span></div>`:''}
@@ -1739,9 +1757,11 @@ function hpkRolar(){ document.querySelectorAll('.hpk-g').forEach(g=>{ const on=g
 const ehStory=p=>p.destino==='story'||destFixo(p)==='story';
 function horaQual(p){ if(ehStory(p)) return null; /* story não usa a tabela do feed */ if(!p.hora||!/^\d{2}:\d{2}$/.test(p.hora)) return null; const x=hv(hdOf(p),p.hora); const m=+p.hora.slice(0,2)*60+ +p.hora.slice(3);
   let perto=null; if(!ehStory(p)&&p.dia) for(const q of S.posts){ if(q===p||q.id===p.id||q.arquivado||q.dia!==p.dia||!q.hora||ehStory(q)) continue; const d=Math.abs(+q.hora.slice(0,2)*60+ +q.hora.slice(3)-m); if(d<60&&(!perto||d<perto.d)) perto={d,num:q.num}; }
-  const parts=[]; if(x) parts.push(pct(x.a)+(x.est?' EST':'')); if(perto) parts.push(perto.d+' MIN DO '+pad(perto.num??0));
-  if(!parts.length) return null; const warn=!!(perto||(x&&(x.est||x.a<.9)));
-  return {t:parts.join(' · '),warn,c:warn?'w':x&&x.a>=1.05?'up':'ok'}; }
+  /* v73: verde ≥ +5% · claro na média · laranja < −10% · laranja forte < −25% · EST = contorno tracejado (palpite) · perto de outro post = ⏱ laranja */
+  if(!x&&!perto) return null;
+  const nivel=!x?'':x.a>=1.15?'n1':x.a>=1.05?'n2':x.a>=.9?'n3':x.a>=.75?'n4':'n5';
+  const t=(x?`<b class="${nivel}">${pct(x.a)}</b>${x.est?'<s>EST</s>':''}`:'')+(perto?`<em>${I.clock}${perto.d}′ DO ${pad(perto.num??0)}</em>`:'');
+  return {t,nivel,est:!!(x&&x.est)}; }
 function horaSheetHTML(p){
   const d=hdOf(p), tags=HORAS.map(h=>hTag(d,h)), best=Math.max(...tags.map(t=>t.v??-99));
   const mx=Math.max(...d.fx.map(x=>x[1]));
