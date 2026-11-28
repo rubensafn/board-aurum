@@ -1242,6 +1242,12 @@ button,a,label,input,textarea{touch-action:manipulation}
   background:linear-gradient(160deg,rgba(255,59,59,.66),rgba(200,16,16,.44)),#160606!important;
   box-shadow:0 0 0 1px rgba(255,150,150,.9),0 0 14px rgba(255,59,59,.55),0 0 28px rgba(220,20,20,.25),inset 0 1px 0 rgba(255,255,255,.18),inset 0 0 12px rgba(255,59,59,.25)!important;text-shadow:0 0 8px rgba(255,59,59,.6)!important;border-color:transparent!important}
 #logout svg,#clrAll svg,.popclear svg,.ib.red svg,.clearall svg,.cfm.danger #cfmOk svg,.mmenu .mout svg,.rsv-top .rclear svg,.rclear svg{color:#ffd1d1!important;filter:drop-shadow(0 0 6px rgba(255,59,59,.85))!important}
+/* v72: % do horário dentro da pílula; laranja = atenção (horário fraco, estimativa ou perto de outro post) */
+.pill.hora .hpct{font-style:normal;font-weight:700;font-size:.86em;margin-left:6px;padding-left:6px;border-left:1px solid rgba(255,255,255,.18);white-space:nowrap}
+.pill.hora .hpct.up{color:#4ade80}.pill.hora .hpct.ok{color:var(--ink-2)}.pill.hora .hpct.w{color:#FFB36B}
+.pill.hora.hwarn{color:#ffe3c8!important;border-color:rgba(255,138,31,.75)!important;background:linear-gradient(160deg,rgba(255,138,31,.30),rgba(200,80,0,.14))!important;box-shadow:0 0 12px rgba(255,138,31,.35)!important}
+.pill.hora.hwarn svg{color:#FF8A1F!important}
+.pill.hora{max-width:100%;white-space:normal}
 </style>
 </head>
 <body>
@@ -1379,7 +1385,8 @@ function rowHTML(p){
   const dayPill = p.postado ? `<span class="pill done">${I.check} ${esc(postedText(p.postado_em))}</span>`
     : `<button class="pill day" ${t?`data-tone="${t}"`:''} data-act="day" data-id="${esc(p.id)}" aria-label="Escolher dia" ${p.aprovado||p.ig_status==='criando'?'disabled':''}>${I.cal} ${esc(dayText(p.dia))}</button>`;
   const trava = p.ig_status==='criando'||p.ig_status==='publicado';
-  const horaPill = p.postado ? '' : `<button class="pill hora${p.hora?' set':''}" data-act="hora" data-id="${esc(p.id)}" aria-label="Escolher horário" ${trava||p.aprovado?'disabled':''}>${I.clock} ${esc(p.hora||'HORÁRIO')}</button>`;
+  const hq = p.postado ? null : horaQual(p);
+  const horaPill = p.postado ? '' : `<button class="pill hora${p.hora?' set':''}${hq&&hq.warn?' hwarn':''}" data-act="hora" data-id="${esc(p.id)}" aria-label="Escolher horário" ${trava||p.aprovado?'disabled':''}>${I.clock} ${esc(p.hora||'HORÁRIO')}${hq?`<i class="hpct ${hq.c}">${hq.t}</i>`:''}</button>`;
   const stPill = p.ig_status==='publicado' ? (p.ig_permalink?`<a class="pill igok" href="${esc(p.ig_permalink)}" data-act="igopen" data-url="${esc(p.ig_permalink)}" target="_blank" rel="noopener">${I.ig} NO INSTAGRAM ›</a>`:`<span class="pill igok">${I.ig} NO INSTAGRAM</span>`)
     : p.ig_status==='criando' ? `<span class="pill apr">${I.send} ${p.dia&&p.hora&&new Date(p.dia+'T'+p.hora+':00-03:00')>Date.now()?'PRONTO · SAI '+esc(p.hora):'POSTANDO…'}</span>`
     : p.ig_status==='erro' ? `<span class="pill erro" title="${esc(p.ig_erro||'')}">ERRO AO POSTAR</span>` : '';
@@ -1728,6 +1735,13 @@ function hpkSet(ctx,h,id){
 }
 function nvHd(){ const f=S.nv&&S.nv.files[0]; return f&&f.kind==='video'?HDADOS.reels:HDADOS.est; }
 function hpkRolar(){ document.querySelectorAll('.hpk-g').forEach(g=>{ const on=g.querySelector('.hpt.on')||g.querySelector('.hpt.best'); if(!on) return; const passo=g.children[4]?g.children[4].offsetTop-g.children[0].offsetTop:59; g.scrollTop=Math.max(0,on.offsetTop-g.children[0].offsetTop-passo); }); }
+/* v72: % do horário em TODA pílula de horário do card; LARANJA (atenção) quando: abaixo de −10%, estimativa (EST) ou a menos de 1 h de outro post de feed do mesmo dia */
+const ehStory=p=>p.destino==='story'||destFixo(p)==='story';
+function horaQual(p){ if(ehStory(p)) return null; /* story não usa a tabela do feed */ if(!p.hora||!/^\d{2}:\d{2}$/.test(p.hora)) return null; const x=hv(hdOf(p),p.hora); const m=+p.hora.slice(0,2)*60+ +p.hora.slice(3);
+  let perto=null; if(!ehStory(p)&&p.dia) for(const q of S.posts){ if(q===p||q.id===p.id||q.arquivado||q.dia!==p.dia||!q.hora||ehStory(q)) continue; const d=Math.abs(+q.hora.slice(0,2)*60+ +q.hora.slice(3)-m); if(d<60&&(!perto||d<perto.d)) perto={d,num:q.num}; }
+  const parts=[]; if(x) parts.push(pct(x.a)+(x.est?' EST':'')); if(perto) parts.push(perto.d+' MIN DO '+pad(perto.num??0));
+  if(!parts.length) return null; const warn=!!(perto||(x&&(x.est||x.a<.9)));
+  return {t:parts.join(' · '),warn,c:warn?'w':x&&x.a>=1.05?'up':'ok'}; }
 function horaSheetHTML(p){
   const d=hdOf(p), tags=HORAS.map(h=>hTag(d,h)), best=Math.max(...tags.map(t=>t.v??-99));
   const mx=Math.max(...d.fx.map(x=>x[1]));
@@ -2217,7 +2231,7 @@ function start(){
   $('#top').hidden=false; $('#fabNovo').hidden=false; S.loaded=false; render(); load();
   rpc('fila_reservas_list',{p_pin:S.pin}).then(r=>{ S.resvN=(r||[]).length; if(!S.resv) $('#c-resv').textContent=S.resvN; }).catch(()=>{}); /* v49: só a contagem da aba RESV, 1x ao abrir o board */
   if(S.view==='resv') abrirResv();
-  rpc('fila_horarios',{p_pin:S.pin}).then(aplicarHorarios).catch(()=>{}); /* v64: tabela ao vivo, 1x ao abrir (só lê o banco, nunca a Meta) */
+  rpc('fila_horarios',{p_pin:S.pin}).then(h=>{ aplicarHorarios(h); if(S.horarios&&S.loaded){ S.sig=''; render(); } }).catch(()=>{}); /* v72: redesenha os cards com o % da tabela ao vivo */ /* v64: tabela ao vivo, 1x ao abrir (só lê o banco, nunca a Meta) */
   fetch(SB_URL+'/functions/v1/fila-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cleanup',pin:S.pin})}).then(r=>r.json()).then(r=>{ if(r&&r.apagados){S.sig='';load();} }).catch(()=>{});
   clearInterval(poll); poll=setInterval(()=>{ if(!readSession()){logout('Sessão expirada, entra de novo');return;} if(!document.hidden) load(); },30000);
 }
