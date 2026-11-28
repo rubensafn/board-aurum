@@ -3,7 +3,7 @@
 
 **ESTE DOC (projeto AURUM EDITS) É O LUGAR PRINCIPAL DAS REGRAS E DO ESTADO DO BOARD.** Regras da varredura/postagem: `claude/AUTO-POSTAGEM-AURUM.md`. Toda conversa nova lê os dois antes de mexer. Toda mudança termina atualizando AQUI. O CÓDIGO (index.html, edge function, tools) tem o principal no GitHub `rubensafn/board-aurum` (a Vercel publica de lá). O GitHub guarda também uma CÓPIA de segurança dos docs em `docs/` (ver Sincronização).
 
-Atualizado em: 28/11/2026, 03h — board **v73**, edge `fila-admin` **v21**.
+Atualizado em: 28/11/2026, 03h — board **v74**, edge `fila-admin` **v21**.
 
 ## 1. Regras do Rubão (não quebrar)
 
@@ -61,7 +61,7 @@ Atualizado em: 28/11/2026, 03h — board **v73**, edge `fila-admin` **v21**.
 - **Ícones**: traço claro (lucide, stroke 2), sem preenchimento grande. Testar no tamanho real.
 - **Ícone do app**: AU do mesmo tamanho/posição do ícone do Cortesias (~52% da largura), sem brilho interno.
 - Abas: PENDENTES amarelo-laranja · RESERVAS ciano · APROVADOS violeta · POSTADOS verde.
-- **Cards: altura MÍNIMA igual pra todos** (276 px celular / 330 px PC) e CRESCEM o quanto precisar pra caber tudo (v66) — nunca cortar botão/aviso. A prévia da legenda NÃO cresce junto: 2 linhas no celular / 4 no PC (v68); legenda inteira só no VER LEGENDA. Fim da página no celular: só o espaço das bolinhas + e calendário (v67). Pílulas (`.meta`) quebram em 2 linhas. Não usar a classe genérica `.on` em botão novo.
+- **Cards: altura MÍNIMA igual pra todos** (276 px celular / 330 px PC) e CRESCEM o quanto precisar pra caber tudo (v66) — nunca cortar botão/aviso. A prévia da legenda NÃO cresce junto: 2 linhas no celular / 4 no PC (v68); legenda inteira só no VER LEGENDA. Fim da página no celular: sem sobra (v74 — as bolinhas ficam guardadas na ABA). Pílulas (`.meta`) quebram em 2 linhas. Não usar a classe genérica `.on` em botão novo.
 
 ## 1b. JÁ CORRIGIDO — NÃO DESFAZER (conferir antes de mexer)
 - Aviso de baixo no rodapé (não subir). Confirmações sempre pop-up no centro.
@@ -77,12 +77,13 @@ Atualizado em: 28/11/2026, 03h — board **v73**, edge `fila-admin` **v21**.
 - Horário = GRADE 09:00–22:00 de 30 em 30 (v71): tocar só MARCA e mostra o alcance embaixo; grava no USAR (pop-up do card) / SALVAR (editar aprovado). Nunca voltar pros 5 botões que gravavam no toque.
 - Vermelho único (v71): TODO botão de apagar/sair/rejeitar (SAIR do menu, EXCLUIR TODAS, APAGAR TODOS, lixeira, confirmar) usa o vermelho vivo da lixeira do card (`#FF3B3B`, camada v71 no fim do CSS). Botão vermelho novo entra nessa lista.
 - Pílula de horário do card (v73): SEMPRE numa linha só, na linha dela, cresce pra direita. Ordem no card: linha 1 = DIA + FEED/STORY (cabe sempre: medido 360/393); linha 2 = HORÁRIO sozinho (ao lado do dia NÃO cabe quando tem aviso: AMANHÃ 78 px + horário até 188 px > 207/240 px) — nunca quebra o texto. Mostra o % do horário com ESCALA DE CORES (pílula inteira na cor): verde ≥ +15% · turquesa +5 a +15% · azul na média (−10 a +5%) · laranja −10 a −25% · vermelho abaixo de −25% (pedido do Rubão). Estimativa = contorno TRACEJADO + "EST" lilás. Menos de 1 h de outro post de feed do dia = ⏱ laranja "30′ DO 04". Story não leva %.
+- Bolinhas + e calendário do celular guardadas na ABA da borda direita (v74), sem espaço vazio no fim da página. Não voltar as bolinhas fixas.
 - Sem zoom no iPhone (v71: viewport sem zoom + `touch-action` + bloqueio da pinça). Não tirar.
 
 ## 2. O que existe hoje (no ar)
 - `index.html` — board inteiro (HTML/CSS/JS num arquivo). Camadas de CSS por versão no fim do `<style>` (… v62, v63, v64/v65 no final).
 - `manifest.webmanifest` + `icons/` — modo app no celular ("Board AU", sem service worker).
-- Abas: PENDENTES · RESERVAS · APROVADOS · POSTADOS (celular: PEND · RESV · APROV · POST). Topo no PC: HORÁRIOS, FILMES, + NOVO POST, SAIR. **Topo no celular (v66): AU + abas + UM botão (grade/X) que abre, animado pra baixo, HORÁRIOS · FILMES · SAIR** (fundo escurece; toque fora fecha). + NOVO POST no celular = bolinha roxa.
+- Abas: PENDENTES · RESERVAS · APROVADOS · POSTADOS (celular: PEND · RESV · APROV · POST). Topo no PC: HORÁRIOS, FILMES, + NOVO POST, SAIR. **Topo no celular (v66): AU + abas + UM botão (grade/X) que abre, animado pra baixo, HORÁRIOS · FILMES · SAIR** (fundo escurece; toque fora fecha). + NOVO POST e calendário no celular ficam guardados numa **ABA** fininha na borda direita (v74): toca ou arrasta pra esquerda → as duas bolinhas saem com mola; fecha tocando de novo, arrastando pra direita, tocando fora, rolando ou usando uma delas. Filtro de dia ligado = número na aba. Espiadinha 1x na 1ª vez.
 - **Card**: (v71) post com vários arquivos TODOS em pé (9:16) = **STORIES EM SEQUÊNCIA**: destino fixo STORY, pílula "N STORIES EM ORDEM"; saem um depois do outro, na ordem dos arquivos.
 - **Card**: capa + número + filme + box PRODUTORA (data em que a distribuidora postou, quando o post veio da varredura) + DIA + HORÁRIO + destino + status do Instagram + avisos + prévia da legenda + APROVAR + copiar / baixar / PEDIR AJUSTE / postado / lixeira — **no máximo 5 botões**. A lixeira de pendente que veio da varredura abre pop-up com 3 opções: RESERVA (volta pra aba RESV) · CANCELAR · REJEITAR (v66).
 - **Horários (v71)**: GRADE rolável 09:00 até 22:00, de 30 em 30 min (4 por linha), cada um com o alcance × média (verde = acima, vermelho = abaixo, contorno verde = os melhores). Hora com menos de 5 posts mostra a ESTIMATIVA com "EST" (vem da edge v21: vizinhos com dado + curva de uso do Instagram no Brasil). Tocar só marca: o painel embaixo mostra alcance, interações e quantos posts; ‹ 30 MIN / 30 MIN › anda meia hora; **USAR HH:MM** grava (no editar do aprovado, grava no SALVAR). OUTRO HORÁRIO (digitar) continua pra minuto quebrado. A mesma grade está no + NOVO POST. Dados: TABELA AO VIVO (`fila_config.horarios`, RPC `fila_horarios`; sem ela, a fixa `HDADOS` de 14/11). Pop-up HORÁRIOS no topo: Reels, Estático e TESTE DA NOITE (7 dias).
@@ -133,4 +134,4 @@ Entrega de lote feito em conversa: (1) subir no board, (2) mandar no chat cada a
 - ESCURO e minimalista, neon como identidade. Fundo com luz colorida difusa + grão + vinheta.
 - Vidro só em navegação e botões; nunca brilho que corta/vaza; nada de glow branco.
 - Cinzel em títulos/rótulos, Inter no texto.
-- Topo: AU volta pro topo; aba ativa com marcador que desliza; troca de aba desliza; recarregar mantém a aba. Todos os painéis abrem como pop-up no meio da tela, fundo travado. Celular: bolinha do calendário (filtro por dia) e + NOVO POST; puxar pra atualizar (bolinha ciano).
+- Topo: AU volta pro topo; aba ativa com marcador que desliza; troca de aba desliza; recarregar mantém a aba. Todos os painéis abrem como pop-up no meio da tela, fundo travado. Celular: ABA na borda direita com o calendário (filtro por dia) e + NOVO POST (v74); puxar pra atualizar (bolinha ciano).

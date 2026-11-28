@@ -1266,6 +1266,24 @@ button,a,label,input,textarea{touch-action:manipulation}
 .pill.hora[class*=" hn"] svg{color:var(--hc)!important}
 .pill.hora .hpct b{color:var(--hc,#fff)!important;text-shadow:none!important}
 .pill.hora .hpct{border-left-color:color-mix(in srgb,var(--hc,#fff) 45%,transparent)}
+/* v74: ABA na borda direita (celular): + NOVO POST e calendário ficam guardados; toca ou arrasta a aba pra abrir. Sem o espaço vazio no fim da página. */
+.dock-tab{display:none}
+@media (max-width:759px){
+  .list{padding-bottom:8px!important}
+  .dock-tab:not([hidden]){display:grid;place-items:center;position:fixed;right:0;bottom:calc(96px + env(safe-area-inset-bottom));z-index:46;width:18px;height:68px;border-radius:14px 0 0 14px;
+    background:linear-gradient(160deg,rgba(167,139,250,.55),rgba(103,232,249,.25)),rgba(14,14,20,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    box-shadow:0 0 0 1px rgba(196,181,253,.75),0 0 14px rgba(167,139,250,.5);transition:width .25s cubic-bezier(.3,1.4,.5,1),opacity .2s;touch-action:none}
+  .dock-tab i{width:7px;height:7px;border-left:2px solid #f5f3ff;border-bottom:2px solid #f5f3ff;transform:translateX(2px) rotate(45deg);transition:transform .3s;filter:drop-shadow(0 0 4px rgba(167,139,250,.9))}
+  body.dock-on .dock-tab i{transform:translateX(-1px) rotate(-135deg)}
+  .dock-tab b{position:absolute;top:-9px;left:-9px;min-width:20px;height:20px;padding:0 4px;border-radius:999px;display:grid;place-items:center;font:700 10.5px/1 var(--body);color:#fff;background:linear-gradient(160deg,#a78bfa,#7c3aed);box-shadow:0 0 0 1.5px #ddd6fe,0 0 10px rgba(167,139,250,.7)}
+  .dock-tab b[hidden]{display:none}
+  .dock-tab:active{width:24px}
+  /* bolinhas guardadas atrás da aba; saem com mola, uma depois da outra */
+  #fab:not([hidden]),.fabnovo:not([hidden]){right:30px!important;transform:translateX(90px) scale(.6)!important;opacity:0!important;pointer-events:none!important;transition:transform .42s cubic-bezier(.3,1.45,.5,1),opacity .25s!important}
+  body.dock-on #fab:not([hidden]),body.dock-on .fabnovo:not([hidden]){transform:none!important;opacity:1!important;pointer-events:auto!important}
+  body.dock-on #fab:not([hidden]){transition-delay:.06s!important}
+  body:has(.sheet.open) .dock-tab,body:has(.cfm.show) .dock-tab,body:has(.toast.show) .dock-tab,body:has(.panel.open) .dock-tab{opacity:0;pointer-events:none}
+}
 </style>
 </head>
 <body>
@@ -1297,6 +1315,7 @@ button,a,label,input,textarea{touch-action:manipulation}
 <button class="fchip glass" id="fchip" data-act="fsheet" aria-label="Filtrar por dia"></button>
 <button class="fab" id="fab" data-act="fsheet" aria-label="Filtrar por dia" hidden></button>
 <button class="fabnovo" id="fabNovo" data-act="novo" aria-label="Novo post" hidden></button>
+<button class="dock-tab" id="dockTab" aria-label="Abrir atalhos (novo post e filtro)" aria-expanded="false" hidden><i></i><b hidden></b></button>
 <main class="wrap"><div class="list" id="list"></div></main>
 <div class="sheet-bg" id="sheetBg"></div>
 <section class="sheet glass" id="sheet" role="dialog" aria-modal="true" aria-label="Detalhes do post"></section>
@@ -1466,7 +1485,7 @@ function renderDays(){
     const tn=k==='atrasados'?'late':k===t?'today':(k===tm&&v!=='done')?'tomorrow':'';
     return `<button class="dtile glass${cur===k?' on':''}" ${tn?`data-tone="${tn}"`:''} data-act="filtro" data-f="${k}" aria-pressed="${cur===k}"><span class="wn"><span class="w">${w}</span>${num?`<span class="n">(${num})</span>`:''}</span><span class="c"><i>${n(k)}</i></span></button>`;
   }).join('');
-  const fb=$('#fab'); if(fb){ fb.hidden=!S.pin; fb.innerHTML=I.cal+'<b>'+n(cur)+'</b>'; }
+  const fb=$('#fab'); if(fb){ fb.hidden=!S.pin; fb.innerHTML=I.cal+'<b>'+n(cur)+'</b>'; } if(window.dockSync) dockSync();
   const cb=$('#clrAll'), tem=v==='done'&&arr.length>0; cb.hidden=!tem; cb.disabled=false; nav.classList.toggle('has-clr',tem);
 }
 const filtrar=(arr,v)=>{const f=S.filtros[v]; return f==='todos'?arr:arr.filter(p=>keyOf(p,v)===f);};
@@ -2043,7 +2062,7 @@ function abrirIG(url){ const sc=(/instagram\.com\/(?:[^/]+\/)?(?:p|reel|reels|tv
   window.open(url,'_blank','noopener'); }
 /* ---- login ---- */
 function logout(msg){ S.pin=''; store.set('fila_sess',null); closeSheet(); showLogin(msg); }
-function showLogin(msg){ const _fb=document.getElementById('fab'); if(_fb) _fb.hidden=true; const _fn=document.getElementById('fabNovo'); if(_fn) _fn.hidden=true; closePanel();
+function showLogin(msg){ const _fb=document.getElementById('fab'); if(_fb) _fb.hidden=true; const _fn=document.getElementById('fabNovo'); if(_fn) _fn.hidden=true; const _dt=document.getElementById('dockTab'); if(_dt) _dt.hidden=true; closePanel();
   $('#top').hidden=true; clearInterval(poll);
   $('#list').innerHTML=`<form class="login glass" id="login"><div class="au">${AU}</div><strong>BOARD</strong>
     <input class="field" id="pin" type="password" autocomplete="current-password" placeholder="SENHA" aria-label="Senha" required>
@@ -2248,7 +2267,7 @@ if(!/^board\.aurumcinema\.com\.br$/.test(location.hostname)) $('#envtag').hidden
 let poll;
 function start(){
   if(!S.pin){ showLogin(); return; }
-  $('#top').hidden=false; $('#fabNovo').hidden=false; S.loaded=false; render(); load();
+  $('#top').hidden=false; $('#fabNovo').hidden=false; setTimeout(()=>window.dockSync&&dockSync(),0); S.loaded=false; render(); load();
   rpc('fila_reservas_list',{p_pin:S.pin}).then(r=>{ S.resvN=(r||[]).length; if(!S.resv) $('#c-resv').textContent=S.resvN; }).catch(()=>{}); /* v49: só a contagem da aba RESV, 1x ao abrir o board */
   if(S.view==='resv') abrirResv();
   rpc('fila_horarios',{p_pin:S.pin}).then(h=>{ aplicarHorarios(h); if(S.horarios&&S.loaded){ S.sig=''; render(); } }).catch(()=>{}); /* v72: redesenha os cards com o % da tabela ao vivo */ /* v64: tabela ao vivo, 1x ao abrir (só lê o banco, nunca a Meta) */
@@ -2270,6 +2289,20 @@ start();
 /* v71: bloqueia zoom por pinça/toque duplo no iPhone (Safari ignora user-scalable=no) */
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 /* toque duplo: resolvido pelo touch-action:manipulation (CSS v71), sem travar toques rápidos */
+/* v74: aba dos atalhos (celular) */
+(function(){ const tab=$('#dockTab'); if(!tab) return;
+  const abre=on=>{ document.body.classList.toggle('dock-on',on); tab.setAttribute('aria-expanded',on); };
+  window.dockAbre=abre;
+  tab.addEventListener('click',e=>{ e.stopPropagation(); abre(!document.body.classList.contains('dock-on')); });
+  let x0=null; tab.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; },{passive:true});
+  tab.addEventListener('touchmove',e=>{ if(x0==null) return; const dx=e.touches[0].clientX-x0; if(dx<-18){ abre(true); x0=null; } else if(dx>18){ abre(false); x0=null; } },{passive:true});
+  document.addEventListener('click',e=>{ if(document.body.classList.contains('dock-on')&&!e.target.closest('#dockTab')){ if(e.target.closest('#fab,#fabNovo')) setTimeout(()=>abre(false),60); else abre(false); } },true);
+  let sy=scrollY; window.addEventListener('scroll',()=>{ if(Math.abs(scrollY-sy)>24&&document.body.classList.contains('dock-on')) abre(false); if(!document.body.classList.contains('dock-on')) sy=scrollY; },{passive:true});
+  /* espiadinha na 1ª vez */
+  setTimeout(()=>{ if(store.get('dock_visto')||tab.hidden||innerWidth>=760) return; store.set('dock_visto','1'); abre(true); setTimeout(()=>abre(false),1400); },2200);
+})();
+function dockSync(){ const tab=$('#dockTab'); if(!tab) return; const fn=$('#fabNovo'), fb=$('#fab'); tab.hidden=!((fn&&!fn.hidden)||(fb&&!fb.hidden));
+  const b=tab.querySelector('b'), fil=S.filtros&&S.filtros[S.view]; const on=fb&&!fb.hidden&&fil&&fil!=='todos'; b.hidden=!on; if(on){ const c=fb.querySelector('b'); b.textContent=c?c.textContent:''; } }
 </script>
 </body>
 </html>
