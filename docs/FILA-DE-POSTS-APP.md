@@ -3,7 +3,7 @@
 
 **ESTE DOC (projeto AURUM EDITS) É O LUGAR PRINCIPAL DAS REGRAS E DO ESTADO DO BOARD.** Regras da varredura/postagem: `claude/AUTO-POSTAGEM-AURUM.md`. Toda conversa nova lê os dois antes de mexer. Toda mudança termina atualizando AQUI. O CÓDIGO (index.html, edge function, tools) tem o principal no GitHub `rubensafn/board-aurum` (a Vercel publica de lá). O GitHub guarda também uma CÓPIA de segurança dos docs em `docs/` (ver Sincronização).
 
-Atualizado em: 28/11/2026, 03h — board **v71**, edge `fila-admin` **v21**.
+Atualizado em: 28/11/2026, 03h — board **v72**, edge `fila-admin` **v21**.
 
 ## 1. Regras do Rubão (não quebrar)
 
@@ -76,6 +76,7 @@ Atualizado em: 28/11/2026, 03h — board **v71**, edge `fila-admin` **v21**.
 - Vídeo +60 s = só FEED + "Só FEED · story à mão" (v48), sem corte automático.
 - Horário = GRADE 09:00–22:00 de 30 em 30 (v71): tocar só MARCA e mostra o alcance embaixo; grava no USAR (pop-up do card) / SALVAR (editar aprovado). Nunca voltar pros 5 botões que gravavam no toque.
 - Vermelho único (v71): TODO botão de apagar/sair/rejeitar (SAIR do menu, EXCLUIR TODAS, APAGAR TODOS, lixeira, confirmar) usa o vermelho vivo da lixeira do card (`#FF3B3B`, camada v71 no fim do CSS). Botão vermelho novo entra nessa lista.
+- Pílula de horário do card mostra o % do horário (v72) e fica LARANJA quando: abaixo de −10%, estimativa (EST) ou a menos de 1 h de outro post de feed do mesmo dia ("30 MIN DO 04"). Story não leva %. Card cresce pra caber; nunca cortar.
 - Sem zoom no iPhone (v71: viewport sem zoom + `touch-action` + bloqueio da pinça). Não tirar.
 
 ## 2. O que existe hoje (no ar)
